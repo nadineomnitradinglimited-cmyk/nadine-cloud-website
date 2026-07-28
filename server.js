@@ -34,7 +34,17 @@ function send404(res) {
   });
 }
 
+const APEX_HOST = 'nadinecloud.com';
+const CANONICAL_HOST = 'www.nadinecloud.com';
+
 const server = http.createServer((req, res) => {
+  const host = (req.headers.host || '').split(':')[0];
+  if (host === APEX_HOST) {
+    res.writeHead(301, { Location: `https://${CANONICAL_HOST}${req.url}` });
+    res.end();
+    return;
+  }
+
   let filePath = safeJoin(ROOT, req.url === '/' ? '/index.html' : req.url);
 
   fs.stat(filePath, (err, stats) => {
