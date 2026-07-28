@@ -1,0 +1,9 @@
+{
+  "name": "nadine-cloud",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Nadine Cloud marketing site — static multi-page HTML/CSS/JS",
+  "scripts": {
+    "start": "node server.js"
+  }
+}

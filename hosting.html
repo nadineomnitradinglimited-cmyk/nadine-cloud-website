@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hosting Plans — Nadine Cloud</title>
+<meta name="description" content="Fast NVMe cPanel hosting with free SSL, daily backups and WhatsApp support. Simple pricing in Kwacha or USD — no surprises.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="canonical" href="https://nadinecloud.com/hosting.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Nadine Cloud">
+<meta property="og:title" content="Hosting Plans — Nadine Cloud">
+<meta property="og:description" content="Fast NVMe cPanel hosting with free SSL, daily backups and WhatsApp support. Simple pricing in Kwacha or USD — no surprises.">
+<meta property="og:url" content="https://nadinecloud.com/hosting.html">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Hosting Plans — Nadine Cloud">
+<meta name="twitter:description" content="Fast NVMe cPanel hosting with free SSL, daily backups and WhatsApp support. Simple pricing in Kwacha or USD — no surprises.">
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <a class="logo" href="index.html" aria-label="Nadine Cloud home">
+      <svg width="30" height="30" viewBox="0 0 30 30" fill="none" aria-hidden="true">
+        <path d="M22.5 12.2a7.5 7.5 0 0 0-14.6-1.6A6 6 0 0 0 8.5 22.5h13a5.2 5.2 0 0 0 1-10.3Z" fill="#0B1B2B"/>
+        <path d="M8.5 22.5h13a5.2 5.2 0 0 0 1-10.3 7.6 7.6 0 0 0-1.4-3" stroke="#C87533" stroke-width="2" stroke-linecap="round" fill="none"/>
+      </svg>
+      Nadine<span style="color:var(--copper)">Cloud</span>
+    </a>
+    <nav>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="services.html">Services</a></li>
+        <li><a href="hosting.html" aria-current="page">Hosting</a></li>
+        <li><a href="domains.html">Domains</a></li>
+        <li><a href="work.html">Our work</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+    </nav>
+    <div style="display:flex;gap:14px;align-items:center">
+      <div class="currency-toggle" role="group" aria-label="Currency">
+        <button id="btnZMW" onclick="setCurrency('ZMW')">ZMW</button>
+        <button id="btnUSD" onclick="setCurrency('USD')">USD</button>
+      </div>
+      <button class="menu-btn" aria-label="Menu">☰</button>
+    </div>
+  </div>
+</header>
+
+<section class="page-hero">
+  <div class="wrap page-hero-inner">
+    <span class="eyebrow">Hosting plans</span>
+    <h1>Fast, reliable hosting — with a human on WhatsApp.</h1>
+    <p>NVMe cPanel hosting with free SSL, daily backups and 99.9% uptime. Simple pricing, no surprises — pay in Kwacha or USD.</p>
+  </div>
+</section>
+
+<section class="section pricing" id="hosting">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Choose a plan</span>
+      <h2>Simple pricing, no surprises</h2>
+      <p>Every plan includes free SSL, daily backups, cPanel access and WhatsApp support. Prices shown in <span id="curLabel" style="font-family:var(--mono)">ZMW</span> — switch anytime in the top bar.</p>
+    </div>
+    <div class="plans">
+      <div class="plan">
+        <h3>Starter</h3>
+        <div class="for">For a single business website</div>
+        <div class="price"><span class="amt" data-zmw="K120" data-usd="$6"></span> <span class="per">/month</span></div>
+        <ul>
+          <li>1 website</li>
+          <li>5 GB NVMe storage</li>
+          <li>5 email accounts</li>
+          <li>Free SSL certificate</li>
+          <li>Daily backups</li>
+          <li>WhatsApp support</li>
+        </ul>
+        <a class="cta" href="contact.html">Get Starter</a>
+      </div>
+      <div class="plan featured">
+        <h3>Business</h3>
+        <div class="for">For growing companies</div>
+        <div class="price"><span class="amt" data-zmw="K240" data-usd="$12"></span> <span class="per">/month</span></div>
+        <ul>
+          <li>5 websites</li>
+          <li>20 GB NVMe storage</li>
+          <li>Unlimited email accounts</li>
+          <li>MySQL databases</li>
+          <li>Free SSL + daily backups</li>
+          <li>Priority WhatsApp support</li>
+        </ul>
+        <a class="cta" href="contact.html">Get Business</a>
+      </div>
+      <div class="plan">
+        <h3>Premium</h3>
+        <div class="for">For agencies &amp; heavy sites</div>
+        <div class="price"><span class="amt" data-zmw="K440" data-usd="$22"></span> <span class="per">/month</span></div>
+        <ul>
+          <li>Unlimited websites</li>
+          <li>50 GB NVMe storage</li>
+          <li>Unlimited email &amp; databases</li>
+          <li>Free .com domain (annual plan)</li>
+          <li>Free SSL + daily backups</li>
+          <li>Priority support</li>
+        </ul>
+        <a class="cta" href="contact.html">Get Premium</a>
+      </div>
+    </div>
+    <p class="pricing-note">* Pay monthly or save with annual billing. Mobile money, card and bank transfer accepted. ZMW prices use a fixed ~K20/$1 rate, reviewed periodically — not the daily spot rate.</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Questions</span>
+      <h2>Hosting FAQ</h2>
+      <p>Anything else, just ask us on WhatsApp.</p>
+    </div>
+    <div class="faq">
+      <details class="faq-item" open>
+        <summary>Can I upgrade my plan later?</summary>
+        <p>Yes — you can move up to a bigger plan at any time. We only charge the prorated difference for the rest of your billing cycle.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Do you migrate my existing website for free?</summary>
+        <p>Yes, if you're moving from another host we'll migrate your site, email and databases at no extra cost on Business and Premium plans.</p>
+      </details>
+      <details class="faq-item">
+        <summary>What payment methods do you accept?</summary>
+        <p>Mobile money (MTN, Airtel), bank transfer, and card payments. Invoices can be paid monthly or annually.</p>
+      </details>
+      <details class="faq-item">
+        <summary>What happens if my site goes down?</summary>
+        <p>We monitor all hosting 24/7 and target 99.9% uptime. If there's an issue, message us on WhatsApp and we'll respond the same day.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<section class="section cta-band">
+  <div class="wrap">
+    <span class="eyebrow">Ready when you are</span>
+    <h2>Get your hosting set up today</h2>
+    <p>Most accounts are activated the same day you order.</p>
+    <div class="actions">
+      <a class="btn-primary" href="contact.html">Choose a plan</a>
+      <a class="btn-ghost" href="https://wa.me/260779472695?text=Hi%20Nadine%20Cloud%2C%20I%27d%20like%20to%20sign%20up%20for%20hosting." target="_blank" rel="noopener">Chat on WhatsApp</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <h4>Nadine Cloud</h4>
+        <p>Web design, cloud hosting, domains and business email for Zambian businesses and beyond. A service of Nadine Omni Trading Limited, Darbars Mall, Lusaka.</p>
+      </div>
+      <div>
+        <h4>Services</h4>
+        <ul>
+          <li><a href="services.html">Web design</a></li>
+          <li><a href="hosting.html">Hosting plans</a></li>
+          <li><a href="domains.html">Domain registration</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Legal</h4>
+        <ul>
+          <li><a href="terms.html">Terms of service</a></li>
+          <li><a href="privacy.html">Privacy policy</a></li>
+          <li><a href="refund.html">Refund policy</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 Nadine Omni Trading Limited. All rights reserved.</span>
+      <span>Lusaka · Zambia</span>
+    </div>
+  </div>
+</footer>
+
+<script src="js/main.js"></script>
+</body>
+</html>

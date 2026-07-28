@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Domain Registration — Nadine Cloud</title>
+<meta name="description" content="Register or transfer .com, .co.zm, .org and more. Same price for registration and renewal — what you see is what you pay.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="canonical" href="https://nadinecloud.com/domains.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Nadine Cloud">
+<meta property="og:title" content="Domain Registration — Nadine Cloud">
+<meta property="og:description" content="Register or transfer .com, .co.zm, .org and more. Same price for registration and renewal — what you see is what you pay.">
+<meta property="og:url" content="https://nadinecloud.com/domains.html">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Domain Registration — Nadine Cloud">
+<meta name="twitter:description" content="Register or transfer .com, .co.zm, .org and more. Same price for registration and renewal — what you see is what you pay.">
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <a class="logo" href="index.html" aria-label="Nadine Cloud home">
+      <svg width="30" height="30" viewBox="0 0 30 30" fill="none" aria-hidden="true">
+        <path d="M22.5 12.2a7.5 7.5 0 0 0-14.6-1.6A6 6 0 0 0 8.5 22.5h13a5.2 5.2 0 0 0 1-10.3Z" fill="#0B1B2B"/>
+        <path d="M8.5 22.5h13a5.2 5.2 0 0 0 1-10.3 7.6 7.6 0 0 0-1.4-3" stroke="#C87533" stroke-width="2" stroke-linecap="round" fill="none"/>
+      </svg>
+      Nadine<span style="color:var(--copper)">Cloud</span>
+    </a>
+    <nav>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="services.html">Services</a></li>
+        <li><a href="hosting.html">Hosting</a></li>
+        <li><a href="domains.html" aria-current="page">Domains</a></li>
+        <li><a href="work.html">Our work</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+    </nav>
+    <div style="display:flex;gap:14px;align-items:center">
+      <div class="currency-toggle" role="group" aria-label="Currency">
+        <button id="btnZMW" onclick="setCurrency('ZMW')">ZMW</button>
+        <button id="btnUSD" onclick="setCurrency('USD')">USD</button>
+      </div>
+      <button class="menu-btn" aria-label="Menu">☰</button>
+    </div>
+  </div>
+</header>
+
+<section class="page-hero">
+  <div class="wrap page-hero-inner">
+    <span class="eyebrow">Domains</span>
+    <h1>Your name, your address on the internet.</h1>
+    <p>Register or transfer .com, .co.zm, .org and more. Registration and renewal at the same price — what you see is what you pay.</p>
+  </div>
+</section>
+
+<section class="section" id="domains">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Check availability</span>
+      <h2>Find your domain name</h2>
+      <p>Search a name below, then contact us to register it — we'll set up the DNS, email and hosting together.</p>
+    </div>
+    <div class="lookup" aria-label="Domain name search" style="max-width:100%">
+      <div class="lookup-bar">
+        <span class="prompt" aria-hidden="true">&gt;</span>
+        <input id="domInput" type="text" placeholder="yourbusiness" aria-label="Domain name" onkeydown="if(event.key==='Enter')lookupDomain()">
+        <button onclick="lookupDomain()">Search domain</button>
+      </div>
+      <div class="lookup-result" id="domResult">Type a name to check .com, .co.zm, .org and more</div>
+      <div class="tld-row">
+        <span class="tld">.com <b data-zmw="K280/yr" data-usd="$14/yr"></b></span>
+        <span class="tld">.co.zm <b data-zmw="K360/yr" data-usd="$18/yr"></b></span>
+        <span class="tld">.org <b data-zmw="K300/yr" data-usd="$15/yr"></b></span>
+        <span class="tld">.net <b data-zmw="K300/yr" data-usd="$15/yr"></b></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="background:var(--sky)">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Domain pricing</span>
+      <h2>All extensions, one price list</h2>
+      <p>Prices shown in <span id="curLabel" style="font-family:var(--mono)">ZMW</span> — switch anytime in the top bar. Registration and renewal are billed the same. ZMW prices use a fixed ~K20/$1 rate, reviewed periodically.</p>
+    </div>
+    <div class="table-wrap">
+      <table class="dom-table">
+        <thead><tr><th>Extension</th><th>Best for</th><th>Price / year</th></tr></thead>
+        <tbody>
+          <tr><td>.com</td><td>Any business, worldwide</td><td data-zmw="K280" data-usd="$14"></td></tr>
+          <tr><td>.co.zm</td><td>Zambian companies</td><td data-zmw="K360" data-usd="$18"></td></tr>
+          <tr><td>.org</td><td>NGOs, churches &amp; ministries</td><td data-zmw="K300" data-usd="$15"></td></tr>
+          <tr><td>.net</td><td>Tech &amp; networks</td><td data-zmw="K300" data-usd="$15"></td></tr>
+          <tr><td>.africa</td><td>Pan-African brands</td><td data-zmw="K340" data-usd="$17"></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Transfers</span>
+      <h2>Already own a domain elsewhere?</h2>
+      <p>We can transfer it in without downtime, then connect it straight to your Nadine Cloud hosting and email.</p>
+    </div>
+    <div class="process">
+      <div class="step">
+        <div class="num">01</div>
+        <h3>Unlock &amp; get your code</h3>
+        <p>We'll tell you exactly what to request from your current registrar — usually an auth/EPP code.</p>
+      </div>
+      <div class="step">
+        <div class="num">02</div>
+        <h3>We start the transfer</h3>
+        <p>Send us the code and we handle the rest. Your site keeps working throughout — no downtime.</p>
+      </div>
+      <div class="step">
+        <div class="num">03</div>
+        <h3>Connect &amp; go</h3>
+        <p>Once transferred, we point it at your hosting and set up your business email the same day.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section cta-band">
+  <div class="wrap">
+    <span class="eyebrow">Get your name</span>
+    <h2>Register or transfer your domain today</h2>
+    <p>Message us the name you want and we'll confirm availability and pricing.</p>
+    <div class="actions">
+      <a class="btn-primary" href="contact.html">Request a domain</a>
+      <a class="btn-ghost" href="https://wa.me/260779472695?text=Hi%20Nadine%20Cloud%2C%20I%27d%20like%20to%20register%20a%20domain." target="_blank" rel="noopener">Chat on WhatsApp</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <h4>Nadine Cloud</h4>
+        <p>Web design, cloud hosting, domains and business email for Zambian businesses and beyond. A service of Nadine Omni Trading Limited, Darbars Mall, Lusaka.</p>
+      </div>
+      <div>
+        <h4>Services</h4>
+        <ul>
+          <li><a href="services.html">Web design</a></li>
+          <li><a href="hosting.html">Hosting plans</a></li>
+          <li><a href="domains.html">Domain registration</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Legal</h4>
+        <ul>
+          <li><a href="terms.html">Terms of service</a></li>
+          <li><a href="privacy.html">Privacy policy</a></li>
+          <li><a href="refund.html">Refund policy</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 Nadine Omni Trading Limited. All rights reserved.</span>
+      <span>Lusaka · Zambia</span>
+    </div>
+  </div>
+</footer>
+
+<script src="js/main.js"></script>
+</body>
+</html>
