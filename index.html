@@ -40,10 +40,6 @@
       </ul>
     </nav>
     <div style="display:flex;gap:14px;align-items:center">
-      <div class="currency-toggle" role="group" aria-label="Currency">
-        <button id="btnZMW" onclick="setCurrency('ZMW')">ZMW</button>
-        <button id="btnUSD" onclick="setCurrency('USD')">USD</button>
-      </div>
       <button class="menu-btn" aria-label="Menu">☰</button>
     </div>
   </div>
@@ -67,10 +63,10 @@
       </div>
       <div class="lookup-result" id="domResult">Type a name to check .com, .co.zm, .org and more</div>
       <div class="tld-row">
-        <span class="tld">.com <b data-zmw="K280/yr" data-usd="$14/yr"></b></span>
-        <span class="tld">.co.zm <b data-zmw="K360/yr" data-usd="$18/yr"></b></span>
-        <span class="tld">.org <b data-zmw="K300/yr" data-usd="$15/yr"></b></span>
-        <span class="tld">.net <b data-zmw="K300/yr" data-usd="$15/yr"></b></span>
+        <span class="tld">.com <b>From K450/yr</b></span>
+        <span class="tld">.co.zm <b>From K650/yr</b></span>
+        <span class="tld">.org <b>From K450/yr</b></span>
+        <span class="tld">.net <b>From K500/yr</b></span>
       </div>
     </div>
   </div>
@@ -80,7 +76,7 @@
   <div class="wrap">
     <span>Free SSL on every site</span>
     <span>Daily backups</span>
-    <span>Pay in Kwacha or USD</span>
+    <span>Local Zambian support</span>
     <span>WhatsApp support</span>
   </div>
 </div>
@@ -121,53 +117,51 @@
   <div class="wrap">
     <div class="section-head">
       <span class="eyebrow">Hosting plans</span>
-      <h2>Simple pricing, no surprises</h2>
-      <p>Every plan includes free SSL, daily backups, cPanel access and WhatsApp support. Prices shown in <span id="curLabel" style="font-family:var(--mono)">ZMW</span> — switch anytime in the top bar.</p>
+      <h2>Simple annual pricing, no surprises</h2>
+      <p>Every plan includes free SSL, free website migration, cPanel access and local Zambian support. Billed annually in Zambian Kwacha.</p>
     </div>
     <div class="plans">
       <div class="plan">
-        <h3>Starter</h3>
-        <div class="for">For a single business website</div>
-        <div class="price"><span class="amt" data-zmw="K120" data-usd="$6"></span> <span class="per">/month</span></div>
+        <h3>Starter Hosting</h3>
+        <div class="for">Perfect for personal websites and startups</div>
+        <div class="price"><span class="amt">ZMW 600</span> <span class="per">/year</span></div>
         <ul>
-          <li>1 website</li>
-          <li>5 GB NVMe storage</li>
-          <li>5 email accounts</li>
-          <li>Free SSL certificate</li>
-          <li>Daily backups</li>
+          <li>1 Website</li>
+          <li>5 GB NVMe SSD Storage</li>
+          <li>5 Business Email Accounts</li>
+          <li>Free SSL Certificate</li>
+          <li>Weekly Backups</li>
         </ul>
         <a class="cta" href="contact.html">Get Starter</a>
       </div>
       <div class="plan featured">
-        <h3>Business</h3>
-        <div class="for">For growing companies</div>
-        <div class="price"><span class="amt" data-zmw="K240" data-usd="$12"></span> <span class="per">/month</span></div>
+        <h3>Business Hosting</h3>
+        <div class="for">Ideal for growing businesses</div>
+        <div class="price"><span class="amt">ZMW 1,200</span> <span class="per">/year</span></div>
         <ul>
-          <li>5 websites</li>
-          <li>20 GB NVMe storage</li>
-          <li>Unlimited email accounts</li>
-          <li>MySQL databases</li>
-          <li>Free SSL + daily backups</li>
-          <li>Priority WhatsApp support</li>
+          <li>Up to 5 Websites</li>
+          <li>20 GB NVMe SSD Storage</li>
+          <li>25 Business Email Accounts</li>
+          <li>Unmetered Bandwidth</li>
+          <li>Daily Backups + Priority Support</li>
         </ul>
         <a class="cta" href="contact.html">Get Business</a>
       </div>
       <div class="plan">
-        <h3>Premium</h3>
-        <div class="for">For agencies &amp; heavy sites</div>
-        <div class="price"><span class="amt" data-zmw="K440" data-usd="$22"></span> <span class="per">/month</span></div>
+        <h3>Professional Hosting</h3>
+        <div class="for">For businesses with multiple websites</div>
+        <div class="price"><span class="amt">ZMW 2,400</span> <span class="per">/year</span></div>
         <ul>
-          <li>Unlimited websites</li>
-          <li>50 GB NVMe storage</li>
-          <li>Unlimited email &amp; databases</li>
-          <li>Free .com domain (annual plan)</li>
-          <li>Free SSL + daily backups</li>
-          <li>Priority support</li>
+          <li>Unlimited Websites</li>
+          <li>50 GB NVMe SSD Storage</li>
+          <li>Unlimited Business Email Accounts</li>
+          <li>Unmetered Bandwidth</li>
+          <li>Daily Backups + Priority Support</li>
         </ul>
-        <a class="cta" href="contact.html">Get Premium</a>
+        <a class="cta" href="contact.html">Get Professional</a>
       </div>
     </div>
-    <p class="pricing-note">* Pay monthly or save with annual billing. Mobile money, card and bank transfer accepted. ZMW prices use a fixed ~K20/$1 rate, reviewed periodically. See <a href="hosting.html" style="color:var(--copper-bright)">full plan details</a>.</p>
+    <p class="pricing-note">* Prices billed annually. Mobile money, card and bank transfer accepted. See <a href="hosting.html" style="color:var(--copper-bright)">full plan details, email hosting &amp; reseller hosting</a>.</p>
   </div>
 </section>
 
@@ -179,9 +173,9 @@
       <p>A few of the platforms and websites designed and delivered by our team. <a href="work.html" style="color:var(--copper)">See the full portfolio →</a></p>
     </div>
     <div class="portfolio-grid">
-      <div class="work"><b>Nadine Express Cargo</b><span>Freight forwarding platform with live tracking and AI chat support.</span><br><span class="tag">Logistics</span></div>
-      <div class="work"><b>OpticZone</b><span>Patient management system and public website for a two-branch eye clinic.</span><br><span class="tag">Healthcare</span></div>
-      <div class="work"><b>MarjoRx Pharmacy</b><span>Brand website with a distinctive prescription-label design concept.</span><br><span class="tag">Pharmacy</span></div>
+      <div class="work"><b>Royal South Luangwa Safari Lodge</b><span>Luxury safari lodge website with a modern responsive design and Progressive Web App (PWA).</span><br><span class="tag">Tourism</span></div>
+      <div class="work"><b>Nadine Express Cargo</b><span>Freight forwarding and cargo tracking platform with shipment management and customer services.</span><br><span class="tag">Logistics</span></div>
+      <div class="work"><b>Optic Zone Opticians</b><span>Patient management system with appointment scheduling, prescriptions, customer database, and reporting.</span><br><span class="tag">Healthcare</span></div>
     </div>
   </div>
 </section>

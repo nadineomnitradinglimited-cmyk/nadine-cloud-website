@@ -5,30 +5,6 @@
   if (btn && links) btn.addEventListener('click', () => links.classList.toggle('open'));
 })();
 
-/* ---------- currency ---------- */
-let currency = 'USD';
-function detectCurrency(){
-  try{
-    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
-    const lang = (navigator.language || '').toLowerCase();
-    if (tz === 'Africa/Lusaka' || lang.endsWith('-zm')) return 'ZMW';
-  }catch(e){}
-  return 'USD';
-}
-function setCurrency(c){
-  currency = c;
-  const zmwBtn = document.getElementById('btnZMW');
-  const usdBtn = document.getElementById('btnUSD');
-  if (zmwBtn) zmwBtn.classList.toggle('active', c==='ZMW');
-  if (usdBtn) usdBtn.classList.toggle('active', c==='USD');
-  const label = document.getElementById('curLabel');
-  if (label) label.textContent = c === 'ZMW' ? 'Zambian Kwacha (ZMW)' : 'US Dollars (USD)';
-  document.querySelectorAll('[data-zmw]').forEach(el=>{
-    el.textContent = c==='ZMW' ? el.dataset.zmw : el.dataset.usd;
-  });
-}
-setCurrency(detectCurrency());
-
 /* ---------- domain lookup (visual demo until WHMCS is connected) ---------- */
 function lookupDomain(){
   const input = document.getElementById('domInput');
@@ -38,8 +14,7 @@ function lookupDomain(){
   if(!raw){ out.textContent = 'Type a name to check .com, .co.zm, .org and more'; return; }
   out.innerHTML = 'Checking ' + raw + '…';
   setTimeout(()=>{
-    const price = currency==='ZMW' ? 'K350/yr' : '$14/yr';
-    out.innerHTML = '<span class="ok">●</span> ' + raw + '.com — contact us to register from ' + price +
+    out.innerHTML = '<span class="ok">●</span> ' + raw + '.com — contact us to register from ZMW 450/yr' +
       ' &nbsp;·&nbsp; <a href="contact.html" style="color:#E08A3C">Order now</a>';
   }, 600);
 }
