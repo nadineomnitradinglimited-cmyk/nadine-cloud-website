@@ -132,14 +132,24 @@ header{position:sticky;top:0;z-index:50;background:rgba(247,249,251,.92);backdro
 .faq-item[open] summary::after{content:"–"}
 .faq-item p{padding:0 22px 18px;font-size:14.5px;color:#41566B}
 
-/* ---------- domains table ---------- */
-.dom-table{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden}
-.dom-table th,.dom-table td{padding:14px 20px;text-align:left;font-size:15px}
-.dom-table th{background:var(--sky);font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#2A3E52}
-.dom-table td{border-top:1px solid var(--line)}
-.dom-table td:first-child{font-family:var(--mono);font-weight:600}
-.dom-table td:last-child{font-family:var(--mono);color:var(--copper)}
-.table-wrap{overflow-x:auto}
+/* ---------- domain TLD cards ---------- */
+.tld-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:18px}
+.tld-card{position:relative;background:#fff;border:1px solid var(--line);border-radius:14px;padding:30px 22px 26px;text-align:center;transition:transform .2s,box-shadow .2s}
+.tld-card:hover{transform:translateY(-4px);box-shadow:0 16px 40px rgba(11,27,43,.08)}
+.tld-card .badge{position:absolute;top:-11px;left:50%;transform:translateX(-50%);background:var(--copper);color:#fff;font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;padding:3px 12px;border-radius:999px;white-space:nowrap}
+.tld-card .ext{display:block;font-family:var(--display);font-size:26px;font-weight:800;color:var(--ink);margin-bottom:14px}
+.tld-card .price{margin-bottom:20px}
+.tld-card .from{display:block;font-family:var(--mono);font-size:11px;color:#8FA3B5;text-transform:uppercase;letter-spacing:.06em}
+.tld-card .amt{font-family:var(--display);font-size:22px;font-weight:800;color:var(--ink)}
+.tld-card .per{font-family:var(--mono);font-size:13px;color:#8FA3B5}
+.tld-card .cta{display:block}
+
+/* ---------- cross-sell ---------- */
+.cross-sell{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:16px}
+.cross-sell a{display:flex;flex-direction:column;gap:6px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:22px;text-decoration:none;color:inherit;transition:transform .2s,box-shadow .2s}
+.cross-sell a:hover{transform:translateY(-3px);box-shadow:0 16px 40px rgba(11,27,43,.08)}
+.cross-sell a b{font-family:var(--display);font-size:16px;color:var(--ink)}
+.cross-sell a span{font-size:13.5px;color:#41566B}
 
 /* ---------- portfolio ---------- */
 .portfolio-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
