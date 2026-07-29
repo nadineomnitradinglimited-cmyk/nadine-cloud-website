@@ -46,6 +46,10 @@ header{position:sticky;top:0;z-index:50;background:rgba(247,249,251,.92);backdro
   .menu-btn{display:block}
 }
 
+/* ---------- promo banner ---------- */
+.promo-banner{line-height:0}
+.promo-banner img{width:100%;height:auto;display:block}
+
 /* ---------- hero ---------- */
 .hero{background:var(--ink);color:var(--cloud);position:relative;overflow:hidden}
 .hero::before{content:"";position:absolute;inset:0;background:
