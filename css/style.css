@@ -52,7 +52,7 @@ header{position:sticky;top:0;z-index:50;background:rgba(247,249,251,.92);backdro
   color:var(--cloud);position:relative;overflow:hidden}
 .hero::before{content:"";position:absolute;inset:0;background:
   radial-gradient(600px 300px at 85% 20%,rgba(200,117,51,.12),transparent 70%);pointer-events:none}
-.hero-inner{position:relative;padding:96px 0 110px;max-width:760px}
+.hero-inner{position:relative;padding:96px 24px 110px clamp(24px,6vw,96px);max-width:760px}
 @media(max-width:760px){
   .hero{background:
     linear-gradient(180deg,rgba(11,27,43,.96) 0%,rgba(11,27,43,.9) 55%,rgba(11,27,43,.75) 100%),
