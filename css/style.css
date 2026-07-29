@@ -72,13 +72,13 @@ header{position:sticky;top:0;z-index:50;background:rgba(247,249,251,.92);backdro
 .page-hero p{font-size:17px;color:#B9C7D4;max-width:560px}
 
 /* domain lookup — signature element */
-.lookup{background:var(--ink-soft);border:1px solid var(--line-light);border-radius:14px;padding:18px 18px 14px;max-width:640px;box-shadow:0 24px 60px rgba(0,0,0,.35)}
+.lookup{background:var(--ink-soft);border:1px solid var(--line-light);border-radius:0;padding:18px 18px 14px;max-width:640px;margin:0 auto;box-shadow:0 24px 60px rgba(0,0,0,.35)}
 .lookup-bar{display:flex;gap:10px}
 .lookup-bar .prompt{font-family:var(--mono);color:var(--copper-bright);align-self:center;font-weight:600}
 .lookup-bar input{flex:1;background:transparent;border:none;color:var(--cloud);font-family:var(--mono);font-size:16px;padding:10px 4px}
 .lookup-bar input::placeholder{color:#5E7387}
 .lookup-bar input:focus{outline:none}
-.lookup-bar button{background:var(--copper);border:none;color:#fff;font-weight:600;font-family:var(--body);padding:10px 22px;border-radius:9px;font-size:15px;transition:background .2s}
+.lookup-bar button{background:var(--copper);border:none;color:#fff;font-weight:600;font-family:var(--body);padding:10px 22px;border-radius:0;font-size:15px;transition:background .2s}
 .lookup-bar button:hover{background:var(--copper-bright)}
 .lookup-result{font-family:var(--mono);font-size:13px;margin-top:12px;padding-top:12px;border-top:1px dashed var(--line-light);color:#8FA3B5;min-height:22px}
 .lookup-result .ok{color:#6FCF97}
