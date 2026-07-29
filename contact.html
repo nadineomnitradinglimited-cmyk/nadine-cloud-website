@@ -63,18 +63,50 @@
   <div class="wrap">
     <div class="contact-grid">
       <div class="contact-card">
-        <h3>Visit or call</h3>
-        <p><strong>Nadine Cloud</strong><br>A service of Nadine Omni Trading Limited<br>Darbars Mall, Lusaka, Zambia</p>
-        <a class="mono" href="mailto:info@nadinecloud.com">info@nadinecloud.com</a><br>
-        <a class="mono" href="tel:+260779472695">+260 77 947 2695</a>
-        <br>
-        <a class="btn-wa" href="https://wa.me/260779472695?text=Hi%20Nadine%20Cloud%2C%20I%27d%20like%20to%20get%20my%20business%20online." target="_blank" rel="noopener">Chat on WhatsApp</a>
+        <h3>Send us a message</h3>
+        <form id="contactForm" class="contact-form">
+          <input type="hidden" name="access_key" value="fed74812-296d-4a5e-9f14-c3a5219c5657">
+          <input type="hidden" name="subject" value="New enquiry from nadinecloud.com">
+          <input type="checkbox" name="botcheck" class="hp" tabindex="-1" autocomplete="off">
+          <label>Name
+            <input type="text" name="name" required>
+          </label>
+          <label>Email
+            <input type="email" name="email" required>
+          </label>
+          <label>Phone (optional)
+            <input type="tel" name="phone">
+          </label>
+          <label>I'm interested in
+            <select name="interest">
+              <option>Web design</option>
+              <option>Hosting</option>
+              <option>Domain registration</option>
+              <option>Not sure yet</option>
+            </select>
+          </label>
+          <label>Message
+            <textarea name="message" rows="5" required></textarea>
+          </label>
+          <button type="submit" class="btn-primary">Send message</button>
+          <p id="formStatus" class="form-status" role="status" aria-live="polite"></p>
+        </form>
       </div>
-      <div class="contact-card">
-        <h3>How ordering works</h3>
-        <p><strong>1.</strong> Choose a plan or request a website quote.</p>
-        <p><strong>2.</strong> We confirm your order and send an invoice — pay by mobile money, card or bank transfer.</p>
-        <p><strong>3.</strong> Your hosting is set up the same day, and design projects start within 48 hours.</p>
+      <div style="display:flex;flex-direction:column;gap:24px">
+        <div class="contact-card">
+          <h3>Visit or call</h3>
+          <p><strong>Nadine Cloud</strong><br>A service of Nadine Omni Trading Limited<br>Darbars Mall, Lusaka, Zambia</p>
+          <a class="mono" href="mailto:info@nadinecloud.com">info@nadinecloud.com</a><br>
+          <a class="mono" href="tel:+260779472695">+260 77 947 2695</a>
+          <br>
+          <a class="btn-wa" href="https://wa.me/260779472695?text=Hi%20Nadine%20Cloud%2C%20I%27d%20like%20to%20get%20my%20business%20online." target="_blank" rel="noopener">Chat on WhatsApp</a>
+        </div>
+        <div class="contact-card">
+          <h3>How ordering works</h3>
+          <p><strong>1.</strong> Choose a plan or request a website quote.</p>
+          <p><strong>2.</strong> We confirm your order and send an invoice — pay by mobile money, card or bank transfer.</p>
+          <p><strong>3.</strong> Your hosting is set up the same day, and design projects start within 48 hours.</p>
+        </div>
       </div>
     </div>
   </div>

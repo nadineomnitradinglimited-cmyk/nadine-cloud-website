@@ -157,6 +157,19 @@ header{position:sticky;top:0;z-index:50;background:rgba(247,249,251,.92);backdro
 .btn-wa{display:inline-block;margin-top:14px;background:var(--ok);color:#fff;text-decoration:none;font-weight:600;padding:12px 24px;border-radius:10px}
 .btn-wa:hover{filter:brightness(1.08)}
 
+/* ---------- contact form ---------- */
+.contact-form{display:flex;flex-direction:column;gap:16px}
+.contact-form label{display:flex;flex-direction:column;gap:6px;font-size:13.5px;font-weight:600;color:#2A3E52}
+.contact-form input,.contact-form select,.contact-form textarea{font-family:var(--body);font-size:15px;padding:11px 13px;border:1px solid var(--line);border-radius:8px;background:var(--cloud);color:var(--ink)}
+.contact-form input:focus,.contact-form select:focus,.contact-form textarea:focus{border-color:var(--copper)}
+.contact-form textarea{resize:vertical;min-height:110px;font-weight:400}
+.contact-form button{align-self:flex-start;border:none}
+.contact-form button:disabled{opacity:.6;cursor:not-allowed}
+.form-status{font-size:14px;min-height:20px;font-weight:500}
+.form-status.ok{color:var(--ok)}
+.form-status.err{color:#B3331D}
+.hp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
+
 /* ---------- CTA band ---------- */
 .cta-band{background:var(--sky);text-align:center}
 .cta-band h2{margin-top:0}

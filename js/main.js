@@ -44,6 +44,47 @@ function lookupDomain(){
   }, 600);
 }
 
+/* ---------- contact form ---------- */
+(function(){
+  const form = document.getElementById('contactForm');
+  if (!form) return;
+  const status = document.getElementById('formStatus');
+  const btn = form.querySelector('button[type="submit"]');
+
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    status.textContent = '';
+    status.className = 'form-status';
+    btn.disabled = true;
+    btn.textContent = 'Sending…';
+
+    fetch('https://api.web3forms.com/submit', {
+      method: 'POST',
+      headers: { 'Accept': 'application/json' },
+      body: new FormData(form)
+    })
+      .then(res => res.json())
+      .then(result => {
+        if (result.success) {
+          form.reset();
+          status.textContent = "Thanks — we've got your message and will reply the same day.";
+          status.classList.add('ok');
+        } else {
+          status.textContent = 'Something went wrong sending that. Please try WhatsApp or email instead.';
+          status.classList.add('err');
+        }
+      })
+      .catch(() => {
+        status.textContent = 'Something went wrong sending that. Please try WhatsApp or email instead.';
+        status.classList.add('err');
+      })
+      .finally(() => {
+        btn.disabled = false;
+        btn.textContent = 'Send message';
+      });
+  });
+})();
+
 /* ---------- typing placeholder animation ---------- */
 (function(){
   const names = ['yourbusiness','myshop','ourchurch','lusakaclinic'];
