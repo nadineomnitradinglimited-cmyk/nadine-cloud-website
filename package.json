@@ -5,5 +5,8 @@
   "description": "Nadine Cloud marketing site — static multi-page HTML/CSS/JS",
   "scripts": {
     "start": "node server.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.70.0"
   }
 }

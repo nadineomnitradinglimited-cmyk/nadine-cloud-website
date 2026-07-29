@@ -1,6 +1,7 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
+const { handleChat } = require('./chat');
 
 const ROOT = __dirname;
 const PORT = process.env.PORT || 3000;
@@ -42,6 +43,11 @@ const server = http.createServer((req, res) => {
   if (host === APEX_HOST) {
     res.writeHead(301, { Location: `https://${CANONICAL_HOST}${req.url}` });
     res.end();
+    return;
+  }
+
+  if (req.method === 'POST' && req.url === '/api/chat') {
+    handleChat(req, res);
     return;
   }
 
