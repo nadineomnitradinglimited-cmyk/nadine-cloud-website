@@ -32,6 +32,7 @@ header{position:sticky;top:0;z-index:50;background:rgba(247,249,251,.92);backdro
 .nav{display:flex;align-items:center;justify-content:space-between;height:68px}
 .logo{display:flex;align-items:center;gap:10px;font-family:var(--display);font-weight:800;font-size:20px;text-decoration:none;letter-spacing:-.01em}
 .logo svg{flex:none}
+.logo img{height:38px;width:auto;display:block}
 .nav-links{display:flex;gap:28px;align-items:center;list-style:none}
 .nav-links a{text-decoration:none;font-weight:500;font-size:15px;color:#2A3E52}
 .nav-links a:hover,.nav-links a[aria-current="page"]{color:var(--copper)}
