@@ -52,7 +52,8 @@ header{position:sticky;top:0;z-index:50;background:rgba(247,249,251,.92);backdro
   color:var(--cloud);position:relative;overflow:hidden}
 .hero::before{content:"";position:absolute;inset:0;background:
   radial-gradient(600px 300px at 85% 20%,rgba(200,117,51,.12),transparent 70%);pointer-events:none}
-.hero-inner{position:relative;padding:96px 24px 110px clamp(24px,6vw,96px);max-width:760px}
+.hero-inner{position:relative;padding:96px 24px 0 clamp(24px,6vw,96px);max-width:760px}
+.lookup-wrap{position:relative;padding:40px 24px 110px;display:flex;justify-content:center}
 @media(max-width:760px){
   .hero{background:
     linear-gradient(180deg,rgba(11,27,43,.96) 0%,rgba(11,27,43,.9) 55%,rgba(11,27,43,.75) 100%),
@@ -72,7 +73,7 @@ header{position:sticky;top:0;z-index:50;background:rgba(247,249,251,.92);backdro
 .page-hero p{font-size:17px;color:#B9C7D4;max-width:560px}
 
 /* domain lookup — signature element */
-.lookup{background:var(--ink-soft);border:1px solid var(--line-light);border-radius:0;padding:18px 18px 14px;max-width:640px;margin:0 auto;box-shadow:0 24px 60px rgba(0,0,0,.35)}
+.lookup{background:var(--ink-soft);border:1px solid var(--line-light);border-radius:0;padding:16px 20px 12px;width:100%;max-width:760px;box-shadow:0 24px 60px rgba(0,0,0,.35)}
 .lookup-bar{display:flex;gap:10px}
 .lookup-bar .prompt{font-family:var(--mono);color:var(--copper-bright);align-self:center;font-weight:600}
 .lookup-bar input{flex:1;background:transparent;border:none;color:var(--cloud);font-family:var(--mono);font-size:16px;padding:10px 4px}
