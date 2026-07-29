@@ -44,11 +44,21 @@ header{position:sticky;top:0;z-index:50;background:rgba(247,249,251,.92);backdro
 }
 
 /* ---------- hero ---------- */
-.hero{background:var(--ink);color:var(--cloud);position:relative;overflow:hidden}
+.hero{
+  background:
+    linear-gradient(90deg,rgba(11,27,43,.96) 0%,rgba(11,27,43,.88) 38%,rgba(11,27,43,.55) 65%,rgba(11,27,43,.25) 100%),
+    url(/assets/hero-bg.jpg) center right/cover no-repeat,
+    var(--ink);
+  color:var(--cloud);position:relative;overflow:hidden}
 .hero::before{content:"";position:absolute;inset:0;background:
-  radial-gradient(600px 300px at 85% 20%,rgba(200,117,51,.18),transparent 70%),
-  radial-gradient(500px 320px at 10% 90%,rgba(220,233,242,.07),transparent 70%);pointer-events:none}
+  radial-gradient(600px 300px at 85% 20%,rgba(200,117,51,.12),transparent 70%);pointer-events:none}
 .hero-inner{position:relative;padding:96px 0 110px;max-width:760px}
+@media(max-width:760px){
+  .hero{background:
+    linear-gradient(180deg,rgba(11,27,43,.96) 0%,rgba(11,27,43,.9) 55%,rgba(11,27,43,.75) 100%),
+    url(/assets/hero-bg.jpg) center/cover no-repeat,
+    var(--ink)}
+}
 .hero h1{font-size:clamp(38px,6vw,64px);font-weight:800;letter-spacing:-.02em;margin:14px 0 20px}
 .hero h1 em{font-style:normal;color:var(--copper-bright)}
 .hero p.lead{font-size:19px;color:#B9C7D4;max-width:560px;margin-bottom:40px}
