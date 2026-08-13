@@ -87,6 +87,12 @@ header{position:sticky;top:0;z-index:50;background:rgba(247,249,251,.92);backdro
 .tld{font-family:var(--mono);font-size:12px;border:1px solid var(--line-light);border-radius:999px;padding:4px 12px;color:#B9C7D4}
 .tld b{color:var(--copper-bright);font-weight:600}
 
+/* ---------- stats bar ---------- */
+.stats-bar{background:var(--ink);padding:52px 0}
+.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:28px;text-align:center}
+.stat .num{display:block;font-family:var(--display);font-weight:800;font-size:clamp(28px,4vw,42px);color:var(--copper-bright);letter-spacing:-.02em}
+.stat .label{display:block;margin-top:6px;font-family:var(--mono);font-size:12px;letter-spacing:.05em;color:#B9C7D4;text-transform:uppercase}
+
 /* ---------- trust strip ---------- */
 .strip{background:var(--sky);padding:18px 0;border-bottom:1px solid var(--line)}
 .strip .wrap{display:flex;gap:28px;flex-wrap:wrap;justify-content:center;font-family:var(--mono);font-size:12.5px;letter-spacing:.04em;color:#2A3E52}
@@ -146,11 +152,14 @@ header{position:sticky;top:0;z-index:50;background:rgba(247,249,251,.92);backdro
 .plan .cta{display:block;text-align:center;text-decoration:none;background:transparent;border:1.5px solid var(--copper);color:var(--copper-bright);font-weight:600;padding:12px;border-radius:10px;transition:background .2s,color .2s}
 .plan .cta:hover,.plan.featured .cta{background:var(--copper);color:#fff}
 .pricing-note{margin-top:26px;font-size:13.5px;color:#8FA3B5;font-family:var(--mono)}
+.price-note{display:block;margin-top:4px;font-family:var(--mono);font-size:11.5px;color:#8FA3B5}
+.offer-price .price-note{color:#8FA3B5}
 
 /* ---------- included checklist ---------- */
-.included-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px 28px}
-.included-grid div{font-size:14.5px;font-weight:500;color:#2A3E52;display:flex;align-items:center;gap:9px}
-.included-grid div::before{content:"✓";color:var(--ok);font-weight:700;flex:none}
+.included-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px}
+.included-grid div{background:#fff;border:1px solid var(--line);border-radius:12px;padding:18px 20px;font-size:14.5px;font-weight:600;color:#2A3E52;display:flex;align-items:center;gap:14px;transition:transform .2s,box-shadow .2s,border-color .2s}
+.included-grid div:hover{transform:translateY(-3px);box-shadow:0 14px 34px rgba(11,27,43,.07);border-color:rgba(46,125,91,.3)}
+.included-grid div::before{content:"✓";color:var(--ok);font-weight:800;flex:none;width:30px;height:30px;border-radius:50%;background:rgba(46,125,91,.12);display:flex;align-items:center;justify-content:center;font-size:14px}
 
 /* ---------- FAQ ---------- */
 .faq{border:1px solid var(--line);border-radius:14px;background:#fff;overflow:hidden}
@@ -190,7 +199,9 @@ header{position:sticky;top:0;z-index:50;background:rgba(247,249,251,.92);backdro
 
 /* ---------- chip row ---------- */
 .chip-row{display:flex;flex-wrap:wrap;gap:10px}
-.chip{background:#fff;border:1px solid var(--line);border-radius:999px;padding:9px 18px;font-size:14px;font-weight:500;color:#2A3E52}
+.chip{background:#fff;border:1px solid var(--line);border-radius:999px;padding:10px 18px 10px 15px;font-size:14px;font-weight:500;color:#2A3E52;display:inline-flex;align-items:center;gap:9px;transition:transform .18s,box-shadow .18s,border-color .18s}
+.chip::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--copper);flex:none}
+.chip:hover{transform:translateY(-3px);box-shadow:0 10px 26px rgba(11,27,43,.08);border-color:rgba(200,117,51,.35)}
 
 /* ---------- contact ---------- */
 .contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:start}
