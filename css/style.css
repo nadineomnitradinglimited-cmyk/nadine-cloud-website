@@ -294,14 +294,20 @@ header{position:sticky;top:0;z-index:50;background:rgba(11,18,32,.86);backdrop-f
 
 /* ---------- global reach ---------- */
 .network-section{background:var(--sky);position:relative;overflow:hidden}
-.network-grid{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center}
-@media(max-width:860px){.network-grid{grid-template-columns:1fr}}
-.network-copy p{color:var(--text-soft);margin-bottom:24px;max-width:480px}
-.network-list{display:grid;gap:12px}
+.network-section .section-head{max-width:680px}
+.network-section .section-head p{color:var(--text-soft)}
+.network-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
 .network-list div{display:flex;align-items:center;gap:10px;font-size:14.5px;color:var(--text-soft)}
 .network-list div::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--copper-bright);flex:none}
-.network-visual svg{width:100%;height:auto;max-width:440px;display:block;margin:0 auto}
-@media(max-width:860px){.network-visual{order:-1;max-width:320px;margin:0 auto}}
+
+/* ---------- world map ---------- */
+.world-map{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 12px 30px rgba(0,0,0,.3)}
+.world-map svg{width:100%;height:auto;display:block}
+.world-map .land{fill:rgba(200,117,51,.20);stroke:rgba(247,249,251,.3);stroke-width:.6;transition:fill .25s;cursor:pointer}
+.world-map .land:hover{fill:rgba(200,117,51,.4)}
+.flow-line{animation:dash-flow 3.5s linear infinite;pointer-events:none}
+.map-node{pointer-events:none}
+@keyframes dash-flow{to{stroke-dashoffset:-48}}
 
 /* ---------- trust strip ---------- */
 .trust-strip{padding:36px 0;text-align:center;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
@@ -360,5 +366,9 @@ footer a:hover{color:var(--copper-bright)}
   .chat-widget{right:14px;bottom:14px}
   .chat-panel{width:calc(100vw - 28px);height:calc(100vh - 110px)}
 }
+
+/* ---------- scroll reveal ---------- */
+.reveal{opacity:0;transform:translateY(22px);transition:opacity .7s ease,transform .7s ease}
+.reveal.in-view{opacity:1;transform:translateY(0)}
 
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto}}

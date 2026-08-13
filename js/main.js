@@ -60,6 +60,64 @@ function lookupDomain(){
   });
 })();
 
+/* ---------- scroll reveal ---------- */
+(function(){
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  if (!('IntersectionObserver' in window)) return;
+  const targets = document.querySelectorAll('.section, .stats-bar, .strip, .trust-strip, .cta-band');
+  if (!targets.length) return;
+  targets.forEach(el => el.classList.add('reveal'));
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('in-view');
+        io.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.12 });
+  targets.forEach(el => io.observe(el));
+})();
+
+/* ---------- count-up stats ---------- */
+(function(){
+  const nums = document.querySelectorAll('.stat .num[data-count]');
+  if (!nums.length) return;
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function animate(el){
+    const target = parseFloat(el.getAttribute('data-count'));
+    const suffix = el.getAttribute('data-suffix') || '';
+    const decimals = (el.getAttribute('data-count').split('.')[1] || '').length;
+    if (reduced || !('IntersectionObserver' in window)) {
+      el.textContent = target.toFixed(decimals) + suffix;
+      return;
+    }
+    const duration = 1200;
+    const start = performance.now();
+    function tick(now){
+      const p = Math.min(1, (now - start) / duration);
+      const eased = 1 - Math.pow(1 - p, 3);
+      el.textContent = (target * eased).toFixed(decimals) + suffix;
+      if (p < 1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  }
+
+  if (!('IntersectionObserver' in window)) {
+    nums.forEach(animate);
+    return;
+  }
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        animate(entry.target);
+        io.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.4 });
+  nums.forEach(el => io.observe(el));
+})();
+
 /* ---------- typing placeholder animation ---------- */
 (function(){
   const names = ['yourbusiness','myshop','ourchurch','lusakaclinic'];
