@@ -32,14 +32,22 @@
     <nav>
       <ul class="nav-links" id="navLinks">
         <li><a href="index.html">Home</a></li>
-        <li><a href="services.html">Services</a></li>
-        <li><a href="hosting.html">Hosting</a></li>
-        <li><a href="domains.html">Domains</a></li>
+        <li class="has-dropdown">
+          <a href="services.html">Products <span class="nav-caret">▾</span></a>
+          <div class="nav-dropdown">
+            <a href="services.html">Web Design</a>
+            <a href="hosting.html">Cloud Hosting</a>
+            <a href="domains.html">Domains</a>
+            <a href="hosting.html#email">Business Email</a>
+          </div>
+        </li>
         <li><a href="work.html">Our work</a></li>
         <li><a href="contact.html">Contact</a></li>
       </ul>
     </nav>
-    <div style="display:flex;gap:14px;align-items:center">
+    <div class="nav-actions">
+      <a class="btn-sm ghost" href="https://wa.me/260770346698?text=Hi%20Nadine%20Cloud%2C%20I%27d%20like%20to%20talk%20to%20sales." target="_blank" rel="noopener">Talk to sales</a>
+      <a class="btn-sm solid" href="contact.html">Get started</a>
       <button class="menu-btn" aria-label="Menu">☰</button>
     </div>
   </div>
@@ -78,27 +86,30 @@
       <div>
         <h4>Nadine Cloud</h4>
         <p>Web design, cloud hosting, domains and business email for businesses worldwide. A service of Nadine Omni Trading Limited.</p>
+        <p style="margin-top:14px"><a href="mailto:info@nadinecloud.com" style="font-family:var(--mono);font-size:13px">info@nadinecloud.com</a></p>
       </div>
       <div>
-        <h4>Services</h4>
+        <h4>Products</h4>
         <ul>
           <li><a href="services.html">Web design</a></li>
-          <li><a href="hosting.html">Hosting plans</a></li>
-          <li><a href="domains.html">Domain registration</a></li>
+          <li><a href="hosting.html">Cloud hosting</a></li>
+          <li><a href="domains.html">Domains</a></li>
+          <li><a href="hosting.html#email">Business email</a></li>
         </ul>
       </div>
       <div>
         <h4>Support</h4>
         <ul>
-          <li><a href="hosting.html#email">Business email</a></li>
           <li><a href="hosting.html#security">Security</a></li>
           <li><a href="hosting.html#migrate">Migrate your hosting</a></li>
           <li><a href="hosting.html#faq">Help center</a></li>
+          <li><a href="contact.html">Contact us</a></li>
         </ul>
       </div>
       <div>
-        <h4>Legal</h4>
+        <h4>Company</h4>
         <ul>
+          <li><a href="work.html">Our work</a></li>
           <li><a href="terms.html">Terms of service</a></li>
           <li><a href="privacy.html">Privacy policy</a></li>
           <li><a href="refund.html">Refund policy</a></li>

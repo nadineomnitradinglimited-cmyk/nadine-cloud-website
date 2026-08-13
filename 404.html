@@ -21,14 +21,22 @@
     <nav>
       <ul class="nav-links" id="navLinks">
         <li><a href="index.html">Home</a></li>
-        <li><a href="services.html">Services</a></li>
-        <li><a href="hosting.html">Hosting</a></li>
-        <li><a href="domains.html">Domains</a></li>
+        <li class="has-dropdown">
+          <a href="services.html">Products <span class="nav-caret">▾</span></a>
+          <div class="nav-dropdown">
+            <a href="services.html">Web Design</a>
+            <a href="hosting.html">Cloud Hosting</a>
+            <a href="domains.html">Domains</a>
+            <a href="hosting.html#email">Business Email</a>
+          </div>
+        </li>
         <li><a href="work.html">Our work</a></li>
         <li><a href="contact.html">Contact</a></li>
       </ul>
     </nav>
-    <div style="display:flex;gap:14px;align-items:center">
+    <div class="nav-actions">
+      <a class="btn-sm ghost" href="https://wa.me/260770346698?text=Hi%20Nadine%20Cloud%2C%20I%27d%20like%20to%20talk%20to%20sales." target="_blank" rel="noopener">Talk to sales</a>
+      <a class="btn-sm solid" href="contact.html">Get started</a>
       <button class="menu-btn" aria-label="Menu">☰</button>
     </div>
   </div>
