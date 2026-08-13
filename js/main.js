@@ -78,40 +78,62 @@ function lookupDomain(){
   targets.forEach(el => io.observe(el));
 })();
 
-/* ---------- count-up stats ---------- */
+/* ---------- looping count-up stats ---------- */
 (function(){
   const nums = document.querySelectorAll('.stat .num[data-count]');
   if (!nums.length) return;
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  function animate(el){
-    const target = parseFloat(el.getAttribute('data-count'));
-    const suffix = el.getAttribute('data-suffix') || '';
+  function format(el, value){
     const decimals = (el.getAttribute('data-count').split('.')[1] || '').length;
-    if (reduced || !('IntersectionObserver' in window)) {
-      el.textContent = target.toFixed(decimals) + suffix;
-      return;
+    const suffix = el.getAttribute('data-suffix') || '';
+    el.textContent = value.toFixed(decimals) + suffix;
+  }
+
+  if (reduced) {
+    nums.forEach(el => format(el, parseFloat(el.getAttribute('data-count'))));
+    return;
+  }
+
+  const COUNT_MS = 1400;
+  const HOLD_MS = 1800;
+
+  function loop(el){
+    const target = parseFloat(el.getAttribute('data-count'));
+    let cycleStart = null;
+
+    function frame(now){
+      if (el.dataset.paused === '1') { cycleStart = null; requestAnimationFrame(frame); return; }
+      if (cycleStart === null) cycleStart = now;
+      const elapsed = now - cycleStart;
+      if (elapsed < COUNT_MS) {
+        const eased = 1 - Math.pow(1 - elapsed / COUNT_MS, 3);
+        format(el, target * eased);
+      } else if (elapsed < COUNT_MS + HOLD_MS) {
+        format(el, target);
+      } else {
+        cycleStart = now;
+      }
+      requestAnimationFrame(frame);
     }
-    const duration = 1200;
-    const start = performance.now();
-    function tick(now){
-      const p = Math.min(1, (now - start) / duration);
-      const eased = 1 - Math.pow(1 - p, 3);
-      el.textContent = (target * eased).toFixed(decimals) + suffix;
-      if (p < 1) requestAnimationFrame(tick);
-    }
-    requestAnimationFrame(tick);
+    requestAnimationFrame(frame);
   }
 
   if (!('IntersectionObserver' in window)) {
-    nums.forEach(animate);
+    nums.forEach(loop);
     return;
   }
   const io = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
+      const el = entry.target;
       if (entry.isIntersecting) {
-        animate(entry.target);
-        io.unobserve(entry.target);
+        el.dataset.paused = '0';
+        if (el.dataset.started !== '1') {
+          el.dataset.started = '1';
+          loop(el);
+        }
+      } else {
+        el.dataset.paused = '1';
       }
     });
   }, { threshold: 0.4 });
