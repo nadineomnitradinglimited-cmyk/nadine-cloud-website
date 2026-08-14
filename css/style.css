@@ -85,13 +85,12 @@ header{position:sticky;top:0;z-index:50;background:rgba(11,18,32,.86);backdrop-f
     var(--ink);
   color:var(--cloud);position:relative;overflow:hidden}
 .hero-inner{position:relative;z-index:2;padding:96px 24px 40px clamp(24px,6vw,96px);max-width:640px}
-.hero-graphic{position:absolute;top:0;right:0;bottom:0;width:56%;display:flex;align-items:center;justify-content:flex-end;pointer-events:none;overflow:hidden}
+.hero-graphic{position:absolute;top:0;right:0;bottom:0;left:0;display:flex;align-items:center;justify-content:center;pointer-events:none;overflow:hidden}
 .hero-servers-img{
-  height:104%;width:auto;max-width:none;object-fit:cover;
-  -webkit-mask-image:linear-gradient(90deg,transparent,#000 32%),linear-gradient(0deg,transparent,#000 14%,#000 86%,transparent);
-  -webkit-mask-composite:source-in;mask-composite:intersect;
-  mask-image:linear-gradient(90deg,transparent,#000 32%),linear-gradient(0deg,transparent,#000 14%,#000 86%,transparent);
-  opacity:.85;
+  width:100%;height:100%;object-fit:contain;object-position:center;
+  -webkit-mask-image:linear-gradient(0deg,transparent,#000 8%,#000 92%,transparent);
+  mask-image:linear-gradient(0deg,transparent,#000 8%,#000 92%,transparent);
+  opacity:.9;
 }
 .hero-globe-overlay{position:absolute;inset:0;width:100%;height:100%}
 @media(max-width:900px){.hero-graphic{opacity:.22;width:100%}}
