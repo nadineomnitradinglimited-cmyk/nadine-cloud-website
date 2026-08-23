@@ -2,6 +2,7 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const { handleChat } = require('./chat');
+const { handleCheckoutInitiate, handleCheckoutStatus, handleLencoWebhook } = require('./payments');
 
 const ROOT = __dirname;
 const PORT = process.env.PORT || 3000;
@@ -48,6 +49,24 @@ const server = http.createServer((req, res) => {
 
   if (req.method === 'POST' && req.url === '/api/chat') {
     handleChat(req, res);
+    return;
+  }
+
+  const urlPath = req.url.split('?')[0];
+
+  if (req.method === 'POST' && urlPath === '/api/checkout') {
+    handleCheckoutInitiate(req, res);
+    return;
+  }
+
+  if (req.method === 'GET' && urlPath.startsWith('/api/checkout/status/')) {
+    const reference = decodeURIComponent(urlPath.slice('/api/checkout/status/'.length));
+    handleCheckoutStatus(req, res, reference);
+    return;
+  }
+
+  if (req.method === 'POST' && urlPath === '/api/lenco-webhook') {
+    handleLencoWebhook(req, res);
     return;
   }
 

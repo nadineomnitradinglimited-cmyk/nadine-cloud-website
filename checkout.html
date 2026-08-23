@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Checkout — Nadine Cloud</title>
+<meta name="description" content="Pay for your Nadine Cloud hosting, domain or email plan by mobile money.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="canonical" href="https://www.nadinecloud.com/checkout.html">
+<meta name="robots" content="noindex">
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <a class="logo" href="index.html" aria-label="Nadine Cloud home">
+      <svg class="logo-mark" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M22.5 12.2a7.5 7.5 0 0 0-14.6-1.6A6 6 0 0 0 8.5 22.5h13a5.2 5.2 0 0 0 1-10.3Z" stroke="#C87533" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Nadine<span class="logo-accent">Cloud</span>
+    </a>
+    <nav>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="index.html">Home</a></li>
+        <li class="has-dropdown">
+          <a href="services.html">Products <span class="nav-caret">▾</span></a>
+          <div class="nav-dropdown">
+            <a href="services.html">Web Design</a>
+            <a href="hosting.html">Cloud Hosting</a>
+            <a href="domains.html">Domains</a>
+            <a href="hosting.html#email">Business Email</a>
+          </div>
+        </li>
+        <li><a href="work.html">Our work</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+    </nav>
+    <div class="nav-actions">
+      <a class="btn-sm ghost" href="https://wa.me/260770346698?text=Hi%20Nadine%20Cloud%2C%20I%27d%20like%20to%20talk%20to%20sales." target="_blank" rel="noopener">Talk to sales</a>
+      <button class="menu-btn" aria-label="Menu">☰</button>
+    </div>
+  </div>
+</header>
+
+<section class="page-hero">
+  <div class="wrap page-hero-inner">
+    <span class="eyebrow">Checkout</span>
+    <h1 id="ckPlanTitle">Complete your order</h1>
+    <p id="ckPlanSub">Pay by mobile money — MTN, Airtel or Zamtel.</p>
+  </div>
+</section>
+
+<section class="section" id="checkout">
+  <div class="wrap">
+    <div class="contact-grid">
+      <div class="contact-card">
+        <h3>Pay with mobile money</h3>
+        <form id="checkoutForm" class="contact-form">
+          <label>Full name
+            <input type="text" name="name" required maxlength="120">
+          </label>
+          <label>Email
+            <input type="email" name="email" required maxlength="200">
+          </label>
+          <label id="domainField" hidden>Domain you want to register
+            <input type="text" name="domain" placeholder="yourbusiness.com" maxlength="255">
+          </label>
+          <label>Mobile money network
+            <select name="operator" required>
+              <option value="">Select network</option>
+              <option value="mtn">MTN Mobile Money</option>
+              <option value="airtel">Airtel Money</option>
+              <option value="zamtel">Zamtel Kwacha</option>
+            </select>
+          </label>
+          <label>Mobile money phone number
+            <input type="tel" name="phone" required placeholder="09XXXXXXXX" maxlength="20">
+          </label>
+          <button type="submit" class="btn-primary" id="ckSubmit">Pay <span id="ckAmountLabel">now</span></button>
+          <p id="ckStatus" class="form-status" role="status" aria-live="polite"></p>
+        </form>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:24px">
+        <div class="contact-card">
+          <h3>Order summary</h3>
+          <p><strong id="ckSummaryPlan">—</strong></p>
+          <p id="ckSummaryAmount" style="font-family:var(--mono);font-size:22px;color:var(--cloud)">—</p>
+          <p style="font-size:13.5px;color:var(--text-mute)">Billed annually. Card payments aren't available yet — mobile money only for now.</p>
+        </div>
+        <div class="contact-card">
+          <h3>How it works</h3>
+          <p><strong>1.</strong> Enter your details and submit.</p>
+          <p><strong>2.</strong> Approve the payment prompt sent to your phone.</p>
+          <p><strong>3.</strong> We'll confirm here and set things up the same day.</p>
+          <p style="margin-top:10px">Prefer to pay another way? <a href="contact.html" style="color:var(--copper-bright)">Contact us</a> or <a href="https://wa.me/260770346698" target="_blank" rel="noopener" style="color:var(--copper-bright)">WhatsApp</a> instead.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <h4>Nadine Cloud</h4>
+        <p>Web design, cloud hosting, domains and business email for businesses worldwide. A service of Nadine Omni Trading Limited.</p>
+        <p style="margin-top:14px"><a href="mailto:info@nadinecloud.com" style="font-family:var(--mono);font-size:13px">info@nadinecloud.com</a></p>
+      </div>
+      <div>
+        <h4>Products</h4>
+        <ul>
+          <li><a href="services.html">Web design</a></li>
+          <li><a href="hosting.html">Cloud hosting</a></li>
+          <li><a href="domains.html">Domains</a></li>
+          <li><a href="hosting.html#email">Business email</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Support</h4>
+        <ul>
+          <li><a href="hosting.html#security">Security</a></li>
+          <li><a href="hosting.html#migrate">Migrate your hosting</a></li>
+          <li><a href="hosting.html#faq">Help center</a></li>
+          <li><a href="contact.html">Contact us</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Company</h4>
+        <ul>
+          <li><a href="work.html">Our work</a></li>
+          <li><a href="terms.html">Terms of service</a></li>
+          <li><a href="privacy.html">Privacy policy</a></li>
+          <li><a href="refund.html">Refund policy</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 Nadine Omni Trading Limited. All rights reserved.</span>
+      <span>Serving clients worldwide</span>
+    </div>
+  </div>
+</footer>
+
+<script src="js/main.js"></script>
+<script src="js/checkout.js"></script>
+</body>
+</html>
