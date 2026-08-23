@@ -91,4 +91,5 @@ const server = http.createServer((req, res) => {
 
 server.listen(PORT, () => {
   console.log(`Nadine Cloud site running on port ${PORT}`);
+  console.log(`LENCO_API_KEY configured: ${Boolean(process.env.LENCO_API_KEY)}`);
 });
