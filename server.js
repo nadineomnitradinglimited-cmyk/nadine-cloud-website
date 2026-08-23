@@ -3,6 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const { handleChat } = require('./chat');
 const { handleCheckoutInitiate, handleCheckoutStatus, handleLencoWebhook } = require('./payments');
+const { handleContact } = require('./contact');
 
 const ROOT = __dirname;
 const PORT = process.env.PORT || 3000;
@@ -70,6 +71,11 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  if (req.method === 'POST' && urlPath === '/api/contact') {
+    handleContact(req, res);
+    return;
+  }
+
   let filePath = safeJoin(ROOT, req.url === '/' ? '/index.html' : req.url);
 
   fs.stat(filePath, (err, stats) => {
@@ -92,4 +98,5 @@ const server = http.createServer((req, res) => {
 server.listen(PORT, () => {
   console.log(`Nadine Cloud site running on port ${PORT}`);
   console.log(`LENCO_API_KEY configured: ${Boolean(process.env.LENCO_API_KEY)}`);
+  console.log(`RESEND_API_KEY configured: ${Boolean(process.env.RESEND_API_KEY)}`);
 });

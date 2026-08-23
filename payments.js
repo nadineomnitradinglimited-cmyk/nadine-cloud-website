@@ -1,7 +1,7 @@
 const crypto = require('crypto');
+const { sendEmail } = require('./email');
 
 const LENCO_BASE = 'https://api.lenco.co/access/v2';
-const WEB3FORMS_ACCESS_KEY = 'fed74812-296d-4a5e-9f14-c3a5219c5657';
 const OPERATORS = new Set(['mtn', 'airtel', 'zamtel']);
 
 const RATE_LIMIT_WINDOW_MS = 60 * 1000;
@@ -77,20 +77,10 @@ async function notifyOrder(reference, outcome, reason) {
     ? `Plan: ${order.plan}\nAmount: ZMW ${order.amount}\nCustomer: ${order.name} <${order.email}>\nPhone: ${order.phone}\nDomain requested: ${order.domain || '-'}\nReference: ${reference}\nStatus: ${outcome}${reasonLine}`
     : `Reference: ${reference}\nStatus: ${outcome}${reasonLine}\n(No local order details — server likely restarted since checkout started; check the Lenco dashboard for this reference.)`;
 
-  try {
-    await fetch('https://api.web3forms.com/submit', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-      body: JSON.stringify({
-        access_key: WEB3FORMS_ACCESS_KEY,
-        subject: `Nadine Cloud checkout — payment ${outcome} (${reference})`,
-        from_name: 'Nadine Cloud checkout',
-        message,
-      }),
-    });
-  } catch (err) {
-    console.error('Order notification failed:', err);
-  }
+  await sendEmail({
+    subject: `Nadine Cloud checkout — payment ${outcome} (${reference})`,
+    text: message,
+  });
   pendingOrders.delete(reference);
 }
 

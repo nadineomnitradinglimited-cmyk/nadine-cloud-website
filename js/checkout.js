@@ -29,8 +29,6 @@
   const statusEl = document.getElementById('ckStatus');
   const submitBtn = document.getElementById('ckSubmit');
   let polling = null;
-  let orderInfo = null;
-  let notifiedRef = null;
 
   function setStatus(text, cls){
     statusEl.textContent = text;
@@ -39,30 +37,6 @@
 
   function stopPolling(){
     if (polling) { clearInterval(polling); polling = null; }
-  }
-
-  // Sent from the browser (not the server) — Web3Forms' free plan blocks
-  // server-side API calls, so this mirrors how the contact form already
-  // sends mail successfully.
-  function notifyByEmail(reference, outcome, reason){
-    if (notifiedRef === reference + outcome) return;
-    notifiedRef = reference + outcome;
-    if (!orderInfo) return;
-    const fd = new FormData();
-    fd.append('access_key', 'fed74812-296d-4a5e-9f14-c3a5219c5657');
-    fd.append('subject', 'Nadine Cloud checkout — payment ' + outcome + ' (' + reference + ')');
-    fd.append('from_name', 'Nadine Cloud checkout');
-    fd.append('message',
-      'Plan: ' + orderInfo.plan +
-      '\nAmount: ZMW ' + orderInfo.amount +
-      '\nCustomer: ' + orderInfo.name + ' <' + orderInfo.email + '>' +
-      '\nPhone: ' + orderInfo.phone +
-      '\nDomain requested: ' + (orderInfo.domain || '-') +
-      '\nReference: ' + reference +
-      '\nStatus: ' + outcome +
-      (reason ? '\nReason: ' + reason : '')
-    );
-    fetch('https://api.web3forms.com/submit', { method: 'POST', headers: { Accept: 'application/json' }, body: fd }).catch(() => {});
   }
 
   function pollStatus(reference, attemptsLeft){
@@ -78,13 +52,11 @@
         if (data.status === 'successful') {
           stopPolling();
           setStatus("Payment received! We'll set things up and confirm by email shortly.", 'ok');
-          notifyByEmail(reference, 'paid');
         } else if (data.status === 'failed') {
           stopPolling();
           const reason = data.reason ? ' (' + data.reason + ')' : '';
           setStatus('The payment failed or was declined' + reason + '. You can try again below.', 'err');
           submitBtn.disabled = false;
-          notifyByEmail(reference, 'failed', data.reason);
         } else if (data.status === 'pay-offline') {
           setStatus('Check your phone and approve the payment prompt to continue…', '');
         }
@@ -108,7 +80,6 @@
       phone: fd.get('phone'),
       operator: fd.get('operator'),
     };
-    orderInfo = body;
 
     fetch('/api/checkout', {
       method: 'POST',

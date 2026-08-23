@@ -33,19 +33,27 @@ function lookupDomain(){
     btn.disabled = true;
     btn.textContent = 'Sending…';
 
-    fetch('https://api.web3forms.com/submit', {
+    const fd = new FormData(form);
+    fetch('/api/contact', {
       method: 'POST',
-      headers: { 'Accept': 'application/json' },
-      body: new FormData(form)
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: fd.get('name'),
+        email: fd.get('email'),
+        phone: fd.get('phone'),
+        interest: fd.get('interest'),
+        message: fd.get('message'),
+        botcheck: fd.get('botcheck'),
+      })
     })
-      .then(res => res.json())
-      .then(result => {
-        if (result.success) {
+      .then(res => res.json().then(data => ({ ok: res.ok, data })))
+      .then(({ ok, data }) => {
+        if (ok) {
           form.reset();
           status.textContent = "Thanks — we've got your message and will reply the same day.";
           status.classList.add('ok');
         } else {
-          status.textContent = 'Something went wrong sending that. Please try WhatsApp or email instead.';
+          status.textContent = data.error || 'Something went wrong sending that. Please try WhatsApp or email instead.';
           status.classList.add('err');
         }
       })
