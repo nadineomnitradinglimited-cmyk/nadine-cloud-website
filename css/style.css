@@ -40,7 +40,8 @@ a{color:inherit}
 .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--copper-bright);font-weight:600}
 h1,h2,h3{font-family:var(--display);line-height:1.12}
 h2{font-size:clamp(28px,4vw,40px);font-weight:700;margin:10px 0 14px;color:var(--cloud)}
-.section{padding:88px 0}
+.section{padding:72px 0;border-top:1px solid var(--line)}
+.hero + .strip,.hero + .stats-bar,header + .hero,.page-hero + .section{border-top:none}
 .section-head{max-width:620px;margin-bottom:48px}
 .section-head p{color:var(--text-soft)}
 button{font-family:inherit;cursor:pointer}
@@ -150,7 +151,7 @@ header{position:sticky;top:0;z-index:50;background:rgba(11,18,32,.86);backdrop-f
 .strip span::before{content:"✓ ";color:var(--ok);font-weight:700}
 
 /* ---------- services / solutions ---------- */
-.services-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px}
+.services-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px}
 .svc{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:28px 24px;box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 10px 26px rgba(0,0,0,.3);transition:transform .2s,box-shadow .2s,border-color .2s}
 .svc:hover{transform:translateY(-4px);box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 18px 42px rgba(0,0,0,.4);border-color:var(--line-strong)}
 .svc .ic{width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:16px}
@@ -310,8 +311,8 @@ header{position:sticky;top:0;z-index:50;background:rgba(11,18,32,.86);backdrop-f
 /* ---------- world map ---------- */
 .world-map{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 12px 30px rgba(0,0,0,.3)}
 .world-map svg{width:100%;height:auto;display:block}
-.world-map .land{fill:rgba(200,117,51,.20);stroke:rgba(247,249,251,.3);stroke-width:.6;transition:fill .25s;cursor:pointer}
-.world-map .land:hover{fill:rgba(200,117,51,.4)}
+.world-map .land{fill:#28395A;stroke:rgba(247,249,251,.25);stroke-width:.6;transition:fill .25s;cursor:pointer}
+.world-map .land:hover{fill:var(--copper)}
 .flow-line{animation:dash-flow 3.5s linear infinite;pointer-events:none}
 .map-node{pointer-events:none}
 @keyframes dash-flow{to{stroke-dashoffset:-48}}
