@@ -68,13 +68,14 @@ async function lencoRequest(pathname, options = {}) {
   return { httpStatus: res.status, body };
 }
 
-async function notifyOrder(reference, outcome) {
+async function notifyOrder(reference, outcome, reason) {
   if (notified.has(reference)) return;
   notified.add(reference);
   const order = pendingOrders.get(reference);
+  const reasonLine = reason ? `\nReason: ${reason}` : '';
   const message = order
-    ? `Plan: ${order.plan}\nAmount: ZMW ${order.amount}\nCustomer: ${order.name} <${order.email}>\nPhone: ${order.phone}\nDomain requested: ${order.domain || '-'}\nReference: ${reference}\nStatus: ${outcome}`
-    : `Reference: ${reference}\nStatus: ${outcome}\n(No local order details — server likely restarted since checkout started; check the Lenco dashboard for this reference.)`;
+    ? `Plan: ${order.plan}\nAmount: ZMW ${order.amount}\nCustomer: ${order.name} <${order.email}>\nPhone: ${order.phone}\nDomain requested: ${order.domain || '-'}\nReference: ${reference}\nStatus: ${outcome}${reasonLine}`
+    : `Reference: ${reference}\nStatus: ${outcome}${reasonLine}\n(No local order details — server likely restarted since checkout started; check the Lenco dashboard for this reference.)`;
 
   try {
     await fetch('https://api.web3forms.com/submit', {
@@ -188,12 +189,14 @@ async function handleCheckoutStatus(req, res, reference) {
   }
 
   const status = lenco.body && lenco.body.data && lenco.body.data.status;
-  sendJson(res, 200, { status: status || 'pending' });
+  const reasonForFailure = lenco.body && lenco.body.data && lenco.body.data.reasonForFailure;
+  sendJson(res, 200, { status: status || 'pending', reason: reasonForFailure || null });
 
   if (status === 'successful') {
     notifyOrder(reference, 'paid').catch(() => {});
   } else if (status === 'failed') {
-    notifyOrder(reference, 'failed').catch(() => {});
+    console.error(`Checkout ${reference} failed:`, reasonForFailure || '(no reason given)');
+    notifyOrder(reference, 'failed', reasonForFailure).catch(() => {});
   }
 }
 
@@ -236,10 +239,11 @@ async function handleLencoWebhook(req, res) {
 
   const reference = event && event.data && event.data.reference;
   const status = event && event.data && event.data.status;
+  const reasonForFailure = event && event.data && event.data.reasonForFailure;
   if (reference && status === 'successful') {
     await notifyOrder(reference, 'paid');
   } else if (reference && status === 'failed') {
-    await notifyOrder(reference, 'failed');
+    await notifyOrder(reference, 'failed', reasonForFailure);
   }
 
   sendJson(res, 200, { received: true });

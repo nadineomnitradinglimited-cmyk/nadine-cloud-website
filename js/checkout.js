@@ -54,7 +54,8 @@
           setStatus("Payment received! We'll set things up and confirm by email shortly.", 'ok');
         } else if (data.status === 'failed') {
           stopPolling();
-          setStatus('The payment failed or was declined. You can try again below.', 'err');
+          const reason = data.reason ? ' (' + data.reason + ')' : '';
+          setStatus('The payment failed or was declined' + reason + '. You can try again below.', 'err');
           submitBtn.disabled = false;
         } else if (data.status === 'pay-offline') {
           setStatus('Check your phone and approve the payment prompt to continue…', '');
