@@ -2,7 +2,7 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const { handleChat } = require('./chat');
-const { handleCheckoutInitiate, handleCheckoutStatus, handleLencoWebhook } = require('./payments');
+const { handleCheckoutInitiate, handleCheckoutStatus, handleLencoWebhook, handleReceiptDownload } = require('./payments');
 const { handleContact } = require('./contact');
 const { ensurePackagesExist } = require('./whm');
 
@@ -64,6 +64,12 @@ const server = http.createServer((req, res) => {
   if (req.method === 'GET' && urlPath.startsWith('/api/checkout/status/')) {
     const reference = decodeURIComponent(urlPath.slice('/api/checkout/status/'.length));
     handleCheckoutStatus(req, res, reference);
+    return;
+  }
+
+  if (req.method === 'GET' && urlPath.startsWith('/api/checkout/receipt/')) {
+    const reference = decodeURIComponent(urlPath.slice('/api/checkout/receipt/'.length));
+    handleReceiptDownload(req, res, reference);
     return;
   }
 

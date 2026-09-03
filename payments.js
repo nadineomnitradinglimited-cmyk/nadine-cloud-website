@@ -1,6 +1,7 @@
 const crypto = require('crypto');
 const { sendEmail } = require('./email');
 const { createAccount, PACKAGES } = require('./whm');
+const { generateReceiptPdf } = require('./receipt');
 
 const LENCO_BASE = 'https://api.lenco.co/access/v2';
 const OPERATORS = new Set(['mtn', 'airtel', 'zamtel']);
@@ -11,8 +12,18 @@ const hits = new Map();
 
 // in-memory only — order context (which plan/domain) is lost on restart,
 // but the payment itself still completes on Lenco's side either way.
+// Kept (not deleted) after payment so the receipt can still be downloaded;
+// pruned after a day instead.
 const pendingOrders = new Map();
 const notified = new Set();
+const ORDER_TTL_MS = 24 * 60 * 60 * 1000;
+
+function pruneOldOrders() {
+  const now = Date.now();
+  for (const [ref, order] of pendingOrders) {
+    if (now - order.createdAt > ORDER_TTL_MS) pendingOrders.delete(ref);
+  }
+}
 
 function isRateLimited(ip) {
   const now = Date.now();
@@ -89,14 +100,68 @@ async function notifyOrder(reference, outcome, reason) {
     }
   }
 
+  if (order && outcome === 'paid') {
+    order.paidAt = Date.now();
+  }
+
   await sendEmail({
     subject: `Nadine Cloud checkout — payment ${outcome} (${reference})`,
     text: message,
   });
-  pendingOrders.delete(reference);
+
+  // Also try to email the customer their own receipt. This will fail
+  // (silently, logged only) until the nadinecloud.com domain is verified
+  // at resend.com/domains — Resend's free tier only delivers to the
+  // account's own email until then. The download link on the checkout
+  // page works regardless, so this isn't the customer's only way to get it.
+  if (order && outcome === 'paid') {
+    try {
+      const pdf = await generateReceiptPdf({ ...order, currency: 'ZMW' }, { reference, paidAt: new Date(order.paidAt) });
+      const result = await sendEmail({
+        to: order.email,
+        subject: `Your Nadine Cloud receipt — ${reference}`,
+        text: `Hi ${order.name},\n\nThanks for your payment. Your receipt is attached.\n\nPlan: ${order.plan}\nAmount: ZMW ${order.amount}\nReference: ${reference}\n\n— Nadine Cloud`,
+        attachments: [{ filename: `nadine-cloud-receipt-${reference}.pdf`, content: pdf.toString('base64') }],
+      });
+      if (!result.ok) {
+        console.error(`Customer receipt email not delivered for ${reference} (expected until domain verified):`, result.reason);
+      }
+    } catch (err) {
+      console.error('Receipt generation for customer email failed:', err);
+    }
+  }
+}
+
+async function handleReceiptDownload(req, res, reference) {
+  if (!/^[A-Za-z0-9._-]{1,80}$/.test(reference || '')) {
+    sendJson(res, 400, { error: 'Invalid reference.' });
+    return;
+  }
+  const order = pendingOrders.get(reference);
+  if (!order || !order.paidAt) {
+    sendJson(res, 404, { error: 'No paid order found for that reference.' });
+    return;
+  }
+
+  try {
+    const pdf = await generateReceiptPdf(
+      { ...order, currency: 'ZMW' },
+      { reference, paidAt: new Date(order.paidAt) }
+    );
+    res.writeHead(200, {
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': `attachment; filename="nadine-cloud-receipt-${reference}.pdf"`,
+      'Content-Length': pdf.length,
+    });
+    res.end(pdf);
+  } catch (err) {
+    console.error('Receipt generation failed:', err);
+    sendJson(res, 500, { error: 'Could not generate the receipt — please try again.' });
+  }
 }
 
 async function handleCheckoutInitiate(req, res) {
+  pruneOldOrders();
   const ip = (req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown').split(',')[0].trim();
   if (isRateLimited(ip)) {
     sendJson(res, 429, { error: "You're trying too quickly — please wait a moment and try again." });
@@ -257,4 +322,4 @@ async function handleLencoWebhook(req, res) {
   sendJson(res, 200, { received: true });
 }
 
-module.exports = { handleCheckoutInitiate, handleCheckoutStatus, handleLencoWebhook };
+module.exports = { handleCheckoutInitiate, handleCheckoutStatus, handleLencoWebhook, handleReceiptDownload };

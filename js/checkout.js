@@ -64,7 +64,9 @@
       .then((data) => {
         if (data.status === 'successful') {
           stopPolling();
-          setStatus("Payment received! We'll set things up and confirm by email shortly.", 'ok');
+          statusEl.className = 'form-status ok';
+          statusEl.innerHTML = "Payment received! We'll set things up and confirm by email shortly. " +
+            '<a href="/api/checkout/receipt/' + encodeURIComponent(reference) + '" style="color:var(--copper);font-weight:600">Download your receipt (PDF)</a>';
         } else if (data.status === 'failed') {
           stopPolling();
           const reason = data.reason ? ' (' + data.reason + ')' : '';

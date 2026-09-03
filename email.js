@@ -6,18 +6,21 @@ const RESEND_API = 'https://api.resend.com/emails';
 const NOTIFY_TO = 'nadineomnitradinglimited@gmail.com';
 const FROM = 'Nadine Cloud <onboarding@resend.dev>';
 
-async function sendEmail({ subject, text }) {
+async function sendEmail({ subject, text, to, attachments }) {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
     console.error('RESEND_API_KEY not configured — email not sent:', subject);
     return { ok: false, reason: 'not_configured' };
   }
 
+  const payload = { from: FROM, to: [to || NOTIFY_TO], subject, text };
+  if (attachments && attachments.length) payload.attachments = attachments;
+
   try {
     const res = await fetch(RESEND_API, {
       method: 'POST',
       headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ from: FROM, to: [NOTIFY_TO], subject, text }),
+      body: JSON.stringify(payload),
     });
     const body = await res.json().catch(() => null);
     if (!res.ok) {
