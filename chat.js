@@ -28,7 +28,7 @@ HOSTING PLANS (billed monthly, ZMW — annual = 10x monthly price, 2 months free
 - Nadine Cloud — Veyra — K299/mo: 3 websites, 20 GB storage, 150 GB bandwidth, 30 email accounts, 10 databases, Website Builder included, free SSL, priority support.
 - Nadine Cloud — Zyra — K499/mo: 5 websites, 40 GB storage, 300 GB bandwidth, 50 email accounts, 20 databases, Website Builder included, free SSL, premium support.
 - Website Builder is only included on Veyra and Zyra, not Avara or Elora.
-- Included free on every hosting plan: free SSL certificate, free website migration, cPanel, worldwide support.
+- Included free on every hosting plan: free SSL certificate, automatic backups, free website migration, cPanel, worldwide support.
 
 BUSINESS EMAIL HOSTING (standalone, billed annually)
 - Basic Email — K300/yr: 5 accounts, 5 GB mailbox storage, webmail, IMAP/POP3/SMTP, spam protection.
