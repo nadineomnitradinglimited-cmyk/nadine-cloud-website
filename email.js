@@ -1,5 +1,9 @@
 const RESEND_API = 'https://api.resend.com/emails';
-const NOTIFY_TO = 'info@nadinecloud.com';
+// Resend's free tier only allows sending to the account's own verified
+// email until a domain is verified at resend.com/domains — see the
+// README-style note in the commit that added this for how to switch
+// back to info@nadinecloud.com once that's done.
+const NOTIFY_TO = 'nadineomnitradinglimited@gmail.com';
 const FROM = 'Nadine Cloud <onboarding@resend.dev>';
 
 async function sendEmail({ subject, text }) {
