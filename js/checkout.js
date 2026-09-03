@@ -6,11 +6,16 @@
   const plan = params.get('plan') || 'Nadine Cloud order';
   const amount = parseFloat(params.get('amount'));
   const type = params.get('type') || '';
+  const period = params.get('period') === 'mo' ? 'mo' : 'yr';
 
   document.getElementById('ckPlanTitle').textContent = plan;
   document.getElementById('ckSummaryPlan').textContent = plan;
   document.getElementById('ckAmountLabel').textContent = Number.isFinite(amount) ? ('ZMW ' + amount.toLocaleString()) : 'now';
-  document.getElementById('ckSummaryAmount').textContent = Number.isFinite(amount) ? ('ZMW ' + amount.toLocaleString() + ' / yr') : 'Amount to be confirmed';
+  document.getElementById('ckSummaryAmount').textContent = Number.isFinite(amount) ? ('ZMW ' + amount.toLocaleString() + ' / ' + period) : 'Amount to be confirmed';
+  const billingNote = document.getElementById('ckBillingNote');
+  if (billingNote) {
+    billingNote.textContent = (period === 'mo' ? 'Billed monthly. ' : 'Billed annually. ') + "Card payments aren't available yet — mobile money only for now.";
+  }
 
   if (type === 'domain') {
     const field = document.getElementById('domainField');

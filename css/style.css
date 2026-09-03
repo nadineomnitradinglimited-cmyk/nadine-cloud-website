@@ -200,6 +200,7 @@ header{position:sticky;top:0;z-index:50;background:rgba(11,18,32,.86);backdrop-f
 /* ---------- pricing ---------- */
 .pricing .section-head p{color:var(--text-soft)}
 .plans{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:22px}
+#hosting .plans{grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
 .plan{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:30px 26px;display:flex;flex-direction:column}
 .plan.featured{border-color:var(--copper);position:relative;background:var(--surface-2)}
 .plan.featured::before{content:"Most popular";position:absolute;top:-12px;left:24px;background:var(--copper);color:#fff;font-family:var(--mono);font-size:11px;letter-spacing:.08em;padding:3px 12px;border-radius:999px;text-transform:uppercase}
