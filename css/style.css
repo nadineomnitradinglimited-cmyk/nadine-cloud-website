@@ -8,14 +8,15 @@
   --cloud:#0B1220;
   --text-soft:#45566B;
   --text-mute:#78899C;
-  --sky:#EFF4F9;
-  --line:rgba(11,18,32,.10);
-  --line-strong:rgba(11,18,32,.18);
+  --sky:#EAF0F7;
+  --page:#F0F3F8;
+  --line:rgba(11,18,32,.12);
+  --line-strong:rgba(11,18,32,.22);
   --ok:#1E9E63;
   --err:#D6483D;
   --blue:#3B79E0;
   --violet:#8465D6;
-  --display:'Bricolage Grotesque',sans-serif;
+  --display:'Plus Jakarta Sans',sans-serif;
   --body:'Instrument Sans',sans-serif;
   --mono:'IBM Plex Mono',monospace;
 }
@@ -24,14 +25,14 @@ html{scroll-behavior:smooth}
 body{
   font-family:var(--body);color:var(--cloud);line-height:1.6;font-size:16px;
   background:
-    radial-gradient(1200px 700px at 12% -8%,rgba(200,117,51,.05),transparent 55%),
-    radial-gradient(1000px 700px at 100% 30%,rgba(76,141,255,.04),transparent 55%),
-    #F7F9FC;
+    radial-gradient(1200px 700px at 12% -8%,rgba(200,117,51,.06),transparent 55%),
+    radial-gradient(1000px 700px at 100% 30%,rgba(76,141,255,.05),transparent 55%),
+    var(--page);
   background-attachment:fixed;
 }
 body::before{
   content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
-  background-image:radial-gradient(rgba(11,18,32,.045) 1px,transparent 1px);
+  background-image:radial-gradient(rgba(11,18,32,.06) 1px,transparent 1px);
   background-size:26px 26px;
 }
 img{max-width:100%}
@@ -161,7 +162,7 @@ header{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.86);backdro
 
 /* ---------- services / solutions ---------- */
 .services-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px}
-.svc{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:28px 24px;box-shadow:0 1px 2px rgba(11,18,32,.04),0 10px 26px rgba(11,18,32,.05);transition:transform .2s,box-shadow .2s,border-color .2s}
+.svc{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:28px 24px;box-shadow:0 1px 2px rgba(11,18,32,.05),0 10px 26px rgba(11,18,32,.07);transition:transform .2s,box-shadow .2s,border-color .2s}
 .svc:hover{transform:translateY(-4px);box-shadow:0 18px 42px rgba(11,18,32,.10);border-color:var(--line-strong)}
 .svc .ic{width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:16px}
 .svc:nth-child(6n+1) .ic{background:linear-gradient(155deg,rgba(200,117,51,.20),rgba(200,117,51,.06));color:var(--copper)}
@@ -178,7 +179,7 @@ header{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.86);backdro
 
 /* ---------- offer cards ---------- */
 .offer-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:20px}
-.offer-card{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:28px 24px;display:flex;flex-direction:column;box-shadow:0 1px 2px rgba(11,18,32,.04),0 10px 30px rgba(11,18,32,.05);transition:transform .2s,box-shadow .2s,border-color .2s}
+.offer-card{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:28px 24px;display:flex;flex-direction:column;box-shadow:0 1px 2px rgba(11,18,32,.05),0 10px 30px rgba(11,18,32,.07);transition:transform .2s,box-shadow .2s,border-color .2s}
 .offer-card:hover{transform:translateY(-5px);box-shadow:0 20px 44px rgba(11,18,32,.10);border-color:rgba(200,117,51,.4)}
 .offer-card.featured{border:1.5px solid var(--copper)}
 .offer-card.featured::before{content:"Most popular";position:absolute;top:-12px;left:24px;background:var(--copper);color:#fff;font-family:var(--mono);font-size:11px;letter-spacing:.08em;padding:3px 12px;border-radius:999px;text-transform:uppercase}
@@ -203,7 +204,8 @@ header{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.86);backdro
 
 /* ---------- shared card depth ---------- */
 .plan,.included-grid div,.tech-badge,.faq,.tld-card,.cross-sell a,.work,.chip,.contact-card,.stat,.step{
-  box-shadow:0 1px 2px rgba(11,18,32,.04),0 8px 22px rgba(11,18,32,.05);
+  box-shadow:0 1px 2px rgba(11,18,32,.05),0 10px 26px rgba(11,18,32,.07);
+  border-color:var(--line-strong);
 }
 
 /* ---------- pricing ---------- */
@@ -320,7 +322,7 @@ header{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.86);backdro
 .network-list div::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--copper);flex:none}
 
 /* ---------- world map ---------- */
-.world-map{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:0 1px 2px rgba(11,18,32,.04),0 12px 30px rgba(11,18,32,.06)}
+.world-map{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:0 1px 2px rgba(11,18,32,.05),0 12px 30px rgba(11,18,32,.08)}
 .world-map svg{width:100%;height:auto;display:block}
 .world-map .land{fill:#B9C7D9;stroke:rgba(11,18,32,.15);stroke-width:.6;transition:fill .25s;cursor:pointer}
 .world-map .land:hover{fill:var(--copper)}
