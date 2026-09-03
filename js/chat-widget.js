@@ -1,5 +1,5 @@
 (function () {
-  const GREETING = "Hi! I'm the Nadine Cloud assistant. Ask me about hosting, domains, web design or pricing — or message us on WhatsApp anytime.";
+  const GREETING = "Hi, I'm Nadine. Ask me about hosting, domains, web design or pricing — or message us on WhatsApp anytime.";
 
   const history = [];
   let sending = false;
@@ -18,7 +18,7 @@
     </button>
     <div class="chat-panel" hidden>
       <div class="chat-panel-header">
-        <span>Nadine Cloud Assistant</span>
+        <span>Nadine</span>
         <button class="chat-close" aria-label="Close chat">&times;</button>
       </div>
       <div class="chat-messages" role="log" aria-live="polite"></div>
