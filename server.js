@@ -118,4 +118,5 @@ server.listen(PORT, () => {
   console.log(`LENCO_API_KEY configured: ${Boolean(process.env.LENCO_API_KEY)}`);
   console.log(`RESEND_API_KEY configured: ${Boolean(process.env.RESEND_API_KEY)}`);
   console.log(`WHM_API_TOKEN configured: ${Boolean(process.env.WHM_API_TOKEN)}`);
+  console.log(`ANTHROPIC_API_KEY configured: ${Boolean(process.env.ANTHROPIC_API_KEY)}`);
 });
