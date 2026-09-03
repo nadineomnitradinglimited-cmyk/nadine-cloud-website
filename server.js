@@ -4,6 +4,7 @@ const path = require('path');
 const { handleChat } = require('./chat');
 const { handleCheckoutInitiate, handleCheckoutStatus, handleLencoWebhook } = require('./payments');
 const { handleContact } = require('./contact');
+const { ensurePackagesExist } = require('./whm');
 
 const ROOT = __dirname;
 const PORT = process.env.PORT || 3000;
@@ -73,6 +74,23 @@ const server = http.createServer((req, res) => {
 
   if (req.method === 'POST' && urlPath === '/api/contact') {
     handleContact(req, res);
+    return;
+  }
+
+  if (req.method === 'POST' && urlPath === '/api/admin/setup-whm-packages') {
+    // one-time setup route: creates the four fixed hosting packages in WHM.
+    // Accepts no input and touches nothing customer-facing, so it's left
+    // unauthenticated — remove this route once the packages are confirmed
+    // created, it has no further purpose after that.
+    ensurePackagesExist()
+      .then((results) => {
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(results, null, 2));
+      })
+      .catch((err) => {
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: String(err) }));
+      });
     return;
   }
 
