@@ -1,5 +1,6 @@
 const crypto = require('crypto');
 const { sendEmail } = require('./email');
+const { createAccount, PACKAGES } = require('./whm');
 
 const LENCO_BASE = 'https://api.lenco.co/access/v2';
 const OPERATORS = new Set(['mtn', 'airtel', 'zamtel']);
@@ -73,9 +74,20 @@ async function notifyOrder(reference, outcome, reason) {
   notified.add(reference);
   const order = pendingOrders.get(reference);
   const reasonLine = reason ? `\nReason: ${reason}` : '';
-  const message = order
+  let message = order
     ? `Plan: ${order.plan}\nAmount: ZMW ${order.amount}\nCustomer: ${order.name} <${order.email}>\nPhone: ${order.phone}\nDomain requested: ${order.domain || '-'}\nReference: ${reference}\nStatus: ${outcome}${reasonLine}`
     : `Reference: ${reference}\nStatus: ${outcome}${reasonLine}\n(No local order details — server likely restarted since checkout started; check the Lenco dashboard for this reference.)`;
+
+  // On a successful hosting payment with a package + domain on file,
+  // provision the real cPanel account automatically.
+  if (outcome === 'paid' && order && order.type === 'hosting' && order.pkg && order.domain) {
+    const acct = await createAccount({ domain: order.domain, pkgSlug: order.pkg, contactemail: order.email });
+    if (acct.ok) {
+      message += `\n\n--- WHM account created automatically ---\nDomain: ${acct.domain}\nUsername: ${acct.username}\nPassword: ${acct.password}\ncPanel login: https://${acct.domain}:2083\n\nForward these details to the customer (${order.email}) — Resend can't email them directly yet, see the domain-verification note in email.js.`;
+    } else {
+      message += `\n\n--- WHM account creation FAILED ---\nReason: ${acct.reason}${acct.raw ? `\nDetails: ${JSON.stringify(acct.raw.metadata || acct.raw)}` : ''}\nYou'll need to create this account manually in WHM for ${order.domain} on package nadine14_${order.pkg}.`;
+    }
+  }
 
   await sendEmail({
     subject: `Nadine Cloud checkout — payment ${outcome} (${reference})`,
@@ -113,7 +125,9 @@ async function handleCheckoutInitiate(req, res) {
   const email = typeof parsed.email === 'string' ? parsed.email.trim().slice(0, 200) : '';
   const phoneDigits = typeof parsed.phone === 'string' ? parsed.phone.replace(/[^\d+]/g, '').slice(0, 20) : '';
   const operator = typeof parsed.operator === 'string' ? parsed.operator.toLowerCase().trim() : '';
-  const domain = typeof parsed.domain === 'string' ? parsed.domain.trim().slice(0, 255) : '';
+  const domain = typeof parsed.domain === 'string' ? parsed.domain.trim().toLowerCase().replace(/^https?:\/\//, '').replace(/\/.*$/, '').slice(0, 255) : '';
+  const type = typeof parsed.type === 'string' ? parsed.type.trim().slice(0, 30) : '';
+  const pkg = typeof parsed.pkg === 'string' ? parsed.pkg.trim().toLowerCase() : '';
 
   if (!plan) return sendJson(res, 400, { error: 'Missing plan.' });
   if (!Number.isFinite(amount) || amount <= 0 || amount > 20000) return sendJson(res, 400, { error: 'Invalid amount.' });
@@ -121,6 +135,10 @@ async function handleCheckoutInitiate(req, res) {
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return sendJson(res, 400, { error: 'A valid email is required.' });
   if (phoneDigits.length < 9) return sendJson(res, 400, { error: 'A valid mobile money phone number is required.' });
   if (!OPERATORS.has(operator)) return sendJson(res, 400, { error: 'Select MTN, Airtel or Zamtel.' });
+  if (type === 'hosting') {
+    if (!pkg || !PACKAGES[pkg]) return sendJson(res, 400, { error: 'Missing or invalid hosting package.' });
+    if (!domain || !/^[a-z0-9.-]+\.[a-z]{2,}$/.test(domain)) return sendJson(res, 400, { error: 'A valid domain is required to set up hosting.' });
+  }
 
   const reference = genReference();
 
@@ -154,7 +172,7 @@ async function handleCheckoutInitiate(req, res) {
     return;
   }
 
-  pendingOrders.set(reference, { plan, amount, name, email, phone: phoneDigits, domain: domain || null, createdAt: Date.now() });
+  pendingOrders.set(reference, { plan, amount, name, email, phone: phoneDigits, domain: domain || null, type: type || null, pkg: pkg || null, createdAt: Date.now() });
 
   sendJson(res, 200, { reference, status: lenco.body.data.status });
 }

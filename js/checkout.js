@@ -6,6 +6,7 @@
   const plan = params.get('plan') || 'Nadine Cloud order';
   const amount = parseFloat(params.get('amount'));
   const type = params.get('type') || '';
+  const pkg = params.get('pkg') || '';
   const period = params.get('period') === 'mo' ? 'mo' : 'yr';
 
   document.getElementById('ckPlanTitle').textContent = plan;
@@ -22,6 +23,13 @@
     field.hidden = false;
     field.querySelector('input').required = true;
     document.getElementById('ckPlanSub').textContent = "Tell us the domain you want — we'll confirm the exact price if it differs.";
+  } else if (type === 'hosting') {
+    const field = document.getElementById('domainField');
+    field.hidden = false;
+    field.firstChild.textContent = 'Domain for this hosting account';
+    field.querySelector('input').required = true;
+    field.querySelector('input').placeholder = 'yourbusiness.com (no www)';
+    document.getElementById('ckPlanSub').textContent = "Tell us the domain to set up — your hosting account is created automatically as soon as payment clears.";
   }
 
   if (!Number.isFinite(amount) || amount <= 0) {
@@ -79,6 +87,8 @@
     const body = {
       plan,
       amount,
+      type,
+      pkg,
       domain: fd.get('domain') || '',
       name: fd.get('name'),
       email: fd.get('email'),

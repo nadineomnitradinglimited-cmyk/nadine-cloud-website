@@ -1,5 +1,8 @@
+const crypto = require('crypto');
+
 const WHM_HOST = 'https://secure375.servconfig.com:2087';
 const WHM_USER = 'nadine14';
+const WHM_PKG_PREFIX = 'nadine14_';
 
 const PACKAGES = {
   avara: { QUOTA: 5000, BWLIMIT: 25000, MAXPOP: 5, MAXADDON: 0, MAXSQL: 2 },
@@ -51,4 +54,59 @@ async function ensurePackagesExist() {
   return results;
 }
 
-module.exports = { whmRequest, ensurePackagesExist, PACKAGES };
+function genPassword() {
+  // 16 chars, mixed case + digits + one symbol, avoids characters that
+  // commonly break URL/shell/query-string handling downstream
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789';
+  let pw = '';
+  const bytes = crypto.randomBytes(15);
+  for (let i = 0; i < 15; i++) pw += chars[bytes[i] % chars.length];
+  return pw + '!' + Math.floor(Math.random() * 9);
+}
+
+function genUsername(domain) {
+  const base = domain.replace(/^https?:\/\//, '').replace(/^www\./, '').split('.')[0]
+    .toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 10) || 'site';
+  const suffix = crypto.randomBytes(2).toString('hex');
+  return (base + suffix).slice(0, 16);
+}
+
+/**
+ * Creates a real cPanel hosting account on the reseller server.
+ * pkgSlug must be one of 'avara' | 'elora' | 'veyra' | 'zyra'.
+ */
+async function createAccount({ domain, pkgSlug, contactemail }) {
+  if (!PACKAGES[pkgSlug]) {
+    return { ok: false, reason: 'unknown_package' };
+  }
+  const username = genUsername(domain);
+  const password = genPassword();
+  const params = new URLSearchParams({
+    'api.version': '1',
+    username,
+    domain,
+    password,
+    contactemail,
+    plan: WHM_PKG_PREFIX + pkgSlug,
+  });
+
+  try {
+    const { body } = await whmRequest(`/json-api/createacct?${params.toString()}`);
+    const ok = Boolean(body && body.metadata && body.metadata.result === 1);
+    return {
+      ok,
+      username,
+      password,
+      domain,
+      reason: body && body.metadata ? body.metadata.reason : 'unknown',
+      raw: body,
+    };
+  } catch (err) {
+    if (err.code === 'WHM_NOT_CONFIGURED') {
+      return { ok: false, reason: 'not_configured' };
+    }
+    return { ok: false, reason: 'request_failed', error: String(err) };
+  }
+}
+
+module.exports = { whmRequest, ensurePackagesExist, createAccount, PACKAGES };
