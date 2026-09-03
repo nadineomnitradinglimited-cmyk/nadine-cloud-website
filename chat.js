@@ -1,6 +1,12 @@
 const Anthropic = require('@anthropic-ai/sdk');
 
-const client = new Anthropic(); // reads ANTHROPIC_API_KEY from env
+// reads ANTHROPIC_API_KEY from env. Identity-linked keys also require the
+// workspace they act in, sent as a header on every request.
+const client = new Anthropic({
+  defaultHeaders: process.env.ANTHROPIC_WORKSPACE_ID
+    ? { 'anthropic-workspace-id': process.env.ANTHROPIC_WORKSPACE_ID }
+    : undefined,
+});
 
 const MODEL = 'claude-haiku-4-5';
 const MAX_MESSAGE_LENGTH = 800;
