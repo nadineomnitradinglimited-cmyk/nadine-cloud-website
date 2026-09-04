@@ -105,6 +105,10 @@ header .wrap{max-width:1440px}
     radial-gradient(700px 500px at 60% 90%,rgba(76,141,255,.10),transparent 65%),
     var(--ink);
   color:var(--cloud);position:relative;overflow:hidden}
+.hero::after{
+  content:"";position:absolute;inset:0;z-index:1;pointer-events:none;
+  background:linear-gradient(90deg,var(--ink) 0%,rgba(11,18,32,.92) 28%,rgba(11,18,32,.55) 48%,rgba(11,18,32,.12) 68%,transparent 82%);
+}
 .hero-inner{position:relative;z-index:2;padding:96px 24px 40px clamp(24px,6vw,96px);max-width:640px}
 .hero-graphic{position:absolute;top:0;right:0;bottom:0;left:0;display:flex;align-items:center;justify-content:center;pointer-events:none;overflow:hidden}
 .hero-servers-img{
