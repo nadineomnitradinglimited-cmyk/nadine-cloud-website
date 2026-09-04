@@ -14,8 +14,8 @@ function lookupDomain(){
   if(!raw){ out.textContent = 'Type a name to check .com, .co.zm, .org and more'; return; }
   const waText = encodeURIComponent('Hi Nadine Cloud, is ' + raw + '.com available to register?');
   out.innerHTML = 'We\'ll confirm if <strong>' + raw + '.com</strong> is available, from ZMW 450/yr' +
-    ' &nbsp;·&nbsp; <a href="https://wa.me/260770346698?text=' + waText + '" target="_blank" rel="noopener" style="color:#E08A3C">Ask on WhatsApp</a>' +
-    ' &nbsp;·&nbsp; <a href="contact.html" style="color:#E08A3C">Contact form</a>';
+    ' &nbsp;·&nbsp; <a href="https://wa.me/260770346698?text=' + waText + '" target="_blank" rel="noopener" style="color:#7047FF">Ask on WhatsApp</a>' +
+    ' &nbsp;·&nbsp; <a href="contact.html" style="color:#7047FF">Contact form</a>';
 }
 
 /* ---------- contact form ---------- */

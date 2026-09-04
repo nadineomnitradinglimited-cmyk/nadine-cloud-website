@@ -1,8 +1,8 @@
 const PDFDocument = require('pdfkit');
 
 const INK = '#0B1220';
-const COPPER = '#C87533';
-const COPPER_BRIGHT = '#E08A3C';
+const COPPER = '#1769FF';
+const COPPER_BRIGHT = '#2F8CFF';
 const TEXT_SOFT = '#45566B';
 const TEXT_MUTE = '#8296A8';
 const LINE = '#E4E9F0';
