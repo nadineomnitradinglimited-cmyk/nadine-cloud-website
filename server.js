@@ -6,7 +6,7 @@ const { handleCheckoutInitiate, handleCheckoutStatus, handleLencoWebhook, handle
 const { handleContact } = require('./contact');
 const { ensurePackagesExist } = require('./whm');
 const { handleSignup, handleLogin, handleLogout, handleMe } = require('./auth');
-const { handleDomainCheck, registerDomain } = require('./namecheap');
+const { handleDomainCheck } = require('./namecheap');
 
 const ROOT = __dirname;
 const PORT = process.env.PORT || 3000;
@@ -119,28 +119,6 @@ const server = http.createServer((req, res) => {
       .then((results) => {
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify(results, null, 2));
-      })
-      .catch((err) => {
-        res.writeHead(500, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: String(err) }));
-      });
-    return;
-  }
-
-  if (req.method === 'POST' && urlPath === '/api/admin/test-domain-register') {
-    // temporary diagnostic route: registers a random throwaway .com in the
-    // Namecheap SANDBOX (no real domain, no real money) to confirm the
-    // registration path works from this server's actual whitelisted IP,
-    // since that can't be tested from a dev machine. Remove once confirmed.
-    const testName = `qzxwplk${Date.now()}rft.com`;
-    registerDomain(testName, 1, {
-      firstName: 'Nadine', lastName: 'Test',
-      address1: '123 Test Street', city: 'Lusaka', stateProvince: 'Lusaka',
-      postalCode: '10101', country: 'ZM', phone: '+260.977000000', email: 'test@example.com',
-    })
-      .then((result) => {
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ testedDomain: testName, result }, null, 2));
       })
       .catch((err) => {
         res.writeHead(500, { 'Content-Type': 'application/json' });
