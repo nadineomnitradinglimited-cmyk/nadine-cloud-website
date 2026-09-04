@@ -31,6 +31,7 @@
             <a href="hosting.html">Cloud Hosting</a>
             <a href="domains.html">Domains</a>
             <a href="hosting.html#email">Business Email</a>
+            <a href="marketing.html">Marketing</a>
           </div>
         </li>
         <li><a href="work.html">Our work</a></li>
@@ -64,9 +65,19 @@
           <label>Email
             <input type="email" name="email" required maxlength="200">
           </label>
+          <div id="domainChoice" hidden class="radio-group">
+            <span class="radio-group-label">Domain for this hosting account</span>
+            <label class="radio-inline"><input type="radio" name="domainOption" value="existing" checked> I already own this domain</label>
+            <label class="radio-inline"><input type="radio" name="domainOption" value="new"> I need to register a new domain</label>
+          </div>
           <label id="domainField" hidden>Domain you want to register
-            <input type="text" name="domain" placeholder="yourbusiness.com" maxlength="255">
+            <input type="text" name="domain" placeholder="yourbusiness.com" maxlength="255" autocomplete="off">
           </label>
+          <label id="domainConfirmField" hidden>Confirm domain (type it again)
+            <input type="text" name="domainConfirm" placeholder="yourbusiness.com" maxlength="255" autocomplete="off">
+          </label>
+          <p id="domainMismatch" class="form-status err" hidden style="margin:-8px 0 0">Those two don't match — please check for typos.</p>
+          <p id="domainNewNote" class="form-status" hidden style="margin:-8px 0 0;color:var(--text-mute)">This payment covers hosting only. We'll check availability and message you to confirm the exact domain price before registering it.</p>
           <label>Mobile money network
             <select name="operator" required>
               <option value="">Select network</option>
@@ -116,6 +127,7 @@
           <li><a href="hosting.html">Cloud hosting</a></li>
           <li><a href="domains.html">Domains</a></li>
           <li><a href="hosting.html#email">Business email</a></li>
+          <li><a href="marketing.html">Marketing</a></li>
         </ul>
       </div>
       <div>

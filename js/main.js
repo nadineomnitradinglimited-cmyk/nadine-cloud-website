@@ -5,18 +5,17 @@
   if (btn && links) btn.addEventListener('click', () => links.classList.toggle('open'));
 })();
 
-/* ---------- domain lookup (visual demo until WHMCS is connected) ---------- */
+/* ---------- domain name prompt (not a live availability check — message us to confirm) ---------- */
 function lookupDomain(){
   const input = document.getElementById('domInput');
   const out = document.getElementById('domResult');
   if (!input || !out) return;
   const raw = input.value.trim().toLowerCase().replace(/[^a-z0-9-]/g,'');
   if(!raw){ out.textContent = 'Type a name to check .com, .co.zm, .org and more'; return; }
-  out.innerHTML = 'Checking ' + raw + '…';
-  setTimeout(()=>{
-    out.innerHTML = '<span class="ok">●</span> ' + raw + '.com — contact us to register from ZMW 450/yr' +
-      ' &nbsp;·&nbsp; <a href="contact.html" style="color:#E08A3C">Order now</a>';
-  }, 600);
+  const waText = encodeURIComponent('Hi Nadine Cloud, is ' + raw + '.com available to register?');
+  out.innerHTML = 'We\'ll confirm if <strong>' + raw + '.com</strong> is available, from ZMW 450/yr' +
+    ' &nbsp;·&nbsp; <a href="https://wa.me/260770346698?text=' + waText + '" target="_blank" rel="noopener" style="color:#E08A3C">Ask on WhatsApp</a>' +
+    ' &nbsp;·&nbsp; <a href="contact.html" style="color:#E08A3C">Contact form</a>';
 }
 
 /* ---------- contact form ---------- */

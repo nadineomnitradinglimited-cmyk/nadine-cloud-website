@@ -45,6 +45,11 @@ h2{font-size:clamp(28px,4vw,40px);font-weight:700;margin:10px 0 14px;color:var(-
 .hero + .strip,.hero + .stats-bar,header + .hero,.page-hero + .section{border-top:none}
 .section-head{max-width:620px;margin-bottom:48px}
 .section-head p{color:var(--text-soft)}
+.billing-toggle{display:inline-flex;flex-wrap:wrap;background:var(--surface-2);border:1px solid var(--line);border-radius:999px;padding:4px;gap:4px;margin-top:20px}
+.billing-opt{border:none;background:none;font-family:var(--display);font-weight:700;font-size:14px;padding:9px 18px;border-radius:999px;color:var(--text-mute);display:flex;align-items:center;gap:8px;transition:background .15s,color .15s}
+.billing-opt.active{background:var(--cloud);color:var(--page)}
+.billing-opt .save-tag{font-family:var(--mono);font-size:10.5px;font-weight:600;padding:2px 7px;border-radius:999px;background:rgba(30,158,99,.15);color:var(--ok)}
+.billing-opt.active .save-tag{background:rgba(255,255,255,.18);color:#fff}
 button{font-family:inherit;cursor:pointer}
 :focus-visible{outline:3px solid var(--copper);outline-offset:2px}
 
@@ -213,10 +218,21 @@ header{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.86);backdro
 .plans{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:22px}
 #hosting .plans{grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
 .plan{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:30px 26px;display:flex;flex-direction:column}
-.plan.featured{border-color:var(--copper);position:relative;background:var(--surface-2)}
+.plan.featured{border-color:var(--copper);border-width:1.5px;position:relative;background:linear-gradient(165deg,rgba(200,117,51,.07),var(--surface) 55%)}
 .plan.featured::before{content:"Most popular";position:absolute;top:-12px;left:24px;background:var(--copper);color:#fff;font-family:var(--mono);font-size:11px;letter-spacing:.08em;padding:3px 12px;border-radius:999px;text-transform:uppercase}
+.plan-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:16px}
+.plan-icon svg{width:22px;height:22px}
+.plan:nth-child(1) .plan-icon{background:rgba(59,121,224,.14);color:var(--blue)}
+.plan:nth-child(2) .plan-icon{background:rgba(200,117,51,.16);color:var(--copper)}
+.plan:nth-child(3) .plan-icon{background:rgba(132,101,214,.14);color:var(--violet)}
+.plan:nth-child(4) .plan-icon{background:rgba(30,158,99,.14);color:var(--ok)}
 .plan h3{font-size:20px;margin-bottom:4px;color:var(--cloud)}
 .plan .for{font-size:13.5px;color:var(--text-mute);margin-bottom:18px}
+.plan-stats{display:grid;grid-template-columns:1fr 1fr;gap:12px 16px;margin:0 0 18px;padding:14px 16px;background:var(--surface-2);border-radius:10px}
+.plan.featured .plan-stats{background:rgba(255,255,255,.6)}
+.plan-stats div{display:flex;flex-direction:column;gap:2px}
+.plan-stats .n{font-family:var(--display);font-weight:800;font-size:16px;color:var(--cloud);letter-spacing:-.01em}
+.plan-stats .l{font-family:var(--mono);font-size:10px;color:var(--text-mute);text-transform:uppercase;letter-spacing:.03em}
 .price{font-family:var(--mono);margin-bottom:20px}
 .price .amt{font-size:34px;font-weight:600;color:var(--cloud);transition:opacity .18s}
 .price .per{font-size:13px;color:var(--text-mute)}
@@ -300,6 +316,11 @@ header{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.86);backdro
 .contact-form{display:flex;flex-direction:column;gap:16px}
 .contact-form label{display:flex;flex-direction:column;gap:6px;font-size:13.5px;font-weight:600;color:var(--text-soft)}
 .contact-form label[hidden]{display:none}
+.radio-group[hidden]{display:none}
+.radio-group{display:flex;flex-direction:column;gap:8px;padding:12px 14px;background:var(--surface-2);border:1px solid var(--line-strong);border-radius:8px}
+.radio-group-label{font-size:13.5px;font-weight:600;color:var(--text-soft)}
+.radio-inline{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:500;color:var(--cloud);cursor:pointer}
+.radio-inline input{width:auto;padding:0}
 .contact-form input,.contact-form select,.contact-form textarea{font-family:var(--body);font-size:15px;padding:11px 13px;border:1px solid var(--line-strong);border-radius:8px;background:var(--surface-2);color:var(--cloud)}
 .contact-form input:focus,.contact-form select:focus,.contact-form textarea:focus{border-color:var(--copper)}
 .contact-form textarea{resize:vertical;min-height:110px;font-weight:400}

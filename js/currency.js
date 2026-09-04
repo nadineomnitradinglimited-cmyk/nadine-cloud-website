@@ -9,6 +9,10 @@
 (function(){
   const CACHE_KEY = 'nc_currency_v1';
   const CACHE_MS = 12 * 60 * 60 * 1000;
+  let lastCurrency = null;
+  let lastRate = null;
+
+  window.ncRefreshPrices = function(){ applyRate(lastCurrency, lastRate); };
 
   // ISO 3166-1 alpha-2 country -> ISO 4217 currency code.
   const COUNTRY_CURRENCY = {
@@ -59,6 +63,8 @@
   }
 
   function applyRate(currency, rate){
+    lastCurrency = currency;
+    lastRate = rate;
     document.querySelectorAll('[data-zmw]').forEach(function(el){
       const zmw = parseFloat(el.getAttribute('data-zmw'));
       if(!isFinite(zmw)) return;

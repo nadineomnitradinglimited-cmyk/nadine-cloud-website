@@ -7,29 +7,61 @@
   const amount = parseFloat(params.get('amount'));
   const type = params.get('type') || '';
   const pkg = params.get('pkg') || '';
-  const period = params.get('period') === 'mo' ? 'mo' : 'yr';
+  const periodParam = params.get('period');
+  const period = periodParam === 'mo' ? 'mo' : periodParam === '2yr' ? '2yr' : 'yr';
+  const PERIOD_LABEL = { mo: '/month', yr: '/year', '2yr': '/2 years' };
+  const PERIOD_BILLED = { mo: 'Billed monthly. ', yr: 'Billed annually. ', '2yr': 'Billed once, every 2 years. ' };
 
   document.getElementById('ckPlanTitle').textContent = plan;
   document.getElementById('ckSummaryPlan').textContent = plan;
   document.getElementById('ckAmountLabel').textContent = Number.isFinite(amount) ? ('ZMW ' + amount.toLocaleString()) : 'now';
-  document.getElementById('ckSummaryAmount').textContent = Number.isFinite(amount) ? ('ZMW ' + amount.toLocaleString() + ' / ' + period) : 'Amount to be confirmed';
+  document.getElementById('ckSummaryAmount').textContent = Number.isFinite(amount) ? ('ZMW ' + amount.toLocaleString() + ' ' + PERIOD_LABEL[period]) : 'Amount to be confirmed';
   const billingNote = document.getElementById('ckBillingNote');
   if (billingNote) {
-    billingNote.textContent = (period === 'mo' ? 'Billed monthly. ' : 'Billed annually. ') + "Card payments aren't available yet — mobile money only for now.";
+    billingNote.textContent = PERIOD_BILLED[period] + "Card payments aren't available yet — mobile money only for now.";
+  }
+
+  const domainField = document.getElementById('domainField');
+  const domainConfirmField = document.getElementById('domainConfirmField');
+  const domainMismatchEl = document.getElementById('domainMismatch');
+  const domainChoice = document.getElementById('domainChoice');
+  const domainNewNote = document.getElementById('domainNewNote');
+
+  function applyDomainOptionCopy(){
+    if (type !== 'hosting') return;
+    const opt = (document.querySelector('input[name="domainOption"]:checked') || {}).value || 'existing';
+    if (opt === 'new') {
+      domainField.firstChild.textContent = 'Domain you’d like to register';
+      domainField.querySelector('input').placeholder = 'yourbusiness.com';
+      domainNewNote.hidden = false;
+    } else {
+      domainField.firstChild.textContent = 'Domain for this hosting account';
+      domainField.querySelector('input').placeholder = 'yourbusiness.com (no www)';
+      domainNewNote.hidden = true;
+    }
   }
 
   if (type === 'domain') {
-    const field = document.getElementById('domainField');
-    field.hidden = false;
-    field.querySelector('input').required = true;
+    domainField.hidden = false;
+    domainField.querySelector('input').required = true;
+    domainConfirmField.hidden = false;
+    domainConfirmField.querySelector('input').required = true;
     document.getElementById('ckPlanSub').textContent = "Tell us the domain you want — we'll confirm the exact price if it differs.";
   } else if (type === 'hosting') {
-    const field = document.getElementById('domainField');
-    field.hidden = false;
-    field.firstChild.textContent = 'Domain for this hosting account';
-    field.querySelector('input').required = true;
-    field.querySelector('input').placeholder = 'yourbusiness.com (no www)';
-    document.getElementById('ckPlanSub').textContent = "Tell us the domain to set up — your hosting account is created automatically as soon as payment clears.";
+    domainChoice.hidden = false;
+    domainChoice.addEventListener('change', applyDomainOptionCopy);
+    domainField.hidden = false;
+    domainField.querySelector('input').required = true;
+    domainConfirmField.hidden = false;
+    domainConfirmField.querySelector('input').required = true;
+    applyDomainOptionCopy();
+    document.getElementById('ckPlanSub').textContent = "Tell us the domain to use — double-check the spelling, this is exactly what we'll set up.";
+  }
+
+  function domainsMatch(){
+    const a = (domainField.querySelector('input').value || '').trim().toLowerCase();
+    const b = (domainConfirmField.querySelector('input').value || '').trim().toLowerCase();
+    return !domainConfirmField.hidden ? a && a === b : true;
   }
 
   if (!Number.isFinite(amount) || amount <= 0) {
@@ -81,6 +113,14 @@
 
   form.addEventListener('submit', function(e){
     e.preventDefault();
+
+    if (!domainsMatch()) {
+      domainMismatchEl.hidden = false;
+      domainConfirmField.querySelector('input').focus();
+      return;
+    }
+    domainMismatchEl.hidden = true;
+
     stopPolling();
     setStatus('Starting payment…', '');
     submitBtn.disabled = true;
@@ -92,6 +132,7 @@
       type,
       pkg,
       domain: fd.get('domain') || '',
+      domainOption: type === 'hosting' ? (fd.get('domainOption') || 'existing') : '',
       name: fd.get('name'),
       email: fd.get('email'),
       phone: fd.get('phone'),

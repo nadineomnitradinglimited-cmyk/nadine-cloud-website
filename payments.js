@@ -85,19 +85,26 @@ async function notifyOrder(reference, outcome, reason) {
   notified.add(reference);
   const order = pendingOrders.get(reference);
   const reasonLine = reason ? `\nReason: ${reason}` : '';
+  const domainOptionLine = order && order.type === 'hosting'
+    ? `\nDomain option: ${order.domainOption === 'new' ? 'NEW — customer needs this domain registered' : 'Existing — customer already owns this domain'}`
+    : '';
   let message = order
-    ? `Plan: ${order.plan}\nAmount: ZMW ${order.amount}\nCustomer: ${order.name} <${order.email}>\nPhone: ${order.phone}\nDomain requested: ${order.domain || '-'}\nReference: ${reference}\nStatus: ${outcome}${reasonLine}`
+    ? `Plan: ${order.plan}\nAmount: ZMW ${order.amount}\nCustomer: ${order.name} <${order.email}>\nPhone: ${order.phone}\nDomain requested: ${order.domain || '-'}${domainOptionLine}\nReference: ${reference}\nStatus: ${outcome}${reasonLine}`
     : `Reference: ${reference}\nStatus: ${outcome}${reasonLine}\n(No local order details — server likely restarted since checkout started; check the Lenco dashboard for this reference.)`;
 
-  // On a successful hosting payment with a package + domain on file,
-  // provision the real cPanel account automatically.
-  if (outcome === 'paid' && order && order.type === 'hosting' && order.pkg && order.domain) {
+  // On a successful hosting payment for a domain the customer already owns,
+  // provision the real cPanel account automatically. If they need a NEW
+  // domain registered, hold off — there's no registrar API here, so the
+  // domain has to be registered manually before a hosting account makes sense.
+  if (outcome === 'paid' && order && order.type === 'hosting' && order.pkg && order.domain && order.domainOption !== 'new') {
     const acct = await createAccount({ domain: order.domain, pkgSlug: order.pkg, contactemail: order.email });
     if (acct.ok) {
       message += `\n\n--- WHM account created automatically ---\nDomain: ${acct.domain}\nUsername: ${acct.username}\nPassword: ${acct.password}\ncPanel login: https://${acct.domain}:2083\n\nForward these details to the customer (${order.email}) — Resend can't email them directly yet, see the domain-verification note in email.js.`;
     } else {
       message += `\n\n--- WHM account creation FAILED ---\nReason: ${acct.reason}${acct.raw ? `\nDetails: ${JSON.stringify(acct.raw.metadata || acct.raw)}` : ''}\nYou'll need to create this account manually in WHM for ${order.domain} on package nadine14_${order.pkg}.`;
     }
+  } else if (outcome === 'paid' && order && order.type === 'hosting' && order.pkg && order.domainOption === 'new') {
+    message += `\n\n--- ACTION NEEDED: register domain first ---\nCustomer wants a NEW domain (${order.domain || 'name not given'}) registered before hosting is set up. Confirm availability and price with them, register it, then create the WHM account manually on package nadine14_${order.pkg}.`;
   }
 
   if (order && outcome === 'paid') {
@@ -193,6 +200,7 @@ async function handleCheckoutInitiate(req, res) {
   const domain = typeof parsed.domain === 'string' ? parsed.domain.trim().toLowerCase().replace(/^https?:\/\//, '').replace(/\/.*$/, '').slice(0, 255) : '';
   const type = typeof parsed.type === 'string' ? parsed.type.trim().slice(0, 30) : '';
   const pkg = typeof parsed.pkg === 'string' ? parsed.pkg.trim().toLowerCase() : '';
+  const domainOption = parsed.domainOption === 'new' ? 'new' : 'existing';
 
   if (!plan) return sendJson(res, 400, { error: 'Missing plan.' });
   if (!Number.isFinite(amount) || amount <= 0 || amount > 20000) return sendJson(res, 400, { error: 'Invalid amount.' });
@@ -237,7 +245,7 @@ async function handleCheckoutInitiate(req, res) {
     return;
   }
 
-  pendingOrders.set(reference, { plan, amount, name, email, phone: phoneDigits, domain: domain || null, type: type || null, pkg: pkg || null, createdAt: Date.now() });
+  pendingOrders.set(reference, { plan, amount, name, email, phone: phoneDigits, domain: domain || null, type: type || null, pkg: pkg || null, domainOption: type === 'hosting' ? domainOption : null, createdAt: Date.now() });
 
   sendJson(res, 200, { reference, status: lenco.body.data.status });
 }
