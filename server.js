@@ -132,7 +132,7 @@ const server = http.createServer((req, res) => {
     // Namecheap SANDBOX (no real domain, no real money) to confirm the
     // registration path works from this server's actual whitelisted IP,
     // since that can't be tested from a dev machine. Remove once confirmed.
-    const testName = `nadineverify${Date.now()}.com`;
+    const testName = `qzxwplk${Date.now()}rft.com`;
     registerDomain(testName, 1, {
       firstName: 'Nadine', lastName: 'Test',
       address1: '123 Test Street', city: 'Lusaka', stateProvince: 'Lusaka',
