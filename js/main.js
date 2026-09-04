@@ -5,17 +5,46 @@
   if (btn && links) btn.addEventListener('click', () => links.classList.toggle('open'));
 })();
 
-/* ---------- domain name prompt (not a live availability check — message us to confirm) ---------- */
+/* ---------- domain name search (live availability check via Namecheap, .co.zm excluded — that's ZICTA, not Namecheap) ---------- */
+const DOMAIN_PRICE_ZMW = { com: 450, net: 500, org: 450 };
+let domainLookupSeq = 0;
+
 function lookupDomain(){
   const input = document.getElementById('domInput');
   const out = document.getElementById('domResult');
   if (!input || !out) return;
   const raw = input.value.trim().toLowerCase().replace(/[^a-z0-9-]/g,'');
   if(!raw){ out.textContent = 'Type a name to check .com, .co.zm, .org and more'; return; }
-  const waText = encodeURIComponent('Hi Nadine Cloud, is ' + raw + '.com available to register?');
-  out.innerHTML = 'We\'ll confirm if <strong>' + raw + '.com</strong> is available, from ZMW 450/yr' +
-    ' &nbsp;·&nbsp; <a href="https://wa.me/260770346698?text=' + waText + '" target="_blank" rel="noopener" style="color:#7047FF">Ask on WhatsApp</a>' +
-    ' &nbsp;·&nbsp; <a href="contact.html" style="color:#7047FF">Contact form</a>';
+
+  const seq = ++domainLookupSeq;
+  out.textContent = 'Checking ' + raw + '.com, .net and .org…';
+
+  fetch('/api/domain-check?name=' + encodeURIComponent(raw))
+    .then((r) => r.json().then((data) => ({ ok: r.ok, data })))
+    .then(({ ok, data }) => {
+      if (seq !== domainLookupSeq) return; // a newer lookup started; drop this stale result
+      if (!ok || !data.results) throw new Error(data.error || 'check failed');
+
+      const rows = data.results.map((r) => {
+        const tld = r.domain.slice(r.domain.lastIndexOf('.') + 1);
+        const price = DOMAIN_PRICE_ZMW[tld];
+        if (r.available) {
+          const waText = encodeURIComponent('Hi Nadine Cloud, I\'d like to register ' + r.domain);
+          return '<span class="ok">✓</span> <strong>' + r.domain + '</strong> is available' + (price ? ' — from ZMW ' + price + '/yr' : '') +
+            ' &nbsp;<a href="https://wa.me/260770346698?text=' + waText + '" target="_blank" rel="noopener" style="color:#7047FF">Register it</a>';
+        }
+        return '<span style="color:var(--text-mute)">✗ ' + r.domain + ' is already taken</span>';
+      });
+      out.innerHTML = rows.join('<br>') +
+        '<br><span style="color:var(--text-mute)">.co.zm isn’t checked live yet — <a href="contact.html" style="color:#7047FF">message us</a> to confirm.</span>';
+    })
+    .catch(() => {
+      if (seq !== domainLookupSeq) return;
+      const waText = encodeURIComponent('Hi Nadine Cloud, is ' + raw + '.com available to register?');
+      out.innerHTML = 'We\'ll confirm if <strong>' + raw + '.com</strong> is available, from ZMW 450/yr' +
+        ' &nbsp;·&nbsp; <a href="https://wa.me/260770346698?text=' + waText + '" target="_blank" rel="noopener" style="color:#7047FF">Ask on WhatsApp</a>' +
+        ' &nbsp;·&nbsp; <a href="contact.html" style="color:#7047FF">Contact form</a>';
+    });
 }
 
 /* ---------- contact form ---------- */
