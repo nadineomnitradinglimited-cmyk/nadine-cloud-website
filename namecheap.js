@@ -96,6 +96,62 @@ async function checkAvailability(domainNames) {
   }));
 }
 
+// contact: { firstName, lastName, address1, city, stateProvince, postalCode,
+//            country, phone, email } — phone must be like "+260.9770000000".
+// The same contact is used for Registrant/Tech/Admin/AuxBilling, matching
+// what most registrars (including Namecheap's own checkout) do by default
+// for individual customers rather than asking for 4 separate contact sets.
+function contactParams(contact) {
+  const fields = {
+    FirstName: contact.firstName,
+    LastName: contact.lastName,
+    Address1: contact.address1,
+    City: contact.city,
+    StateProvince: contact.stateProvince,
+    PostalCode: contact.postalCode,
+    Country: contact.country,
+    Phone: contact.phone,
+    EmailAddress: contact.email,
+  };
+  const out = {};
+  ['Registrant', 'Tech', 'Admin', 'AuxBilling'].forEach((role) => {
+    Object.entries(fields).forEach(([key, value]) => {
+      out[`${role}${key}`] = value;
+    });
+  });
+  return out;
+}
+
+// Registers a domain the customer already confirmed is available. Returns
+// { ok, domain, orderId, transactionId, chargedAmount } on success, or
+// { ok: false, reason } on failure — never throws, so a failed registration
+// can be reported to the admin/customer instead of crashing the payment flow.
+async function registerDomain(domainName, years, contact) {
+  try {
+    const commandResponse = await namecheapRequest('namecheap.domains.create', {
+      DomainName: domainName,
+      Years: years,
+      AddFreeWhoisguard: 'yes',
+      WGEnabled: 'yes',
+      ...contactParams(contact),
+    });
+
+    const result = commandResponse.DomainCreateResult;
+    if (!result || !(result.Registered === 'true' || result.Registered === true)) {
+      return { ok: false, reason: 'Namecheap did not confirm registration', raw: result };
+    }
+    return {
+      ok: true,
+      domain: result.Domain,
+      orderId: result.OrderID,
+      transactionId: result.TransactionID,
+      chargedAmount: result.ChargedAmount,
+    };
+  } catch (err) {
+    return { ok: false, reason: err.message || String(err) };
+  }
+}
+
 const TLDS = ['com', 'net', 'org'];
 
 async function handleDomainCheck(req, res, urlParams) {
@@ -127,4 +183,4 @@ async function handleDomainCheck(req, res, urlParams) {
   }
 }
 
-module.exports = { isConfigured, checkAvailability, handleDomainCheck };
+module.exports = { isConfigured, checkAvailability, handleDomainCheck, registerDomain };

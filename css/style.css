@@ -334,6 +334,8 @@ header .wrap{max-width:1440px}
 
 /* ---------- contact form ---------- */
 .contact-form{display:flex;flex-direction:column;gap:16px}
+#registrantFields{display:flex;flex-direction:column;gap:16px}
+#registrantFields[hidden]{display:none}
 .contact-form label{display:flex;flex-direction:column;gap:6px;font-size:13.5px;font-weight:600;color:var(--text-soft)}
 .contact-form label[hidden]{display:none}
 .radio-group[hidden]{display:none}

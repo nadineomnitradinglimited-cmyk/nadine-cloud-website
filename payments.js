@@ -3,6 +3,7 @@ const { sendEmail } = require('./email');
 const { createAccount, PACKAGES } = require('./whm');
 const { generateReceiptPdf } = require('./receipt');
 const { isConfigured: dbConfigured, getPool, ensureSchema } = require('./db');
+const { checkAvailability, registerDomain } = require('./namecheap');
 
 // Best-effort persistence to the database (if configured) so orders survive
 // a restart and show up on a customer's account page. Never blocks or
@@ -112,6 +113,50 @@ async function lencoRequest(pathname, options = {}) {
   return { httpStatus: res.status, body };
 }
 
+// Zambian mobile money numbers only (that's the only payment method this
+// site accepts), so the phone used for checkout is always Zambian
+// regardless of the registrant's declared country — format Namecheap wants
+// is "+CountryCode.LocalNumberWithoutLeadingZero".
+function toNamecheapPhone(phoneDigits) {
+  const local = phoneDigits.replace(/^\+?260/, '').replace(/^0/, '');
+  return `+260.${local}`;
+}
+
+// Re-checks availability right before registering (the customer may have
+// checked minutes or hours earlier — someone else could have taken it since,
+// or it could have turned out to be premium-priced, which our fixed listed
+// price wouldn't cover) and only registers if it's still a normal, available
+// domain. Never throws — returns a result object either way so the caller
+// can report success or a clear reason for manual follow-up.
+async function attemptDomainRegistration(order) {
+  if (!order.registrant) return { ok: false, reason: 'No registrant contact details on file for this order.' };
+  try {
+    const [check] = await checkAvailability([order.domain]);
+    if (!check || !check.available) {
+      return { ok: false, reason: `${order.domain} is no longer available to register.` };
+    }
+    if (check.isPremium) {
+      return { ok: false, reason: `${order.domain} is a premium domain (Namecheap price differs from what was charged) — register manually and confirm the price difference with the customer.` };
+    }
+  } catch (err) {
+    return { ok: false, reason: `Could not re-check availability: ${err.message || err}` };
+  }
+
+  const contact = {
+    firstName: (order.name.split(' ')[0] || order.name).slice(0, 50),
+    lastName: (order.name.split(' ').slice(1).join(' ') || order.name).slice(0, 50),
+    address1: order.registrant.address1,
+    city: order.registrant.city,
+    stateProvince: order.registrant.stateProvince || order.registrant.city,
+    postalCode: order.registrant.postalCode,
+    country: order.registrant.country,
+    phone: toNamecheapPhone(order.phone),
+    email: order.email,
+  };
+
+  return registerDomain(order.domain, 1, contact);
+}
+
 async function notifyOrder(reference, outcome, reason) {
   if (notified.has(reference)) return;
   notified.add(reference);
@@ -125,9 +170,7 @@ async function notifyOrder(reference, outcome, reason) {
     : `Reference: ${reference}\nStatus: ${outcome}${reasonLine}\n(No local order details — server likely restarted since checkout started; check the Lenco dashboard for this reference.)`;
 
   // On a successful hosting payment for a domain the customer already owns,
-  // provision the real cPanel account automatically. If they need a NEW
-  // domain registered, hold off — there's no registrar API here, so the
-  // domain has to be registered manually before a hosting account makes sense.
+  // provision the real cPanel account automatically.
   if (outcome === 'paid' && order && order.type === 'hosting' && order.pkg && order.domain && order.domainOption !== 'new') {
     const acct = await createAccount({ domain: order.domain, pkgSlug: order.pkg, contactemail: order.email });
     if (acct.ok) {
@@ -136,7 +179,28 @@ async function notifyOrder(reference, outcome, reason) {
       message += `\n\n--- WHM account creation FAILED ---\nReason: ${acct.reason}${acct.raw ? `\nDetails: ${JSON.stringify(acct.raw.metadata || acct.raw)}` : ''}\nYou'll need to create this account manually in WHM for ${order.domain} on package nadine14_${order.pkg}.`;
     }
   } else if (outcome === 'paid' && order && order.type === 'hosting' && order.pkg && order.domainOption === 'new') {
-    message += `\n\n--- ACTION NEEDED: register domain first ---\nCustomer wants a NEW domain (${order.domain || 'name not given'}) registered before hosting is set up. Confirm availability and price with them, register it, then create the WHM account manually on package nadine14_${order.pkg}.`;
+    // Register the new domain first, then chain into WHM account creation
+    // if that succeeds — same automatic flow as an existing domain, just
+    // with a registration step in front of it.
+    const reg = await attemptDomainRegistration(order);
+    if (reg.ok) {
+      message += `\n\n--- Domain registered automatically ---\nDomain: ${reg.domain}\nNamecheap order: ${reg.orderId}\n\nProceeding to create the hosting account…`;
+      const acct = await createAccount({ domain: order.domain, pkgSlug: order.pkg, contactemail: order.email });
+      if (acct.ok) {
+        message += `\n\n--- WHM account created automatically ---\nDomain: ${acct.domain}\nUsername: ${acct.username}\nPassword: ${acct.password}\ncPanel login: https://${acct.domain}:2083\n\nForward these details to the customer (${order.email}).`;
+      } else {
+        message += `\n\n--- WHM account creation FAILED (domain is registered, hosting isn't) ---\nReason: ${acct.reason}\nCreate this account manually in WHM for ${order.domain} on package nadine14_${order.pkg}.`;
+      }
+    } else {
+      message += `\n\n--- ACTION NEEDED: domain registration failed ---\nCustomer wants a NEW domain (${order.domain || 'name not given'}) registered before hosting is set up.\nReason: ${reg.reason}\nRegister it manually, then create the WHM account on package nadine14_${order.pkg}.`;
+    }
+  } else if (outcome === 'paid' && order && order.type === 'domain' && order.domain) {
+    const reg = await attemptDomainRegistration(order);
+    if (reg.ok) {
+      message += `\n\n--- Domain registered automatically ---\nDomain: ${reg.domain}\nNamecheap order: ${reg.orderId}\nCharged by Namecheap: ${reg.chargedAmount}\n\nWhoisGuard privacy protection was requested — confirm it applied in the Namecheap dashboard.`;
+    } else {
+      message += `\n\n--- ACTION NEEDED: automatic registration failed ---\nDomain: ${order.domain}\nReason: ${reg.reason}\nRegister it manually and let the customer (${order.email}) know once it's done.`;
+    }
   }
 
   if (order && outcome === 'paid') {
@@ -234,6 +298,11 @@ async function handleCheckoutInitiate(req, res) {
   const type = typeof parsed.type === 'string' ? parsed.type.trim().slice(0, 30) : '';
   const pkg = typeof parsed.pkg === 'string' ? parsed.pkg.trim().toLowerCase() : '';
   const domainOption = parsed.domainOption === 'new' ? 'new' : 'existing';
+  const address1 = typeof parsed.address1 === 'string' ? parsed.address1.trim().slice(0, 200) : '';
+  const city = typeof parsed.city === 'string' ? parsed.city.trim().slice(0, 100) : '';
+  const stateProvince = typeof parsed.stateProvince === 'string' ? parsed.stateProvince.trim().slice(0, 100) : '';
+  const postalCode = typeof parsed.postalCode === 'string' ? parsed.postalCode.trim().slice(0, 20) : '';
+  const country = typeof parsed.country === 'string' ? parsed.country.trim().toUpperCase().slice(0, 10) : '';
 
   if (!plan) return sendJson(res, 400, { error: 'Missing plan.' });
   if (!Number.isFinite(amount) || amount <= 0 || amount > 20000) return sendJson(res, 400, { error: 'Invalid amount.' });
@@ -244,6 +313,14 @@ async function handleCheckoutInitiate(req, res) {
   if (type === 'hosting') {
     if (!pkg || !PACKAGES[pkg]) return sendJson(res, 400, { error: 'Missing or invalid hosting package.' });
     if (!domain || !/^[a-z0-9.-]+\.[a-z]{2,}$/.test(domain)) return sendJson(res, 400, { error: 'A valid domain is required to set up hosting.' });
+  }
+
+  const needsRegistrant = type === 'domain' || (type === 'hosting' && domainOption === 'new');
+  if (needsRegistrant) {
+    if (!domain) return sendJson(res, 400, { error: 'A domain name is required.' });
+    if (!address1 || !city || !postalCode || !country || country === 'OTHER') {
+      return sendJson(res, 400, { error: 'A full contact address is required to register a domain — please fill in every field, or message us on WhatsApp if your country isn’t listed.' });
+    }
   }
 
   const reference = genReference();
@@ -278,7 +355,13 @@ async function handleCheckoutInitiate(req, res) {
     return;
   }
 
-  const orderRecord = { plan, amount, name, email, phone: phoneDigits, domain: domain || null, type: type || null, pkg: pkg || null, domainOption: type === 'hosting' ? domainOption : null, createdAt: Date.now() };
+  const orderRecord = {
+    plan, amount, name, email, phone: phoneDigits,
+    domain: domain || null, type: type || null, pkg: pkg || null,
+    domainOption: type === 'hosting' ? domainOption : null,
+    registrant: needsRegistrant ? { address1, city, stateProvince, postalCode, country } : null,
+    createdAt: Date.now(),
+  };
   pendingOrders.set(reference, orderRecord);
   persistOrder(reference, orderRecord);
 

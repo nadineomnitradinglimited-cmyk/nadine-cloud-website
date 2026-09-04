@@ -32,6 +32,12 @@
   const domainMismatchEl = document.getElementById('domainMismatch');
   const domainChoice = document.getElementById('domainChoice');
   const domainNewNote = document.getElementById('domainNewNote');
+  const registrantFields = document.getElementById('registrantFields');
+
+  function setRegistrantRequired(required){
+    registrantFields.hidden = !required;
+    registrantFields.querySelectorAll('input').forEach((el) => { el.required = required; });
+  }
 
   function applyDomainOptionCopy(){
     if (type !== 'hosting') return;
@@ -40,10 +46,12 @@
       domainField.firstChild.textContent = 'Domain you’d like to register';
       domainField.querySelector('input').placeholder = 'yourbusiness.com';
       domainNewNote.hidden = false;
+      setRegistrantRequired(true);
     } else {
       domainField.firstChild.textContent = 'Domain for this hosting account';
       domainField.querySelector('input').placeholder = 'yourbusiness.com (no www)';
       domainNewNote.hidden = true;
+      setRegistrantRequired(false);
     }
   }
 
@@ -52,6 +60,7 @@
     domainField.querySelector('input').required = true;
     domainConfirmField.hidden = false;
     domainConfirmField.querySelector('input').required = true;
+    setRegistrantRequired(true);
     document.getElementById('ckPlanSub').textContent = "Tell us the domain you want — we'll confirm the exact price if it differs.";
   } else if (type === 'hosting') {
     domainChoice.hidden = false;
@@ -143,6 +152,11 @@
       email: fd.get('email'),
       phone: fd.get('phone'),
       operator: fd.get('operator'),
+      address1: fd.get('address1') || '',
+      city: fd.get('city') || '',
+      stateProvince: fd.get('stateProvince') || '',
+      postalCode: fd.get('postalCode') || '',
+      country: fd.get('country') || '',
     };
 
     fetch('/api/checkout', {

@@ -76,6 +76,40 @@
           </label>
           <p id="domainMismatch" class="form-status err" hidden style="margin:-8px 0 0">Those two don't match — please check for typos.</p>
           <p id="domainNewNote" class="form-status" hidden style="margin:-8px 0 0;color:var(--text-mute)">This payment covers hosting only. We'll check availability and message you to confirm the exact domain price before registering it.</p>
+
+          <div id="registrantFields" hidden>
+            <p class="form-status" style="margin:0 0 10px;color:var(--text-mute)">Domain registration requires a real contact address on file (ICANN requirement) — this is who will legally own the domain.</p>
+            <label>Street address
+              <input type="text" name="address1" maxlength="200" autocomplete="address-line1">
+            </label>
+            <label>City
+              <input type="text" name="city" maxlength="100" autocomplete="address-level2">
+            </label>
+            <label>State / Province
+              <input type="text" name="stateProvince" maxlength="100" autocomplete="address-level1">
+            </label>
+            <label>Postal code
+              <input type="text" name="postalCode" maxlength="20" autocomplete="postal-code">
+            </label>
+            <label>Country
+              <select name="country" autocomplete="country">
+                <option value="ZM" selected>Zambia</option>
+                <option value="ZA">South Africa</option>
+                <option value="ZW">Zimbabwe</option>
+                <option value="KE">Kenya</option>
+                <option value="NG">Nigeria</option>
+                <option value="GH">Ghana</option>
+                <option value="TZ">Tanzania</option>
+                <option value="MW">Malawi</option>
+                <option value="BW">Botswana</option>
+                <option value="GB">United Kingdom</option>
+                <option value="US">United States</option>
+                <option value="CA">Canada</option>
+                <option value="AU">Australia</option>
+                <option value="OTHER">Other (message us)</option>
+              </select>
+            </label>
+          </div>
           <label>Mobile money network
             <select name="operator" required>
               <option value="">Select network</option>
