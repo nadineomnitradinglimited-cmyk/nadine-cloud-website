@@ -231,7 +231,11 @@ header .wrap{max-width:1440px}
 .plan:nth-child(2) .plan-icon{background:rgba(23,105,255,.16);color:var(--copper)}
 .plan:nth-child(3) .plan-icon{background:rgba(132,101,214,.14);color:var(--violet)}
 .plan:nth-child(4) .plan-icon{background:rgba(30,158,99,.14);color:var(--ok)}
-.plan h3{font-size:20px;margin-bottom:4px;color:var(--cloud)}
+.plan h3{font-size:20px;font-weight:800;margin-bottom:4px;color:var(--cloud);letter-spacing:-.01em}
+.plan:nth-child(1) h3{color:var(--blue)}
+.plan:nth-child(2) h3{color:var(--copper)}
+.plan:nth-child(3) h3{color:var(--violet)}
+.plan:nth-child(4) h3{color:var(--ok)}
 .plan .for{font-size:13.5px;color:var(--text-mute);margin-bottom:18px}
 .plan-stats{display:grid;grid-template-columns:1fr 1fr;gap:12px 16px;margin:0 0 18px;padding:14px 16px;background:var(--surface-2);border-radius:10px}
 .plan.featured .plan-stats{background:rgba(255,255,255,.6)}
