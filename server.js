@@ -6,6 +6,7 @@ const { handleCheckoutInitiate, handleCheckoutStatus, handleLencoWebhook, handle
 const { handleContact } = require('./contact');
 const { ensurePackagesExist } = require('./whm');
 const { handleSignup, handleLogin, handleLogout, handleMe } = require('./auth');
+const { handleDomainCheck } = require('./namecheap');
 
 const ROOT = __dirname;
 const PORT = process.env.PORT || 3000;
@@ -101,6 +102,11 @@ const server = http.createServer((req, res) => {
 
   if (req.method === 'GET' && urlPath === '/api/auth/me') {
     handleMe(req, res);
+    return;
+  }
+
+  if (req.method === 'GET' && urlPath === '/api/domain-check') {
+    handleDomainCheck(req, res, new URLSearchParams(req.url.split('?')[1] || ''));
     return;
   }
 
