@@ -248,14 +248,15 @@ header .wrap{max-width:1440px}
 .plan li::before{content:"✓ ";color:var(--copper);font-weight:700}
 .plan .cta{display:block;text-align:center;text-decoration:none;background:transparent;border:1.5px solid var(--copper);color:var(--copper);font-weight:600;padding:12px;border-radius:10px;transition:background .2s,color .2s}
 .plan .cta:hover,.plan.featured .cta{background:var(--copper);color:#fff}
-.other-billing{margin-top:18px;padding-top:16px;border-top:1px solid var(--line);display:grid;grid-template-columns:16px 1fr auto auto;column-gap:9px;row-gap:1px;align-items:center}
+.other-billing{margin-top:18px;padding-top:16px;border-top:1px solid var(--line);display:grid;grid-template-columns:15px minmax(0,1fr) auto;column-gap:8px;row-gap:1px;align-items:center}
 .other-billing-label{grid-column:1 / -1;font-family:var(--mono);font-size:10.5px;font-weight:600;color:var(--text-mute);text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px}
 .ob-option{display:contents;cursor:pointer}
-.ob-option input{width:15px;height:15px;margin:0;accent-color:var(--copper)}
+.ob-option input{width:15px;height:15px;margin:0;accent-color:var(--copper);flex:none}
 .ob-option:hover .ob-name{color:var(--copper)}
-.ob-name{color:var(--text-soft);font-size:12.5px;padding:7px 0;white-space:nowrap}
-.ob-price{font-family:var(--mono);font-weight:600;color:var(--cloud);font-size:12.5px;white-space:nowrap;text-align:right;padding:7px 0}
-.ob-save{font-family:var(--mono);font-size:10px;font-weight:700;color:var(--ok);background:#ECFDF3;padding:2px 7px;border-radius:999px;white-space:nowrap;justify-self:end}
+.ob-name{color:var(--text-soft);font-size:12px;padding:6px 0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ob-price-wrap{display:flex;flex-direction:column;align-items:flex-end;gap:2px;padding:6px 0}
+.ob-price{font-family:var(--mono);font-weight:600;color:var(--cloud);font-size:12px;white-space:nowrap}
+.ob-save{font-family:var(--mono);font-size:9.5px;font-weight:700;color:var(--ok);background:#ECFDF3;padding:1px 6px;border-radius:999px;white-space:nowrap}
 .pricing-note{margin-top:26px;font-size:13.5px;color:var(--text-mute);font-family:var(--mono)}
 .price-note{display:block;margin-top:4px;font-family:var(--mono);font-size:11.5px;color:var(--text-mute)}
 .offer-price .price-note{color:var(--text-mute)}
