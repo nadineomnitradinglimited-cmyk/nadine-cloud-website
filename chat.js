@@ -22,6 +22,9 @@ CONTACT
 - Email: info@nadinecloud.com
 - Contact page: /contact.html (has a form too)
 
+ACCOUNTS
+- Customers can create an account at /signup.html and log in at /login.html. Logged-in customers see their order history and can re-download paid receipts at /account.html. If someone asks how to check past orders, log in, or find a receipt, point them to /account.html (or /login.html if they're not sure they're logged in) rather than only suggesting WhatsApp.
+
 SERVICES OVERVIEW
 - Web design — modern, mobile-first websites for shops, clinics, ministries, schools, NGOs. Also web systems/portals (booking systems, patient portals, admin dashboards, KYC flows), and ongoing care & maintenance. Process: Discovery -> Design -> Build -> Launch & support. Pricing is a fixed quote per project, not a flat rate — direct people to /contact.html or WhatsApp for a quote.
 - Cloud hosting — cPanel hosting, priced in Zambian Kwacha (ZMW). Customer picks a billing period at checkout: Monthly, 6 Months (save 10%), 1 Year (save 15%), 2 Years (save 20%) or 3 Years (save 25%) — the longer the period, the bigger the discount.

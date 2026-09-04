@@ -42,7 +42,7 @@
           '<input type="radio" name="' + radioName + '" value="' + key + '"' + (key === 'mo' ? ' checked' : '') + '>' +
           '<span class="ob-name">' + cfg.name + '</span>' +
           '<span class="ob-price">ZMW ' + total.toLocaleString() + '</span>' +
-          (cfg.discount > 0 ? '<span class="ob-save">Save ' + Math.round(cfg.discount * 100) + '%</span>' : '') +
+          '<span class="ob-save">' + (cfg.discount > 0 ? 'Save ' + Math.round(cfg.discount * 100) + '%' : '') + '</span>' +
           '</label>';
       });
       obEl.innerHTML = html;
