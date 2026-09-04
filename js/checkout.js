@@ -7,10 +7,16 @@
   const amount = parseFloat(params.get('amount'));
   const type = params.get('type') || '';
   const pkg = params.get('pkg') || '';
+  const PERIOD_LABEL = { mo: '/month', '6mo': '/6 months', yr: '/year', '2yr': '/2 years', '3yr': '/3 years' };
+  const PERIOD_BILLED = {
+    mo: 'Billed monthly. ',
+    '6mo': 'Billed every 6 months. ',
+    yr: 'Billed annually. ',
+    '2yr': 'Billed once, every 2 years. ',
+    '3yr': 'Billed once, every 3 years. ',
+  };
   const periodParam = params.get('period');
-  const period = periodParam === 'mo' ? 'mo' : periodParam === '2yr' ? '2yr' : 'yr';
-  const PERIOD_LABEL = { mo: '/month', yr: '/year', '2yr': '/2 years' };
-  const PERIOD_BILLED = { mo: 'Billed monthly. ', yr: 'Billed annually. ', '2yr': 'Billed once, every 2 years. ' };
+  const period = PERIOD_LABEL[periodParam] ? periodParam : 'yr';
 
   document.getElementById('ckPlanTitle').textContent = plan;
   document.getElementById('ckSummaryPlan').textContent = plan;

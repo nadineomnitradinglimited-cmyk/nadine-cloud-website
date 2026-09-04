@@ -1,6 +1,12 @@
 (function(){
-  const MULTIPLIER = { mo: 1, yr: 10, '2yr': 20 };
-  const PER_LABEL = { mo: '/month', yr: '/year', '2yr': '/2 years' };
+  // Central billing config — edit discounts/labels here only.
+  const BILLING_PERIODS = {
+    mo:    { months: 1,  discount: 0,    per: '/month',    billed: 'Billed monthly' },
+    '6mo': { months: 6,  discount: 0.10, per: '/6 months',  billed: 'Billed every 6 months' },
+    yr:    { months: 12, discount: 0.15, per: '/year',      billed: 'Billed yearly' },
+    '2yr': { months: 24, discount: 0.20, per: '/2 years',   billed: 'Billed once, every 2 years' },
+    '3yr': { months: 36, discount: 0.25, per: '/3 years',   billed: 'Billed once, every 3 years' },
+  };
 
   document.querySelectorAll('.pricing').forEach(function(section){
     const toggle = section.querySelector('.billing-toggle');
@@ -13,33 +19,65 @@
     if (!hostingPlans.length) return;
 
     hostingPlans.forEach(function(plan){
-      const amtEl = plan.querySelector('.amt[data-zmw]');
+      const amtEl = plan.querySelector('.price .amt[data-zmw]');
       if (!amtEl) return;
-      const mo = parseFloat(amtEl.getAttribute('data-zmw'));
-      if (!isFinite(mo)) return;
-      plan.setAttribute('data-amt-mo', mo);
-      plan.setAttribute('data-amt-yr', Math.round(mo * MULTIPLIER.yr));
-      plan.setAttribute('data-amt-2yr', Math.round(mo * MULTIPLIER['2yr']));
+      plan._baseMo = parseFloat(amtEl.getAttribute('data-zmw'));
     });
 
+    function priceFor(baseMo, periodKey) {
+      const cfg = BILLING_PERIODS[periodKey];
+      const total = Math.round(baseMo * cfg.months * (1 - cfg.discount));
+      const perMonth = Math.round(total / cfg.months);
+      return { total: total, perMonth: perMonth };
+    }
+
     function setPeriod(period){
+      const cfg = BILLING_PERIODS[period];
+      if (!cfg) return;
+
       toggle.querySelectorAll('.billing-opt').forEach(function(btn){
         btn.classList.toggle('active', btn.dataset.period === period);
       });
+
       hostingPlans.forEach(function(plan){
-        const amtEl = plan.querySelector('.amt[data-zmw]');
-        const perEl = plan.querySelector('.per');
+        if (!isFinite(plan._baseMo)) return;
+        const amtEl = plan.querySelector('.price .amt[data-zmw]');
+        const perEl = plan.querySelector('.price .per');
+        const equivEl = plan.querySelector('.price-equiv');
+        const savingsEl = plan.querySelector('.price-savings');
         const cta = plan.querySelector('.cta');
         if (!amtEl || !cta) return;
-        const amount = plan.getAttribute(period === 'yr' ? 'data-amt-yr' : period === '2yr' ? 'data-amt-2yr' : 'data-amt-mo');
-        amtEl.setAttribute('data-zmw', amount);
-        amtEl.textContent = 'ZMW ' + Number(amount).toLocaleString();
-        if (perEl) perEl.textContent = PER_LABEL[period] || '/month';
+
+        const { total, perMonth } = priceFor(plan._baseMo, period);
+
+        amtEl.setAttribute('data-zmw', total);
+        amtEl.textContent = 'ZMW ' + total.toLocaleString();
+        if (perEl) perEl.textContent = cfg.per;
+
+        if (equivEl) {
+          if (period === 'mo') {
+            equivEl.hidden = true;
+          } else {
+            equivEl.hidden = false;
+            equivEl.textContent = 'Equivalent to ZMW ' + perMonth.toLocaleString() + '/month';
+          }
+        }
+
+        if (savingsEl) {
+          if (cfg.discount > 0) {
+            savingsEl.hidden = false;
+            savingsEl.textContent = 'Save ' + Math.round(cfg.discount * 100) + '%';
+          } else {
+            savingsEl.hidden = true;
+          }
+        }
+
         const url = new URL(cta.getAttribute('href'), window.location.href);
-        url.searchParams.set('amount', amount);
+        url.searchParams.set('amount', total);
         url.searchParams.set('period', period);
         cta.setAttribute('href', url.pathname + url.search);
       });
+
       if (window.ncRefreshPrices) window.ncRefreshPrices();
     }
 

@@ -24,11 +24,11 @@ CONTACT
 
 SERVICES OVERVIEW
 - Web design — modern, mobile-first websites for shops, clinics, ministries, schools, NGOs. Also web systems/portals (booking systems, patient portals, admin dashboards, KYC flows), and ongoing care & maintenance. Process: Discovery -> Design -> Build -> Launch & support. Pricing is a fixed quote per project, not a flat rate — direct people to /contact.html or WhatsApp for a quote.
-- Cloud hosting — cPanel hosting, billed monthly in Zambian Kwacha (ZMW). Annual billing available with 2 months free.
+- Cloud hosting — cPanel hosting, priced in Zambian Kwacha (ZMW). Customer picks a billing period at checkout: Monthly, 6 Months (save 10%), 1 Year (save 15%), 2 Years (save 20%) or 3 Years (save 25%) — the longer the period, the bigger the discount.
 - Domain registration & transfers.
 - Business email hosting.
 
-HOSTING PLANS (billed monthly, ZMW — annual = 10x monthly price, 2 months free)
+HOSTING PLANS (base price shown is per month, billed monthly by default)
 - Nadine Cloud — Avara — K99/mo: 1 website, 5 GB storage, 25 GB bandwidth, 5 email accounts, 2 databases, free SSL, cPanel, standard support.
 - Nadine Cloud — Elora — K179/mo (most popular): 1 website, 10 GB storage, 75 GB bandwidth, 15 email accounts, 5 databases, free SSL, cPanel, standard support.
 - Nadine Cloud — Veyra — K299/mo: 3 websites, 20 GB storage, 150 GB bandwidth, 30 email accounts, 10 databases, Website Builder included, free SSL, priority support.
@@ -49,7 +49,7 @@ DOMAIN REGISTRATION (annual, ZMW, "from" prices — exact price depends on the s
 Nadine Cloud can also transfer in domains registered elsewhere.
 
 PAYMENT
-Mobile money (MTN, Airtel, Zamtel) at checkout, or bank transfer on request. Card payments are coming soon, not available yet. Hosting is billed monthly (annual option available with 2 months free); domains and standalone email are billed annually. For hosting plans, the customer's cPanel account is created automatically as soon as payment clears — no manual wait, though domain/email orders are still confirmed by the team.
+Mobile money (MTN, Airtel, Zamtel) at checkout, or bank transfer on request. Card payments are coming soon, not available yet. Hosting billing period (Monthly/6 Months/1 Year/2 Years/3 Years) is chosen with a selector above the plans on the hosting page — longer periods get a bigger discount (10/15/20/25%), charged as one upfront total, not per month. Domains and standalone email are billed annually. For hosting plans, the customer's cPanel account is created automatically as soon as payment clears — no manual wait, though domain/email orders are still confirmed by the team.
 
 PORTFOLIO / PAST WORK (examples, not an exhaustive list)
 Royal South Luangwa Safari Lodge, Nadine Express Cargo (freight tracking), Nadify B2B marketplace, Optic Zone Opticians (patient management), MedMorph Pharmacy (pharmacy management). Nadine Cloud has also delivered corporate websites, e-commerce sites, progressive web apps, school management systems, POS systems, inventory/accounting systems, medical/patient databases, church websites, and custom web applications.
