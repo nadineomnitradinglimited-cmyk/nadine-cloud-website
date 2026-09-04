@@ -3,15 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Checkout — Nadine Cloud</title>
-<meta name="description" content="Pay for your Nadine Cloud hosting, domain or email plan by mobile money.">
+<title>Log In — Nadine Cloud</title>
+<meta name="robots" content="noindex">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Instrument+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-<link rel="canonical" href="https://www.nadinecloud.com/checkout.html">
-<meta name="robots" content="noindex">
+<link rel="canonical" href="https://www.nadinecloud.com/login.html">
 </head>
 <body>
 
@@ -37,8 +36,8 @@
       </ul>
     </nav>
     <div class="nav-actions">
-      <a class="btn-sm ghost" href="https://wa.me/260770346698?text=Hi%20Nadine%20Cloud%2C%20I%27d%20like%20to%20talk%20to%20sales." target="_blank" rel="noopener">Talk to sales</a>
       <a class="btn-sm ghost" href="account.html">Account</a>
+      <a class="btn-sm solid" href="hosting.html#hosting">Get started</a>
       <button class="menu-btn" aria-label="Menu">☰</button>
     </div>
   </div>
@@ -46,65 +45,33 @@
 
 <section class="page-hero">
   <div class="wrap page-hero-inner">
-    <span class="eyebrow">Checkout</span>
-    <h1 id="ckPlanTitle">Complete your order</h1>
-    <p id="ckPlanSub">Pay by mobile money — MTN, Airtel or Zamtel.</p>
+    <span class="eyebrow">Account</span>
+    <h1>Log in to your account.</h1>
+    <p>View your orders and receipts.</p>
   </div>
 </section>
 
-<section class="section" id="checkout">
+<section class="section" id="login">
   <div class="wrap">
     <div class="contact-grid">
       <div class="contact-card">
-        <h3>Pay with mobile money</h3>
-        <form id="checkoutForm" class="contact-form">
-          <label>Full name
-            <input type="text" name="name" required maxlength="120">
-          </label>
+        <h3>Log in</h3>
+        <form id="loginForm" class="contact-form">
           <label>Email
             <input type="email" name="email" required maxlength="200">
           </label>
-          <div id="domainChoice" hidden class="radio-group">
-            <span class="radio-group-label">Domain for this hosting account</span>
-            <label class="radio-inline"><input type="radio" name="domainOption" value="existing" checked> I already own this domain</label>
-            <label class="radio-inline"><input type="radio" name="domainOption" value="new"> I need to register a new domain</label>
-          </div>
-          <label id="domainField" hidden>Domain you want to register
-            <input type="text" name="domain" placeholder="yourbusiness.com" maxlength="255" autocomplete="off">
+          <label>Password
+            <input type="password" name="password" required maxlength="200">
           </label>
-          <label id="domainConfirmField" hidden>Confirm domain (type it again)
-            <input type="text" name="domainConfirm" placeholder="yourbusiness.com" maxlength="255" autocomplete="off">
-          </label>
-          <p id="domainMismatch" class="form-status err" hidden style="margin:-8px 0 0">Those two don't match — please check for typos.</p>
-          <p id="domainNewNote" class="form-status" hidden style="margin:-8px 0 0;color:var(--text-mute)">This payment covers hosting only. We'll check availability and message you to confirm the exact domain price before registering it.</p>
-          <label>Mobile money network
-            <select name="operator" required>
-              <option value="">Select network</option>
-              <option value="mtn">MTN Mobile Money</option>
-              <option value="airtel">Airtel Money</option>
-              <option value="zamtel">Zamtel Kwacha</option>
-            </select>
-          </label>
-          <label>Mobile money phone number
-            <input type="tel" name="phone" required placeholder="09XXXXXXXX" maxlength="20">
-          </label>
-          <button type="submit" class="btn-primary" id="ckSubmit">Pay <span id="ckAmountLabel">now</span></button>
-          <p id="ckStatus" class="form-status" role="status" aria-live="polite"></p>
+          <button type="submit" class="btn-primary">Log in</button>
+          <p id="formStatus" class="form-status" role="status" aria-live="polite"></p>
         </form>
       </div>
       <div style="display:flex;flex-direction:column;gap:24px">
         <div class="contact-card">
-          <h3>Order summary</h3>
-          <p><strong id="ckSummaryPlan">—</strong></p>
-          <p id="ckSummaryAmount" style="font-family:var(--mono);font-size:22px;color:var(--cloud)">—</p>
-          <p style="font-size:13.5px;color:var(--text-mute)" id="ckBillingNote">Card payments aren't available yet — mobile money only for now.</p>
-        </div>
-        <div class="contact-card">
-          <h3>How it works</h3>
-          <p><strong>1.</strong> Enter your details and submit.</p>
-          <p><strong>2.</strong> Approve the payment prompt sent to your phone.</p>
-          <p><strong>3.</strong> We'll confirm here and set things up the same day.</p>
-          <p style="margin-top:10px">Prefer to pay another way? <a href="contact.html" style="color:var(--copper-bright)">Contact us</a> or <a href="https://wa.me/260770346698" target="_blank" rel="noopener" style="color:var(--copper-bright)">WhatsApp</a> instead.</p>
+          <h3>New here?</h3>
+          <p>Create an account to keep track of your orders and receipts in one place.</p>
+          <a class="btn-ghost" href="signup.html">Create an account</a>
         </div>
       </div>
     </div>
@@ -156,6 +123,7 @@
 </footer>
 
 <script src="js/main.js"></script>
-<script src="js/checkout.js"></script>
+<script src="js/auth-forms.js"></script>
+<script src="js/chat-widget.js"></script>
 </body>
 </html>

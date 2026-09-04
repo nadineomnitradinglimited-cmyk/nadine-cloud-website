@@ -2,6 +2,38 @@ const crypto = require('crypto');
 const { sendEmail } = require('./email');
 const { createAccount, PACKAGES } = require('./whm');
 const { generateReceiptPdf } = require('./receipt');
+const { isConfigured: dbConfigured, getPool, ensureSchema } = require('./db');
+
+// Best-effort persistence to the database (if configured) so orders survive
+// a restart and show up on a customer's account page. Never blocks or
+// fails the checkout flow — the in-memory pendingOrders Map above remains
+// the source of truth for the live payment/receipt flow either way.
+async function persistOrder(reference, order) {
+  if (!dbConfigured()) return;
+  try {
+    await ensureSchema();
+    const userResult = await getPool().query('SELECT id FROM users WHERE email = $1', [order.email]);
+    const userId = userResult.rows[0] ? userResult.rows[0].id : null;
+    await getPool().query(
+      `INSERT INTO orders (reference, user_id, plan, amount, type, pkg, domain, domain_option, email, status)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 'pending')
+       ON CONFLICT (reference) DO NOTHING`,
+      [reference, userId, order.plan, order.amount, order.type, order.pkg, order.domain, order.domainOption, order.email]
+    );
+  } catch (err) {
+    console.error('persistOrder failed (non-fatal):', err);
+  }
+}
+
+async function updateOrderStatus(reference, status, paidAt) {
+  if (!dbConfigured()) return;
+  try {
+    await ensureSchema();
+    await getPool().query('UPDATE orders SET status = $1, paid_at = $2 WHERE reference = $3', [status, paidAt || null, reference]);
+  } catch (err) {
+    console.error('updateOrderStatus failed (non-fatal):', err);
+  }
+}
 
 const LENCO_BASE = 'https://api.lenco.co/access/v2';
 const OPERATORS = new Set(['mtn', 'airtel', 'zamtel']);
@@ -110,6 +142,7 @@ async function notifyOrder(reference, outcome, reason) {
   if (order && outcome === 'paid') {
     order.paidAt = Date.now();
   }
+  updateOrderStatus(reference, outcome, order && order.paidAt ? new Date(order.paidAt) : null);
 
   await sendEmail({
     subject: `Nadine Cloud checkout — payment ${outcome} (${reference})`,
@@ -245,7 +278,9 @@ async function handleCheckoutInitiate(req, res) {
     return;
   }
 
-  pendingOrders.set(reference, { plan, amount, name, email, phone: phoneDigits, domain: domain || null, type: type || null, pkg: pkg || null, domainOption: type === 'hosting' ? domainOption : null, createdAt: Date.now() });
+  const orderRecord = { plan, amount, name, email, phone: phoneDigits, domain: domain || null, type: type || null, pkg: pkg || null, domainOption: type === 'hosting' ? domainOption : null, createdAt: Date.now() };
+  pendingOrders.set(reference, orderRecord);
+  persistOrder(reference, orderRecord);
 
   sendJson(res, 200, { reference, status: lenco.body.data.status });
 }

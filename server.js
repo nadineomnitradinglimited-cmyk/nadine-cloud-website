@@ -5,6 +5,7 @@ const { handleChat } = require('./chat');
 const { handleCheckoutInitiate, handleCheckoutStatus, handleLencoWebhook, handleReceiptDownload } = require('./payments');
 const { handleContact } = require('./contact');
 const { ensurePackagesExist } = require('./whm');
+const { handleSignup, handleLogin, handleLogout, handleMe } = require('./auth');
 
 const ROOT = __dirname;
 const PORT = process.env.PORT || 3000;
@@ -83,6 +84,26 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  if (req.method === 'POST' && urlPath === '/api/auth/signup') {
+    handleSignup(req, res);
+    return;
+  }
+
+  if (req.method === 'POST' && urlPath === '/api/auth/login') {
+    handleLogin(req, res);
+    return;
+  }
+
+  if (req.method === 'POST' && urlPath === '/api/auth/logout') {
+    handleLogout(req, res);
+    return;
+  }
+
+  if (req.method === 'GET' && urlPath === '/api/auth/me') {
+    handleMe(req, res);
+    return;
+  }
+
   if (req.method === 'POST' && urlPath === '/api/admin/setup-whm-packages') {
     // one-time setup route: creates the four fixed hosting packages in WHM.
     // Accepts no input and touches nothing customer-facing, so it's left
@@ -126,4 +147,5 @@ server.listen(PORT, () => {
   console.log(`WHM_API_TOKEN configured: ${Boolean(process.env.WHM_API_TOKEN)}`);
   console.log(`ANTHROPIC_API_KEY configured: ${Boolean(process.env.ANTHROPIC_API_KEY)}`);
   console.log(`ANTHROPIC_WORKSPACE_ID configured: ${Boolean(process.env.ANTHROPIC_WORKSPACE_ID)}`);
+  console.log(`DATABASE_URL configured: ${Boolean(process.env.DATABASE_URL)}`);
 });

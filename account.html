@@ -3,24 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Contact Us — Nadine Cloud</title>
-<meta name="description" content="Get in touch with Nadine Cloud for web design, hosting or domains. WhatsApp, call or email us — we reply the same day.">
+<title>My Account — Nadine Cloud</title>
+<meta name="robots" content="noindex">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Instrument+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-<link rel="canonical" href="https://www.nadinecloud.com/contact.html">
-<meta property="og:type" content="website">
-<meta property="og:site_name" content="Nadine Cloud">
-<meta property="og:title" content="Contact Us — Nadine Cloud">
-<meta property="og:description" content="Get in touch with Nadine Cloud for web design, hosting or domains. WhatsApp, call or email us — we reply the same day.">
-<meta property="og:url" content="https://www.nadinecloud.com/contact.html">
-<meta property="og:image" content="https://www.nadinecloud.com/assets/hero-servers.jpg">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Contact Us — Nadine Cloud">
-<meta name="twitter:description" content="Get in touch with Nadine Cloud for web design, hosting or domains. WhatsApp, call or email us — we reply the same day.">
-<meta name="twitter:image" content="https://www.nadinecloud.com/assets/hero-servers.jpg">
+<link rel="canonical" href="https://www.nadinecloud.com/account.html">
 </head>
 <body>
 
@@ -42,12 +32,11 @@
         <li><a href="domains.html#transfer">Transfer</a></li>
         <li><a href="hosting.html#faq">Help Center</a></li>
         <li><a href="work.html">Our work</a></li>
-        <li><a href="contact.html" aria-current="page">Contact</a></li>
+        <li><a href="contact.html">Contact</a></li>
       </ul>
     </nav>
     <div class="nav-actions">
-      <a class="btn-sm ghost" href="https://wa.me/260770346698?text=Hi%20Nadine%20Cloud%2C%20I%27d%20like%20to%20talk%20to%20sales." target="_blank" rel="noopener">Talk to sales</a>
-      <a class="btn-sm ghost" href="account.html">Account</a>
+      <a class="btn-sm ghost" href="account.html" aria-current="page">Account</a>
       <a class="btn-sm solid" href="hosting.html#hosting">Get started</a>
       <button class="menu-btn" aria-label="Menu">☰</button>
     </div>
@@ -56,60 +45,45 @@
 
 <section class="page-hero">
   <div class="wrap page-hero-inner">
-    <span class="eyebrow">Contact us</span>
-    <h1>Let's get you online.</h1>
-    <p>Tell us what you need — a new website, hosting for an existing one, or a domain — and we'll reply the same day.</p>
+    <span class="eyebrow">Account</span>
+    <h1 id="acctTitle">My account</h1>
+    <p id="acctSub">Loading…</p>
   </div>
 </section>
 
-<section class="section" id="contact">
+<section class="section" id="account">
   <div class="wrap">
-    <div class="contact-grid">
-      <div class="contact-card">
-        <h3>Send us a message</h3>
-        <form id="contactForm" class="contact-form">
-          <input type="checkbox" name="botcheck" class="hp" tabindex="-1" autocomplete="off">
-          <label>Name
-            <input type="text" name="name" required>
-          </label>
-          <label>Email
-            <input type="email" name="email" required>
-          </label>
-          <label>Phone (optional)
-            <input type="tel" name="phone">
-          </label>
-          <label>I'm interested in
-            <select name="interest">
-              <option>Web design</option>
-              <option>Hosting</option>
-              <option>Domain registration</option>
-              <option>Not sure yet</option>
-            </select>
-          </label>
-          <label>Message
-            <textarea name="message" rows="5" required></textarea>
-          </label>
-          <button type="submit" class="btn-primary">Send message</button>
-          <p id="formStatus" class="form-status" role="status" aria-live="polite"></p>
-        </form>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:24px">
+
+    <div id="loggedOutView" hidden>
+      <div class="contact-grid">
         <div class="contact-card">
-          <h3>Visit or call</h3>
-          <p><strong>Nadine Cloud</strong><br>A service of Nadine Omni Trading Limited<br>Serving clients worldwide</p>
-          <a class="mono" href="mailto:info@nadinecloud.com">info@nadinecloud.com</a><br>
-          <a class="mono" href="tel:+260770346698">+260 77 034 6698</a>
-          <br>
-          <a class="btn-wa" href="https://wa.me/260770346698?text=Hi%20Nadine%20Cloud%2C%20I%27d%20like%20to%20get%20my%20business%20online." target="_blank" rel="noopener">Chat on WhatsApp</a>
+          <h3>Log in</h3>
+          <p>Log in to see your orders and receipts.</p>
+          <a class="btn-primary" href="login.html">Log in</a>
         </div>
         <div class="contact-card">
-          <h3>How ordering works</h3>
-          <p><strong>1.</strong> Choose a plan or request a website quote.</p>
-          <p><strong>2.</strong> We confirm your order and send an invoice — pay by mobile money, card or bank transfer.</p>
-          <p><strong>3.</strong> Your hosting is set up the same day, and design projects start within 48 hours.</p>
+          <h3>New here?</h3>
+          <p>Create an account to keep track of your orders in one place.</p>
+          <a class="btn-ghost" href="signup.html">Create an account</a>
         </div>
       </div>
     </div>
+
+    <div id="loggedInView" hidden>
+      <div class="contact-card" style="margin-bottom:24px">
+        <h3 id="acctName">—</h3>
+        <p id="acctEmail" style="color:var(--text-mute)"></p>
+        <button type="button" id="logoutBtn" class="btn-ghost" style="margin-top:10px">Log out</button>
+      </div>
+      <div class="contact-card">
+        <h3>Your orders</h3>
+        <div id="ordersEmpty" hidden><p>No orders yet.</p></div>
+        <div id="ordersList"></div>
+      </div>
+    </div>
+
+    <div id="acctError" class="contact-card" hidden></div>
+
   </div>
 </section>
 
@@ -158,6 +132,7 @@
 </footer>
 
 <script src="js/main.js"></script>
+<script src="js/account.js"></script>
 <script src="js/chat-widget.js"></script>
 </body>
 </html>
