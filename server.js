@@ -148,4 +148,8 @@ server.listen(PORT, () => {
   console.log(`ANTHROPIC_API_KEY configured: ${Boolean(process.env.ANTHROPIC_API_KEY)}`);
   console.log(`ANTHROPIC_WORKSPACE_ID configured: ${Boolean(process.env.ANTHROPIC_WORKSPACE_ID)}`);
   console.log(`DATABASE_URL configured: ${Boolean(process.env.DATABASE_URL)}`);
+  console.log(`NAMECHEAP_API_KEY configured: ${Boolean(process.env.NAMECHEAP_API_KEY)}`);
+  console.log(`NAMECHEAP_API_USER configured: ${Boolean(process.env.NAMECHEAP_API_USER)}`);
+  console.log(`NAMECHEAP_USERNAME configured: ${Boolean(process.env.NAMECHEAP_USERNAME)}`);
+  console.log(`NAMECHEAP_SANDBOX: ${process.env.NAMECHEAP_SANDBOX || '(not set)'}`);
 });
