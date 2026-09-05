@@ -1,4 +1,5 @@
 const Anthropic = require('@anthropic-ai/sdk');
+const { sendEmail } = require('./email');
 
 // reads ANTHROPIC_API_KEY from env. Identity-linked keys also require the
 // workspace they act in, sent as a header on every request.
@@ -12,6 +13,23 @@ const MODEL = 'claude-haiku-4-5';
 const MAX_MESSAGE_LENGTH = 800;
 const MAX_HISTORY_TURNS = 8;
 const MAX_OUTPUT_TOKENS = 500;
+
+// Bot -> human handoff routing. `to` should be the real mailbox for that
+// person once it exists; every category currently falls back to Ezra's own
+// Gmail (the only address guaranteed to be checked today) because
+// ezrazion@nadinecloud.com and mirriam@nadinecloud.com can't receive mail
+// yet — the cPanel account for nadinecloud.com is still blocked on an
+// InMotion support ticket (orphaned WHM userdata). Swap the `to` values
+// below once each mailbox is confirmed live; nothing else needs to change.
+const HANDOFF_ROUTES = {
+  technical: { label: 'Technical', to: 'nadineomnitradinglimited@gmail.com' }, // -> ezrazion@nadinecloud.com later
+  packages: { label: 'Packages & pricing', to: 'nadineomnitradinglimited@gmail.com' }, // -> mirriam@nadinecloud.com later (Mirriam currently has no email at all, only WhatsApp +260 973809031)
+  setup: { label: 'Setup', to: 'nadineomnitradinglimited@gmail.com' }, // -> the setup lead's address, once known
+  general: { label: 'General', to: 'nadineomnitradinglimited@gmail.com' },
+};
+const HANDOFF_TAG_RE = /\[\[HANDOFF:(\w+)\]\]/;
+const HANDOFF_DONE_RE = /\[\[HANDOFF_DONE\]\]/;
+const CONTACT_INFO_RE = /[^\s@]+@[^\s@]+\.[^\s@]+|(?:\+?\d[\d\s-]{6,}\d)/;
 
 const SYSTEM_PROMPT = `Your name is Nadine. You are the friendly support assistant embedded on the Nadine Cloud website (www.nadinecloud.com) — a web design, hosting, domains and business email provider serving businesses worldwide. Nadine Cloud is a service of Nadine Omni Trading Limited. Introduce yourself by name only if it comes up naturally (e.g. someone asks who they're talking to) — don't force it into every reply.
 
@@ -64,8 +82,10 @@ HOW TO REPLY
 - Keep answers short — a few sentences, plain text, no markdown headers or bullet-heavy formatting (this renders in a small chat bubble).
 - Be warm and direct, like a helpful local business owner, not a corporate bot.
 - When someone is ready to move forward (order hosting, register a domain, get a website quote), point them to WhatsApp (+260 77 034 6698) or /contact.html.
-- For anything needing a real person — account-specific issues, billing problems, complaints, technical support on an existing site, or anything you're not confident about — say so plainly and hand off to WhatsApp or /contact.html rather than guessing.
-- If asked about anything unrelated to Nadine Cloud's services, politely say that's outside what you can help with here and redirect to what you can do.`;
+- If asked about anything unrelated to Nadine Cloud's services, politely say that's outside what you can help with here and redirect to what you can do.
+
+HANDING OFF TO A REAL PERSON
+When someone needs a real person — account-specific issues, billing problems, complaints, technical support on an existing site/hosting/domain, a custom pricing or package negotiation, help getting set up, or anything you're not confident about — don't just point them at WhatsApp. Instead, warmly say a team member will personally reach out, and ask for their name plus the best way to reach them (email or WhatsApp number) if they haven't already given it earlier in this conversation. The very first time you ask for their contact details for a given issue, end your reply with this exact marker on its own line (it's stripped automatically, the customer never sees it): [[HANDOFF:category]] — where category is exactly one of: technical, packages, setup, general (technical = hosting/site/domain problems on an existing account; packages = pricing/plan/custom package questions; setup = help getting a new site/account/domain set up; general = anything else needing a person). Only add this marker once per issue — if you already asked for contact details earlier in this chat, don't ask again and don't repeat the marker, just wait for their reply or answer normally.`;
 
 const RATE_LIMIT_WINDOW_MS = 60 * 1000;
 const RATE_LIMIT_MAX = 8;
@@ -134,8 +154,39 @@ async function handleChat(req, res) {
     return;
   }
 
-  const history = historyIn
-    .filter((m) => m && (m.role === 'user' || m.role === 'assistant') && typeof m.content === 'string')
+  const rawHistory = historyIn.filter(
+    (m) => m && (m.role === 'user' || m.role === 'assistant') && typeof m.content === 'string'
+  );
+
+  const lastAssistant = [...rawHistory].reverse().find((m) => m.role === 'assistant');
+  const handoffMatch = lastAssistant && !HANDOFF_DONE_RE.test(lastAssistant.content)
+    ? lastAssistant.content.match(HANDOFF_TAG_RE)
+    : null;
+  const pendingCategory = handoffMatch && HANDOFF_ROUTES[handoffMatch[1].toLowerCase()]
+    ? handoffMatch[1].toLowerCase()
+    : null;
+
+  if (pendingCategory && CONTACT_INFO_RE.test(message)) {
+    const route = HANDOFF_ROUTES[pendingCategory];
+    const transcript = rawHistory
+      .concat({ role: 'user', content: message })
+      .map((m) => `${m.role === 'user' ? 'Customer' : 'Nadine (bot)'}: ${m.content.replace(HANDOFF_TAG_RE, '').trim()}`)
+      .join('\n\n');
+
+    const emailResult = await sendEmail({
+      to: route.to,
+      subject: `[Chat handoff — ${route.label}] A customer needs a person`,
+      text: `A website chat visitor needs a real person (category: ${route.label}).\n\nTranscript:\n\n${transcript}\n\n— Sent automatically by the Nadine Cloud chat widget.`,
+    });
+    if (!emailResult.ok) console.error(`Handoff notification not delivered (${route.label}):`, emailResult.reason);
+
+    const reply = "Thanks — I've passed this straight to our team, they'll reach out to you shortly.";
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ reply, historyReply: `${reply} [[HANDOFF_DONE]]` }));
+    return;
+  }
+
+  const history = rawHistory
     .slice(-MAX_HISTORY_TURNS * 2)
     .map((m) => ({ role: m.role, content: m.content.slice(0, MAX_MESSAGE_LENGTH) }));
 
@@ -148,10 +199,12 @@ async function handleChat(req, res) {
     });
 
     const textBlock = response.content.find((b) => b.type === 'text');
-    const reply = textBlock ? textBlock.text : "Sorry, I couldn't come up with a reply — try WhatsApp instead.";
+    const rawReply = textBlock ? textBlock.text : "Sorry, I couldn't come up with a reply — try WhatsApp instead.";
+    const reply = rawReply.replace(HANDOFF_TAG_RE, '').trim();
+    const historyReply = reply !== rawReply.trim() ? rawReply.trim() : undefined;
 
     res.writeHead(200, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ reply }));
+    res.end(JSON.stringify(historyReply ? { reply, historyReply } : { reply }));
   } catch (err) {
     console.error('Chat error:', err);
     res.writeHead(502, { 'Content-Type': 'application/json' });

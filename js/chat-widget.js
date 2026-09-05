@@ -91,7 +91,7 @@
       } else {
         addMessage('assistant', data.reply);
         history.push({ role: 'user', content: message });
-        history.push({ role: 'assistant', content: data.reply });
+        history.push({ role: 'assistant', content: data.historyReply || data.reply });
       }
     } catch (err) {
       typingRow.remove();
