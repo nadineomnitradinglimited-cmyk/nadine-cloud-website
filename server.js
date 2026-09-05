@@ -110,33 +110,6 @@ const server = http.createServer((req, res) => {
     return;
   }
 
-  if (req.method === 'GET' && urlPath === '/api/admin/test-email') {
-    // temporary diagnostic route: sends a real test email to whatever
-    // address is passed, to confirm Resend can now deliver beyond the
-    // account owner's own inbox now that nadinecloud.com is verified.
-    // Remove once confirmed.
-    const to = new URLSearchParams(req.url.split('?')[1] || '').get('to');
-    if (!to) {
-      res.writeHead(400, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ error: 'Pass ?to=address@example.com' }));
-      return;
-    }
-    require('./email').sendEmail({
-      to,
-      subject: 'Nadine Cloud — test email',
-      text: 'If you got this, Resend is delivering correctly to addresses other than the account owner.',
-    })
-      .then((result) => {
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify(result));
-      })
-      .catch((err) => {
-        res.writeHead(500, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: String(err) }));
-      });
-    return;
-  }
-
   if (req.method === 'POST' && urlPath === '/api/admin/setup-whm-packages') {
     // one-time setup route: creates the four fixed hosting packages in WHM.
     // Accepts no input and touches nothing customer-facing, so it's left
