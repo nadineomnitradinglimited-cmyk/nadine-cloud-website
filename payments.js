@@ -213,11 +213,10 @@ async function notifyOrder(reference, outcome, reason) {
     text: message,
   });
 
-  // Also try to email the customer their own receipt. This will fail
-  // (silently, logged only) until the nadinecloud.com domain is verified
-  // at resend.com/domains — Resend's free tier only delivers to the
-  // account's own email until then. The download link on the checkout
-  // page works regardless, so this isn't the customer's only way to get it.
+  // Also email the customer their own receipt — nadinecloud.com is verified
+  // with Resend now, so this actually delivers (confirmed via a live test to
+  // an unrelated inbox). The download link on the checkout page still works
+  // as a backup either way.
   if (order && outcome === 'paid') {
     try {
       const pdf = await generateReceiptPdf({ ...order, currency: 'ZMW' }, { reference, paidAt: new Date(order.paidAt) });
@@ -228,7 +227,7 @@ async function notifyOrder(reference, outcome, reason) {
         attachments: [{ filename: `nadine-cloud-receipt-${reference}.pdf`, content: pdf.toString('base64') }],
       });
       if (!result.ok) {
-        console.error(`Customer receipt email not delivered for ${reference} (expected until domain verified):`, result.reason);
+        console.error(`Customer receipt email not delivered for ${reference}:`, result.reason);
       }
     } catch (err) {
       console.error('Receipt generation for customer email failed:', err);
