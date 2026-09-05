@@ -110,6 +110,28 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  if (req.method === 'GET' && urlPath === '/api/admin/list-paid-orders') {
+    // temporary diagnostic route: lists real paid orders from the database
+    // so we can check whether any customer's receipt email needs a manual
+    // resend from before nadinecloud.com was verified with Resend.
+    // Remove once reviewed.
+    const { getPool, ensureSchema } = require('./db');
+    ensureSchema()
+      .then(() => getPool().query(
+        'SELECT reference, plan, amount, email, domain, status, created_at, paid_at FROM orders WHERE status = $1 ORDER BY paid_at DESC',
+        ['paid']
+      ))
+      .then((result) => {
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(result.rows, null, 2));
+      })
+      .catch((err) => {
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: String(err) }));
+      });
+    return;
+  }
+
   if (req.method === 'POST' && urlPath === '/api/admin/setup-whm-packages') {
     // one-time setup route: creates the four fixed hosting packages in WHM.
     // Accepts no input and touches nothing customer-facing, so it's left
