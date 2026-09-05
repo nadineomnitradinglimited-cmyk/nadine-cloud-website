@@ -1,10 +1,15 @@
 const RESEND_API = 'https://api.resend.com/emails';
-// Resend's free tier only allows sending to the account's own verified
-// email until a domain is verified at resend.com/domains — see the
-// README-style note in the commit that added this for how to switch
-// back to info@nadinecloud.com once that's done.
+// nadinecloud.com is now verified at resend.com/domains (DKIM, DMARC and
+// the send/rsend CNAMEs all confirmed resolving) — sending from the real
+// domain instead of Resend's shared onboarding@resend.dev address, which
+// lifts the "can only send to your own account email" restriction that
+// was blocking every receipt/notification email to actual customers.
+// NOTIFY_TO stays your own Gmail — that's the fallback address for admin
+// alerts (new orders, contact form submissions) when no `to` is given;
+// switch it to an @nadinecloud.com address only once you have a real
+// mailbox there that you actually check.
 const NOTIFY_TO = 'nadineomnitradinglimited@gmail.com';
-const FROM = 'Nadine Cloud <onboarding@resend.dev>';
+const FROM = 'Nadine Cloud <info@nadinecloud.com>';
 
 async function sendEmail({ subject, text, to, attachments }) {
   const apiKey = process.env.RESEND_API_KEY;
