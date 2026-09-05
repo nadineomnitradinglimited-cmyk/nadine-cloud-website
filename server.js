@@ -110,6 +110,51 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  if (req.method === 'POST' && urlPath === '/api/admin/resend-receipt') {
+    // temporary route: re-sends a customer's receipt for a specific order
+    // reference, for orders paid before nadinecloud.com was verified with
+    // Resend (when customer delivery may have silently failed). Remove
+    // once used.
+    const ref = new URLSearchParams(req.url.split('?')[1] || '').get('reference');
+    if (!ref) {
+      res.writeHead(400, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Pass ?reference=NC-...' }));
+      return;
+    }
+    const { getPool, ensureSchema } = require('./db');
+    const { generateReceiptPdf } = require('./receipt');
+    const { sendEmail } = require('./email');
+    ensureSchema()
+      .then(() => getPool().query('SELECT * FROM orders WHERE reference = $1', [ref]))
+      .then(async (result) => {
+        const order = result.rows[0];
+        if (!order) throw new Error('No order found for that reference');
+        const pdf = await generateReceiptPdf(
+          { plan: order.plan, amount: order.amount, domain: order.domain, email: order.email, currency: 'ZMW' },
+          { reference: order.reference, paidAt: new Date(order.paid_at) }
+        );
+        const attachments = [{ filename: `nadine-cloud-receipt-${order.reference}.pdf`, content: pdf.toString('base64') }];
+        const sendResult = await sendEmail({
+          to: order.email,
+          subject: `Your Nadine Cloud receipt — ${order.reference}`,
+          text: `Hi,\n\nThanks for your payment. Your receipt is attached.\n\nPlan: ${order.plan}\nAmount: ZMW ${order.amount}\nReference: ${order.reference}\n\n— Nadine Cloud`,
+          attachments,
+        });
+        const ownCopyResult = await sendEmail({
+          subject: `[Copy] Receipt sent to ${order.email} — ${order.reference}`,
+          text: `This is the same receipt just re-sent to the customer (${order.email}).\n\nPlan: ${order.plan}\nAmount: ZMW ${order.amount}\nReference: ${order.reference}`,
+          attachments,
+        });
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ sentTo: order.email, sendResult, ownCopyResult }, null, 2));
+      })
+      .catch((err) => {
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: String(err) }));
+      });
+    return;
+  }
+
   if (req.method === 'GET' && urlPath === '/api/admin/list-paid-orders') {
     // temporary diagnostic route: lists real paid orders from the database
     // so we can check whether any customer's receipt email needs a manual
