@@ -105,37 +105,6 @@ const server = http.createServer((req, res) => {
     return;
   }
 
-  if (req.method === 'POST' && urlPath === '/api/admin/send-account-details') {
-    // temporary one-off route: emails a specific customer's already-created
-    // cPanel login details directly, for accounts created before this was
-    // automatic. Remove once used.
-    const params = new URLSearchParams(req.url.split('?')[1] || '');
-    const to = params.get('to');
-    const name = params.get('name') || '';
-    const domain = params.get('domain');
-    const username = params.get('username');
-    const password = params.get('password');
-    if (!to || !domain || !username || !password) {
-      res.writeHead(400, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ error: 'Pass ?to=&domain=&username=&password=&name=' }));
-      return;
-    }
-    require('./email').sendEmail({
-      to,
-      subject: `Your Nadine Cloud hosting is ready — ${domain}`,
-      text: `Hi ${name || 'there'},\n\nYour hosting account is set up and ready to go.\n\ncPanel login: https://${domain}:2083\nUsername: ${username}\nPassword: ${password}\n\nWe'd recommend logging in and changing your password once you're in.\n\nAny trouble, reach us on WhatsApp at +260 77 034 6698.\n\n— Nadine Cloud`,
-    })
-      .then((result) => {
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify(result));
-      })
-      .catch((err) => {
-        res.writeHead(500, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: String(err) }));
-      });
-    return;
-  }
-
   if (req.method === 'GET' && urlPath === '/api/domain-check') {
     handleDomainCheck(req, res, new URLSearchParams(req.url.split('?')[1] || ''));
     return;
