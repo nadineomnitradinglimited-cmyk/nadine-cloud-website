@@ -157,6 +157,22 @@ async function attemptDomainRegistration(order) {
   return registerDomain(order.domain, 1, contact);
 }
 
+// Emails the new cPanel login details straight to the customer — this used
+// to only go in the admin email with a note to forward it manually, from
+// back when Resend couldn't deliver to customers directly. Now that
+// nadinecloud.com is verified, send it to them immediately instead.
+async function emailAccountDetailsToCustomer(order, acct) {
+  const result = await sendEmail({
+    to: order.email,
+    subject: `Your Nadine Cloud hosting is ready — ${acct.domain}`,
+    text: `Hi ${order.name},\n\nYour hosting account is set up and ready to go.\n\ncPanel login: https://${acct.domain}:2083\nUsername: ${acct.username}\nPassword: ${acct.password}\n\nWe'd recommend logging in and changing your password once you're in.\n\nAny trouble, reach us on WhatsApp at +260 77 034 6698.\n\n— Nadine Cloud`,
+  });
+  if (!result.ok) {
+    console.error(`Account details email not delivered to customer for ${acct.domain}:`, result.reason);
+  }
+  return result;
+}
+
 async function notifyOrder(reference, outcome, reason) {
   if (notified.has(reference)) return;
   notified.add(reference);
@@ -174,7 +190,8 @@ async function notifyOrder(reference, outcome, reason) {
   if (outcome === 'paid' && order && order.type === 'hosting' && order.pkg && order.domain && order.domainOption !== 'new') {
     const acct = await createAccount({ domain: order.domain, pkgSlug: order.pkg, contactemail: order.email });
     if (acct.ok) {
-      message += `\n\n--- WHM account created automatically ---\nDomain: ${acct.domain}\nUsername: ${acct.username}\nPassword: ${acct.password}\ncPanel login: https://${acct.domain}:2083\n\nForward these details to the customer (${order.email}) — Resend can't email them directly yet, see the domain-verification note in email.js.`;
+      const emailResult = await emailAccountDetailsToCustomer(order, acct);
+      message += `\n\n--- WHM account created automatically ---\nDomain: ${acct.domain}\nUsername: ${acct.username}\nPassword: ${acct.password}\ncPanel login: https://${acct.domain}:2083\n\nLogin details ${emailResult.ok ? 'were emailed directly to the customer' : `FAILED to send to the customer (${emailResult.reason}) — forward manually`} (${order.email}).`;
     } else {
       message += `\n\n--- WHM account creation FAILED ---\nReason: ${acct.reason}${acct.raw ? `\nDetails: ${JSON.stringify(acct.raw.metadata || acct.raw)}` : ''}\nYou'll need to create this account manually in WHM for ${order.domain} on package nadine14_${order.pkg}.`;
     }
@@ -187,7 +204,8 @@ async function notifyOrder(reference, outcome, reason) {
       message += `\n\n--- Domain registered automatically ---\nDomain: ${reg.domain}\nNamecheap order: ${reg.orderId}\n\nProceeding to create the hosting account…`;
       const acct = await createAccount({ domain: order.domain, pkgSlug: order.pkg, contactemail: order.email });
       if (acct.ok) {
-        message += `\n\n--- WHM account created automatically ---\nDomain: ${acct.domain}\nUsername: ${acct.username}\nPassword: ${acct.password}\ncPanel login: https://${acct.domain}:2083\n\nForward these details to the customer (${order.email}).`;
+        const emailResult = await emailAccountDetailsToCustomer(order, acct);
+        message += `\n\n--- WHM account created automatically ---\nDomain: ${acct.domain}\nUsername: ${acct.username}\nPassword: ${acct.password}\ncPanel login: https://${acct.domain}:2083\n\nLogin details ${emailResult.ok ? 'were emailed directly to the customer' : `FAILED to send to the customer (${emailResult.reason}) — forward manually`} (${order.email}).`;
       } else {
         message += `\n\n--- WHM account creation FAILED (domain is registered, hosting isn't) ---\nReason: ${acct.reason}\nCreate this account manually in WHM for ${order.domain} on package nadine14_${order.pkg}.`;
       }
