@@ -14,18 +14,15 @@ const MAX_MESSAGE_LENGTH = 800;
 const MAX_HISTORY_TURNS = 8;
 const MAX_OUTPUT_TOKENS = 500;
 
-// Bot -> human handoff routing. `to` should be the real mailbox for that
-// person once it exists; every category currently falls back to Ezra's own
-// Gmail (the only address guaranteed to be checked today) because
-// ezrazion@nadinecloud.com and mirriam@nadinecloud.com can't receive mail
-// yet — the cPanel account for nadinecloud.com is still blocked on an
-// InMotion support ticket (orphaned WHM userdata). Swap the `to` values
-// below once each mailbox is confirmed live; nothing else needs to change.
+// Bot -> human handoff routing. Real @nadinecloud.com mailboxes now exist
+// (created in the nadine14 cPanel account on InMotion) — technical goes to
+// Ezra directly, packages/pricing goes to Mirriam directly. setup still has
+// no named person, so it goes to the general inbox for now.
 const HANDOFF_ROUTES = {
-  technical: { label: 'Technical', to: 'nadineomnitradinglimited@gmail.com' }, // -> ezrazion@nadinecloud.com later
-  packages: { label: 'Packages & pricing', to: 'nadineomnitradinglimited@gmail.com' }, // -> mirriam@nadinecloud.com later (Mirriam currently has no email at all, only WhatsApp +260 973809031)
-  setup: { label: 'Setup', to: 'nadineomnitradinglimited@gmail.com' }, // -> the setup lead's address, once known
-  general: { label: 'General', to: 'nadineomnitradinglimited@gmail.com' },
+  technical: { label: 'Technical', to: 'ezrazion@nadinecloud.com' },
+  packages: { label: 'Packages & pricing', to: 'mirriam@nadinecloud.com' },
+  setup: { label: 'Setup', to: 'info@nadinecloud.com' }, // swap once the setup lead's own address is known
+  general: { label: 'General', to: 'info@nadinecloud.com' },
 };
 const HANDOFF_TAG_RE = /\[\[HANDOFF:(\w+)\]\]/;
 const HANDOFF_DONE_RE = /\[\[HANDOFF_DONE\]\]/;
