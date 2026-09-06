@@ -60,7 +60,7 @@
 
       document.getElementById('logoutBtn').addEventListener('click', function(){
         fetch('/api/auth/logout', { method: 'POST', credentials: 'same-origin' })
-          .then(() => { window.location.href = 'index.html'; });
+          .then(() => { window.location.href = '/'; });
       });
     })
     .catch(() => showError('Could not load your account — please try again.'));

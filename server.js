@@ -127,7 +127,27 @@ const server = http.createServer((req, res) => {
     return;
   }
 
-  let filePath = safeJoin(ROOT, req.url === '/' ? '/index.html' : req.url);
+  // Clean URLs: /hosting.html is only ever reached via this redirect, so a
+  // page never actually renders at its .html address -- redirect it to the
+  // extension-less URL instead. The Google Search Console verification file
+  // is excluded because Google fetches that exact literal path.
+  if (urlPath.endsWith('.html') && urlPath !== '/google5b0b24e4fe6f0f29.html') {
+    const clean = urlPath === '/index.html' ? '/' : urlPath.slice(0, -'.html'.length);
+    const query = req.url.slice(urlPath.length);
+    res.writeHead(301, { Location: `${clean}${query}` });
+    res.end();
+    return;
+  }
+
+  let filePath;
+  if (urlPath === '/') {
+    filePath = safeJoin(ROOT, '/index.html');
+  } else if (!path.extname(urlPath)) {
+    const htmlCandidate = safeJoin(ROOT, `${urlPath}.html`);
+    filePath = fs.existsSync(htmlCandidate) ? htmlCandidate : safeJoin(ROOT, urlPath);
+  } else {
+    filePath = safeJoin(ROOT, urlPath);
+  }
 
   fs.stat(filePath, (err, stats) => {
     if (!err && stats.isDirectory()) {

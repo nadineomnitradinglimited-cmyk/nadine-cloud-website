@@ -41,6 +41,6 @@
     });
   }
 
-  wire('signupForm', '/api/auth/signup', 'account.html');
-  wire('loginForm', '/api/auth/login', 'account.html');
+  wire('signupForm', '/api/auth/signup', 'account');
+  wire('loginForm', '/api/auth/login', 'account');
 })();

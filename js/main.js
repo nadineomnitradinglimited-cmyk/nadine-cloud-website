@@ -36,14 +36,14 @@ function lookupDomain(){
         return '<span style="color:var(--text-mute)">✗ ' + r.domain + ' is already taken</span>';
       });
       out.innerHTML = rows.join('<br>') +
-        '<br><span style="color:var(--text-mute)">.co.zm isn’t checked live yet — <a href="contact.html" style="color:#7047FF">message us</a> to confirm.</span>';
+        '<br><span style="color:var(--text-mute)">.co.zm isn’t checked live yet — <a href="contact" style="color:#7047FF">message us</a> to confirm.</span>';
     })
     .catch(() => {
       if (seq !== domainLookupSeq) return;
       const waText = encodeURIComponent('Hi Nadine Cloud, is ' + raw + '.com available to register?');
       out.innerHTML = 'We\'ll confirm if <strong>' + raw + '.com</strong> is available, from ZMW 450/yr' +
         ' &nbsp;·&nbsp; <a href="https://wa.me/260770346698?text=' + waText + '" target="_blank" rel="noopener" style="color:#7047FF">Ask on WhatsApp</a>' +
-        ' &nbsp;·&nbsp; <a href="contact.html" style="color:#7047FF">Contact form</a>';
+        ' &nbsp;·&nbsp; <a href="contact" style="color:#7047FF">Contact form</a>';
     });
 }
 
