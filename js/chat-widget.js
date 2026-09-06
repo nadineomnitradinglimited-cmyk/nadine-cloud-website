@@ -1,8 +1,24 @@
 (function () {
   const GREETING = "Hi, I'm Nadine. Ask me about hosting, domains, web design or pricing — or message us on WhatsApp anytime.";
+  const NAME_KEY = 'nc_chat_name';
+  const SKIPPED_KEY = 'nc_chat_skipped_name';
 
   const history = [];
   let sending = false;
+
+  function getStoredName() {
+    try { return localStorage.getItem(NAME_KEY) || ''; } catch (e) { return ''; }
+  }
+  function storeName(name) {
+    try { localStorage.setItem(NAME_KEY, name); } catch (e) { /* ignore */ }
+  }
+  function nameResolved() {
+    try { return Boolean(localStorage.getItem(NAME_KEY) || localStorage.getItem(SKIPPED_KEY)); }
+    catch (e) { return true; } // if storage is unavailable, don't block the chat on it
+  }
+  function markSkipped() {
+    try { localStorage.setItem(SKIPPED_KEY, '1'); } catch (e) { /* ignore */ }
+  }
 
   function escapeHtml(str) {
     const div = document.createElement('div');
@@ -21,8 +37,14 @@
         <span>Nadine</span>
         <button class="chat-close" aria-label="Close chat">&times;</button>
       </div>
-      <div class="chat-messages" role="log" aria-live="polite"></div>
-      <form class="chat-input-row">
+      <div class="chat-gate">
+        <p>What's your name? So our team knows who they're talking to if you ever need a hand.</p>
+        <input type="text" class="chat-gate-input" placeholder="Your name" aria-label="Your name" autocomplete="name" maxlength="60">
+        <button type="button" class="chat-gate-start">Start chatting</button>
+        <button type="button" class="chat-gate-skip">Skip for now</button>
+      </div>
+      <div class="chat-messages" role="log" aria-live="polite" hidden></div>
+      <form class="chat-input-row" hidden>
         <input type="text" class="chat-input" placeholder="Type a message…" aria-label="Message" autocomplete="off" maxlength="800">
         <button type="submit" class="chat-send" aria-label="Send">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
@@ -35,6 +57,10 @@
   const bubbleBtn = root.querySelector('.chat-bubble');
   const panel = root.querySelector('.chat-panel');
   const closeBtn = root.querySelector('.chat-close');
+  const gate = root.querySelector('.chat-gate');
+  const gateInput = root.querySelector('.chat-gate-input');
+  const gateStart = root.querySelector('.chat-gate-start');
+  const gateSkip = root.querySelector('.chat-gate-skip');
   const messagesEl = root.querySelector('.chat-messages');
   const form = root.querySelector('.chat-input-row');
   const input = root.querySelector('.chat-input');
@@ -48,11 +74,34 @@
     return row;
   }
 
+  function showChat() {
+    gate.hidden = true;
+    messagesEl.hidden = false;
+    form.hidden = false;
+    if (!messagesEl.children.length) addMessage('assistant', GREETING);
+    input.focus();
+  }
+
+  function resolveName(name) {
+    if (name) storeName(name); else markSkipped();
+    showChat();
+  }
+
+  gateStart.addEventListener('click', () => resolveName(gateInput.value.trim()));
+  gateInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); resolveName(gateInput.value.trim()); }
+  });
+  gateSkip.addEventListener('click', () => resolveName(''));
+
   function openPanel() {
     panel.hidden = false;
     bubbleBtn.setAttribute('aria-expanded', 'true');
-    if (!messagesEl.children.length) addMessage('assistant', GREETING);
-    input.focus();
+    if (nameResolved()) {
+      showChat();
+    } else {
+      gate.hidden = false;
+      gateInput.focus();
+    }
   }
 
   function closePanel() {
@@ -81,7 +130,7 @@
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message, history }),
+        body: JSON.stringify({ message, history, name: getStoredName() }),
       });
       const data = await res.json();
       typingRow.remove();

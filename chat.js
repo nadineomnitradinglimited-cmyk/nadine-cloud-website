@@ -22,22 +22,22 @@ const HANDOFF_ROUTES = {
   technical: {
     label: 'Technical',
     to: 'ezrazion@nadinecloud.com',
-    confirmReply: "Thanks — I've connected you with Ezra, our technical lead. She'll reach out to you directly shortly.",
+    confirmBody: "I've connected you with Ezra, our technical lead. She'll reach out to you directly shortly.",
   },
   packages: {
     label: 'Packages & pricing',
     to: 'mirriam@nadinecloud.com',
-    confirmReply: "Thanks — I've connected you with Mirriam, who handles our packages and pricing. She'll reach out to you directly shortly.",
+    confirmBody: "I've connected you with Mirriam, who handles our packages and pricing. She'll reach out to you directly shortly.",
   },
   setup: {
     label: 'Setup',
     to: 'info@nadinecloud.com', // swap once the setup lead's own address is known
-    confirmReply: "Thanks — I've passed this to our setup team. Someone will reach out to you directly shortly.",
+    confirmBody: "I've passed this to our setup team. Someone will reach out to you directly shortly.",
   },
   general: {
     label: 'General',
     to: 'info@nadinecloud.com',
-    confirmReply: "Thanks — I've passed this straight to our team. Someone will reach out to you directly shortly.",
+    confirmBody: "I've passed this straight to our team. Someone will reach out to you directly shortly.",
   },
 };
 const HANDOFF_TAG_RE = /\[\[HANDOFF:(\w+)\]\]/;
@@ -99,7 +99,7 @@ HOW TO REPLY
 - If asked about anything unrelated to Nadine Cloud's services, politely say that's outside what you can help with here and redirect to what you can do.
 
 HANDING OFF TO A REAL PERSON
-When someone needs a real person — account-specific issues, billing problems, complaints, technical support on an existing site/hosting/domain, a custom pricing or package negotiation, help getting set up, or anything you're not confident about — don't just point them at WhatsApp. Instead, warmly say a team member will personally reach out, and ask for their name plus the best way to reach them (email or WhatsApp number) if they haven't already given it earlier in this conversation. The very first time you ask for their contact details for a given issue, end your reply with this exact marker on its own line (it's stripped automatically, the customer never sees it): [[HANDOFF:category]] — where category is exactly one of: technical, packages, setup, general (technical = hosting/site/domain problems on an existing account; packages = pricing/plan/custom package questions; setup = help getting a new site/account/domain set up; general = anything else needing a person). Only add this marker once per issue — if you already asked for contact details earlier in this chat, don't ask again and don't repeat the marker, just wait for their reply or answer normally.`;
+When someone needs a real person — account-specific issues, billing problems, complaints, technical support on an existing site/hosting/domain, a custom pricing or package negotiation, help getting set up, or anything you're not confident about — don't just point them at WhatsApp. Instead, warmly say a team member will personally reach out, and ask for the best way to reach them (email or WhatsApp number) if they haven't already given it earlier in this conversation — you already have their name, so don't ask for it again. The very first time you ask for their contact details for a given issue, end your reply with this exact marker on its own line (it's stripped automatically, the customer never sees it): [[HANDOFF:category]] — where category is exactly one of: technical, packages, setup, general (technical = hosting/site/domain problems on an existing account; packages = pricing/plan/custom package questions; setup = help getting a new site/account/domain set up; general = anything else needing a person). Only add this marker once per issue — if you already asked for contact details earlier in this chat, don't ask again and don't repeat the marker, just wait for their reply or answer normally.`;
 
 const RATE_LIMIT_WINDOW_MS = 60 * 1000;
 const RATE_LIMIT_MAX = 8;
@@ -161,6 +161,7 @@ async function handleChat(req, res) {
 
   const message = typeof parsed.message === 'string' ? parsed.message.trim().slice(0, MAX_MESSAGE_LENGTH) : '';
   const historyIn = Array.isArray(parsed.history) ? parsed.history : [];
+  const name = typeof parsed.name === 'string' ? parsed.name.replace(/[\r\n]+/g, ' ').trim().slice(0, 60) : '';
 
   if (!message) {
     res.writeHead(400, { 'Content-Type': 'application/json' });
@@ -192,12 +193,12 @@ async function handleChat(req, res) {
     const emailResult = await sendEmail({
       to: route.to,
       replyTo: customerEmail ? customerEmail[0] : undefined,
-      subject: `[Chat handoff — ${route.label}] A customer needs a person`,
-      text: `A website chat visitor needs a real person (category: ${route.label}).${customerEmail ? '\n\nJust hit Reply on this email to write back to them directly.' : ''}\n\nTranscript:\n\n${transcript}\n\n— Sent automatically by the Nadine Cloud chat widget.`,
+      subject: `[Chat handoff — ${route.label}] ${name || 'A customer'} needs a person`,
+      text: `A website chat visitor needs a real person (category: ${route.label}).\nName: ${name || '(not given)'}${customerEmail ? '\n\nJust hit Reply on this email to write back to them directly.' : ''}\n\nTranscript:\n\n${transcript}\n\n— Sent automatically by the Nadine Cloud chat widget.`,
     });
     if (!emailResult.ok) console.error(`Handoff notification not delivered (${route.label}):`, emailResult.reason);
 
-    const reply = route.confirmReply;
+    const reply = `${name ? `Thanks, ${name}` : 'Thanks'} — ${route.confirmBody}`;
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ reply, historyReply: `${reply} [[HANDOFF_DONE]]` }));
     return;
@@ -207,11 +208,15 @@ async function handleChat(req, res) {
     .slice(-MAX_HISTORY_TURNS * 2)
     .map((m) => ({ role: m.role, content: m.content.slice(0, MAX_MESSAGE_LENGTH) }));
 
+  const system = name
+    ? `${SYSTEM_PROMPT}\n\nThe customer's name is ${name} — you already have it (they entered it before starting the chat), so never ask for their name. You can address them by it if it feels natural.`
+    : SYSTEM_PROMPT;
+
   try {
     const response = await client.messages.create({
       model: MODEL,
       max_tokens: MAX_OUTPUT_TOKENS,
-      system: SYSTEM_PROMPT,
+      system,
       messages: [...history, { role: 'user', content: message }],
     });
 
