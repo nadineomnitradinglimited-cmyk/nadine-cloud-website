@@ -3,8 +3,11 @@
   const NAME_KEY = 'nc_chat_name';
   const SKIPPED_KEY = 'nc_chat_skipped_name';
 
+  const INACTIVITY_MS = 30 * 60 * 1000;
+
   const history = [];
   let sending = false;
+  let inactivityTimer = null;
 
   function getStoredName() {
     try { return localStorage.getItem(NAME_KEY) || ''; } catch (e) { return ''; }
@@ -74,12 +77,22 @@
     return row;
   }
 
+  function scheduleInactivityClose() {
+    if (inactivityTimer) clearTimeout(inactivityTimer);
+    inactivityTimer = setTimeout(() => {
+      history.length = 0;
+      messagesEl.innerHTML = '';
+      closePanel();
+    }, INACTIVITY_MS);
+  }
+
   function showChat() {
     gate.hidden = true;
     messagesEl.hidden = false;
     form.hidden = false;
     if (!messagesEl.children.length) addMessage('assistant', GREETING);
     input.focus();
+    scheduleInactivityClose();
   }
 
   function resolveName(name) {
@@ -122,6 +135,7 @@
     addMessage('user', message);
     input.value = '';
     sending = true;
+    scheduleInactivityClose();
 
     const typingRow = addMessage('assistant', '…');
     typingRow.classList.add('chat-typing');
@@ -141,6 +155,7 @@
         addMessage('assistant', data.reply);
         history.push({ role: 'user', content: message });
         history.push({ role: 'assistant', content: data.historyReply || data.reply });
+        scheduleInactivityClose();
       }
     } catch (err) {
       typingRow.remove();
