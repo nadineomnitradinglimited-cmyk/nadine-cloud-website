@@ -19,13 +19,30 @@ const MAX_OUTPUT_TOKENS = 500;
 // Ezra directly, packages/pricing goes to Mirriam directly. setup still has
 // no named person, so it goes to the general inbox for now.
 const HANDOFF_ROUTES = {
-  technical: { label: 'Technical', to: 'ezrazion@nadinecloud.com' },
-  packages: { label: 'Packages & pricing', to: 'mirriam@nadinecloud.com' },
-  setup: { label: 'Setup', to: 'info@nadinecloud.com' }, // swap once the setup lead's own address is known
-  general: { label: 'General', to: 'info@nadinecloud.com' },
+  technical: {
+    label: 'Technical',
+    to: 'ezrazion@nadinecloud.com',
+    confirmReply: "Thanks — I've connected you with Ezra, our technical lead. She'll reach out to you directly shortly.",
+  },
+  packages: {
+    label: 'Packages & pricing',
+    to: 'mirriam@nadinecloud.com',
+    confirmReply: "Thanks — I've connected you with Mirriam, who handles our packages and pricing. She'll reach out to you directly shortly.",
+  },
+  setup: {
+    label: 'Setup',
+    to: 'info@nadinecloud.com', // swap once the setup lead's own address is known
+    confirmReply: "Thanks — I've passed this to our setup team. Someone will reach out to you directly shortly.",
+  },
+  general: {
+    label: 'General',
+    to: 'info@nadinecloud.com',
+    confirmReply: "Thanks — I've passed this straight to our team. Someone will reach out to you directly shortly.",
+  },
 };
 const HANDOFF_TAG_RE = /\[\[HANDOFF:(\w+)\]\]/;
 const HANDOFF_DONE_RE = /\[\[HANDOFF_DONE\]\]/;
+const EMAIL_RE = /[^\s@]+@[^\s@]+\.[^\s@]+/;
 const CONTACT_INFO_RE = /[^\s@]+@[^\s@]+\.[^\s@]+|(?:\+?\d[\d\s-]{6,}\d)/;
 
 const SYSTEM_PROMPT = `Your name is Nadine. You are the friendly support assistant embedded on the Nadine Cloud website (www.nadinecloud.com) — a web design, hosting, domains and business email provider serving businesses worldwide. Nadine Cloud is a service of Nadine Omni Trading Limited. Introduce yourself by name only if it comes up naturally (e.g. someone asks who they're talking to) — don't force it into every reply.
@@ -170,14 +187,17 @@ async function handleChat(req, res) {
       .map((m) => `${m.role === 'user' ? 'Customer' : 'Nadine (bot)'}: ${m.content.replace(HANDOFF_TAG_RE, '').trim()}`)
       .join('\n\n');
 
+    const customerEmail = message.match(EMAIL_RE);
+
     const emailResult = await sendEmail({
       to: route.to,
+      replyTo: customerEmail ? customerEmail[0] : undefined,
       subject: `[Chat handoff — ${route.label}] A customer needs a person`,
-      text: `A website chat visitor needs a real person (category: ${route.label}).\n\nTranscript:\n\n${transcript}\n\n— Sent automatically by the Nadine Cloud chat widget.`,
+      text: `A website chat visitor needs a real person (category: ${route.label}).${customerEmail ? '\n\nJust hit Reply on this email to write back to them directly.' : ''}\n\nTranscript:\n\n${transcript}\n\n— Sent automatically by the Nadine Cloud chat widget.`,
     });
     if (!emailResult.ok) console.error(`Handoff notification not delivered (${route.label}):`, emailResult.reason);
 
-    const reply = "Thanks — I've passed this straight to our team, they'll reach out to you shortly.";
+    const reply = route.confirmReply;
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ reply, historyReply: `${reply} [[HANDOFF_DONE]]` }));
     return;

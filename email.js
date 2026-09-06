@@ -11,7 +11,7 @@ const RESEND_API = 'https://api.resend.com/emails';
 const NOTIFY_TO = 'info@nadinecloud.com';
 const FROM = 'Nadine Cloud <info@nadinecloud.com>';
 
-async function sendEmail({ subject, text, to, attachments }) {
+async function sendEmail({ subject, text, to, attachments, replyTo }) {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
     console.error('RESEND_API_KEY not configured — email not sent:', subject);
@@ -20,6 +20,7 @@ async function sendEmail({ subject, text, to, attachments }) {
 
   const payload = { from: FROM, to: [to || NOTIFY_TO], subject, text };
   if (attachments && attachments.length) payload.attachments = attachments;
+  if (replyTo) payload.reply_to = [replyTo];
 
   try {
     const res = await fetch(RESEND_API, {
