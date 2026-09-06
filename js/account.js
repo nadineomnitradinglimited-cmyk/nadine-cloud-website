@@ -44,8 +44,14 @@
           const row = document.createElement('div');
           row.style.cssText = 'display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px dashed var(--line)';
           const left = document.createElement('div');
-          left.innerHTML = '<strong>' + o.plan + '</strong><br><span style="color:var(--text-mute);font-size:13px">' +
-            new Date(o.created_at).toLocaleDateString() + ' · ZMW ' + Number(o.amount).toLocaleString() + ' · ' + statusLabel(o.status) + '</span>';
+          const planEl = document.createElement('strong');
+          planEl.textContent = o.plan;
+          const metaEl = document.createElement('span');
+          metaEl.style.cssText = 'color:var(--text-mute);font-size:13px';
+          metaEl.textContent = new Date(o.created_at).toLocaleDateString() + ' · ZMW ' + Number(o.amount).toLocaleString() + ' · ' + statusLabel(o.status);
+          left.appendChild(planEl);
+          left.appendChild(document.createElement('br'));
+          left.appendChild(metaEl);
           row.appendChild(left);
           if (o.status === 'paid') {
             const link = document.createElement('a');
