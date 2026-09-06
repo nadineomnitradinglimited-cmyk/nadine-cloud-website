@@ -5,6 +5,16 @@
   if (btn && links) btn.addEventListener('click', () => links.classList.toggle('open'));
 })();
 
+/* ---------- auto-expand a <details> FAQ item when linked to directly ---------- */
+(function(){
+  function openTargetDetails(){
+    const el = document.getElementById(location.hash.slice(1));
+    if (el && el.tagName === 'DETAILS') el.open = true;
+  }
+  openTargetDetails();
+  window.addEventListener('hashchange', openTargetDetails);
+})();
+
 /* ---------- domain name search (live availability check via Namecheap, .co.zm excluded — that's ZICTA, not Namecheap) ---------- */
 const DOMAIN_PRICE_ZMW = { com: 450, net: 500, org: 450 };
 let domainLookupSeq = 0;

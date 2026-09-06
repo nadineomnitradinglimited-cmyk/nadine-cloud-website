@@ -34,12 +34,26 @@
       <ul class="nav-links" id="navLinks">
         <li><a href="services">Web Design</a></li>
         <li><a href="domains">Domains</a></li>
-        <li><a href="hosting">Hosting</a></li>
-        <li><a href="hosting#email">Email</a></li>
-        <li><a href="marketing" aria-current="page">Marketing</a></li>
-        <li><a href="hosting#security">Security</a></li>
+        <li class="has-dropdown">
+          <a href="hosting">Hosting <span class="nav-caret">▾</span></a>
+          <div class="nav-dropdown">
+            <a href="hosting#hosting">Hosting Plans</a>
+            <a href="hosting#email">Business Email</a>
+            <a href="hosting#security">Security</a>
+            <a href="hosting#migrate">Free Migration</a>
+            <a href="hosting#faq">Help Center</a>
+          </div>
+        </li>
+        <li class="has-dropdown">
+          <a href="marketing" aria-current="page">Marketing <span class="badge-new">New</span> <span class="nav-caret">▾</span></a>
+          <div class="nav-dropdown">
+            <a href="marketing#seo">SEO Setup &amp; Optimization</a>
+            <a href="marketing#social">Social Media Management</a>
+            <a href="marketing#email-marketing">Email Marketing Campaigns</a>
+            <a href="marketing#ads">Paid Ads Management</a>
+          </div>
+        </li>
         <li><a href="domains#transfer">Transfer</a></li>
-        <li><a href="hosting#faq">Help Center</a></li>
         <li><a href="work">Our work</a></li>
         <li><a href="contact">Contact</a></li>
       </ul>
@@ -69,22 +83,22 @@
       <p>Priced per project, based on your goals and how much ongoing management you need — message us for a quote.</p>
     </div>
     <div class="services-grid">
-      <div class="svc">
+      <div class="svc" id="seo">
         <div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1769FF" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></div>
         <h3>SEO setup &amp; optimization</h3>
         <p>On-page SEO, meta tags, sitemaps and search console setup so your site actually shows up in search results.</p>
       </div>
-      <div class="svc">
+      <div class="svc" id="social">
         <div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1769FF" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M8 12h.01M12 12h.01M16 12h.01"/></svg></div>
         <h3>Social media management</h3>
         <p>We plan and post content on Facebook, Instagram and other platforms to keep your business active and visible.</p>
       </div>
-      <div class="svc">
+      <div class="svc" id="email-marketing">
         <div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1769FF" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg></div>
         <h3>Email marketing campaigns</h3>
         <p>Newsletters and promotional emails to your customer list, using the business email we already host for you.</p>
       </div>
-      <div class="svc">
+      <div class="svc" id="ads">
         <div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1769FF" stroke-width="2"><path d="M3 12h18M12 3v18"/><path d="m17 8 4 4-4 4M7 8l-4 4 4 4"/></svg></div>
         <h3>Paid ads management</h3>
         <p>Google and Facebook ad campaigns set up, targeted and managed to bring in the customers you're after.</p>
