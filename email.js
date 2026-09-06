@@ -4,11 +4,11 @@ const RESEND_API = 'https://api.resend.com/emails';
 // domain instead of Resend's shared onboarding@resend.dev address, which
 // lifts the "can only send to your own account email" restriction that
 // was blocking every receipt/notification email to actual customers.
-// NOTIFY_TO stays your own Gmail — that's the fallback address for admin
-// alerts (new orders, contact form submissions) when no `to` is given;
-// switch it to an @nadinecloud.com address only once you have a real
-// mailbox there that you actually check.
-const NOTIFY_TO = 'nadineomnitradinglimited@gmail.com';
+// NOTIFY_TO is the fallback address for admin alerts (new orders, contact
+// form submissions) when no `to` is given. info@nadinecloud.com is now a
+// real, checked mailbox (created in the nadine14 cPanel account), so all
+// admin notifications land there instead of the owner's Gmail.
+const NOTIFY_TO = 'info@nadinecloud.com';
 const FROM = 'Nadine Cloud <info@nadinecloud.com>';
 
 async function sendEmail({ subject, text, to, attachments }) {
