@@ -127,6 +127,29 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  if (req.method === 'GET' && urlPath === '/api/admin/find-order') {
+    // temporary one-off lookup route: searches orders by domain, order
+    // email or account name. Remove once used.
+    const q = new URLSearchParams(req.url.split('?')[1] || '').get('q') || '';
+    require('./db').getPool()
+      .query(
+        `SELECT o.reference, o.plan, o.amount, o.type, o.pkg, o.domain, o.domain_option, o.email, o.status, o.created_at, o.paid_at, u.name
+         FROM orders o LEFT JOIN users u ON u.id = o.user_id
+         WHERE o.domain ILIKE $1 OR o.email ILIKE $1 OR u.name ILIKE $1
+         ORDER BY o.created_at DESC LIMIT 20`,
+        [`%${q}%`]
+      )
+      .then((result) => {
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(result.rows, null, 2));
+      })
+      .catch((err) => {
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: String(err) }));
+      });
+    return;
+  }
+
   // Clean URLs: /hosting.html is only ever reached via this redirect, so a
   // page never actually renders at its .html address -- redirect it to the
   // extension-less URL instead. The Google Search Console verification file
