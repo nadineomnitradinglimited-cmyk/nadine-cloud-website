@@ -4,7 +4,6 @@ const path = require('path');
 const { handleChat } = require('./chat');
 const { handleCheckoutInitiate, handleCheckoutStatus, handleLencoWebhook, handleReceiptDownload } = require('./payments');
 const { handleContact } = require('./contact');
-const { ensurePackagesExist } = require('./whm');
 const { handleSignup, handleLogin, handleLogout, handleMe } = require('./auth');
 const { handleDomainCheck } = require('./namecheap');
 
@@ -107,46 +106,6 @@ const server = http.createServer((req, res) => {
 
   if (req.method === 'GET' && urlPath === '/api/domain-check') {
     handleDomainCheck(req, res, new URLSearchParams(req.url.split('?')[1] || ''));
-    return;
-  }
-
-  if (req.method === 'POST' && urlPath === '/api/admin/setup-whm-packages') {
-    // one-time setup route: creates the four fixed hosting packages in WHM.
-    // Accepts no input and touches nothing customer-facing, so it's left
-    // unauthenticated — remove this route once the packages are confirmed
-    // created, it has no further purpose after that.
-    ensurePackagesExist()
-      .then((results) => {
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify(results, null, 2));
-      })
-      .catch((err) => {
-        res.writeHead(500, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: String(err) }));
-      });
-    return;
-  }
-
-  if (req.method === 'GET' && urlPath === '/api/admin/find-order') {
-    // temporary one-off lookup route: searches orders by domain, order
-    // email or account name. Remove once used.
-    const q = new URLSearchParams(req.url.split('?')[1] || '').get('q') || '';
-    require('./db').getPool()
-      .query(
-        `SELECT o.reference, o.plan, o.amount, o.type, o.pkg, o.domain, o.domain_option, o.email, o.status, o.created_at, o.paid_at, u.name
-         FROM orders o LEFT JOIN users u ON u.id = o.user_id
-         WHERE o.domain ILIKE $1 OR o.email ILIKE $1 OR u.name ILIKE $1
-         ORDER BY o.created_at DESC LIMIT 20`,
-        [`%${q}%`]
-      )
-      .then((result) => {
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify(result.rows, null, 2));
-      })
-      .catch((err) => {
-        res.writeHead(500, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: String(err) }));
-      });
     return;
   }
 
