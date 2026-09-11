@@ -4,7 +4,6 @@ const path = require('path');
 const { handleChat } = require('./chat');
 const { handleCheckoutInitiate, handleCheckoutStatus, handleLencoWebhook, handleReceiptDownload } = require('./payments');
 const { handleContact } = require('./contact');
-const { ensurePackagesExist } = require('./whm');
 const { handleSignup, handleLogin, handleLogout, handleMe } = require('./auth');
 const { handleDomainCheck } = require('./namecheap');
 
@@ -107,21 +106,6 @@ const server = http.createServer((req, res) => {
 
   if (req.method === 'GET' && urlPath === '/api/domain-check') {
     handleDomainCheck(req, res, new URLSearchParams(req.url.split('?')[1] || ''));
-    return;
-  }
-
-  if (req.method === 'POST' && urlPath === '/api/admin/setup-whm-packages') {
-    // temporary: syncs the new wordpress/builder packages to WHM. Remove
-    // once confirmed created.
-    ensurePackagesExist()
-      .then((results) => {
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify(results, null, 2));
-      })
-      .catch((err) => {
-        res.writeHead(500, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: String(err) }));
-      });
     return;
   }
 
