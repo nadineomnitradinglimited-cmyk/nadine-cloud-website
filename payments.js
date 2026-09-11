@@ -1,6 +1,6 @@
 const crypto = require('crypto');
 const { sendEmail } = require('./email');
-const { createAccount, PACKAGES } = require('./whm');
+const { createAccount, HOSTING_PACKAGES, DATABASE_PACKAGES } = require('./whm');
 const { generateReceiptPdf } = require('./receipt');
 const { isConfigured: dbConfigured, getPool, ensureSchema } = require('./db');
 const { checkAvailability, registerDomain } = require('./namecheap');
@@ -162,6 +162,15 @@ async function attemptDomainRegistration(order) {
   return registerDomain(order.domain, 1, contact);
 }
 
+// Standalone database orders have no domain of their own (no website
+// involved) but WHM's createacct still requires one to identify the
+// account — this generates a syntactically valid, internal-only one that's
+// never meant to resolve publicly.
+function syntheticDbDomain(reference) {
+  const slug = reference.toLowerCase().replace(/[^a-z0-9]/g, '').slice(-12);
+  return `db-${slug}.nadinecloud.com`;
+}
+
 // Emails the new cPanel login details straight to the customer — this used
 // to only go in the admin email with a note to forward it manually, from
 // back when Resend couldn't deliver to customers directly. Now that
@@ -174,6 +183,18 @@ async function emailAccountDetailsToCustomer(order, acct) {
   });
   if (!result.ok) {
     console.error(`Account details email not delivered to customer for ${acct.domain}:`, result.reason);
+  }
+  return result;
+}
+
+async function emailDatabaseDetailsToCustomer(order, acct, maxsql) {
+  const result = await sendEmail({
+    to: order.email,
+    subject: `Your Nadine Cloud database hosting is ready — ${order.plan}`,
+    text: `Hi ${order.name},\n\nYour database hosting account is set up and ready to go.\n\ncPanel login: https://${acct.domain}:2083\nUsername: ${acct.username}\nPassword: ${acct.password}\n\nFrom there, go to MySQL Databases (or PostgreSQL Databases) and use the wizard to create your database(s) — your plan covers up to ${maxsql}. Each database gets its own username/password that your app connects with directly.\n\nWe'd recommend logging in and changing your cPanel password once you're in.\n\nAny trouble, reach us on WhatsApp at +260 77 034 6698.\n\n— Nadine Cloud`,
+  });
+  if (!result.ok) {
+    console.error(`Database account email not delivered to customer for ${acct.domain}:`, result.reason);
   }
   return result;
 }
@@ -216,6 +237,16 @@ async function notifyOrder(reference, outcome, reason) {
       }
     } else {
       message += `\n\n--- ACTION NEEDED: domain registration failed ---\nCustomer wants a NEW domain (${order.domain || 'name not given'}) registered before hosting is set up.\nReason: ${reg.reason}\nRegister it manually, then create the WHM account on package nadine14_${order.pkg}.`;
+    }
+  } else if (outcome === 'paid' && order && order.type === 'database' && order.pkg) {
+    const dbDomain = syntheticDbDomain(reference);
+    const acct = await createAccount({ domain: dbDomain, pkgSlug: order.pkg, contactemail: order.email });
+    if (acct.ok) {
+      const maxsql = (DATABASE_PACKAGES[order.pkg] || {}).MAXSQL || '?';
+      const emailResult = await emailDatabaseDetailsToCustomer(order, acct, maxsql);
+      message += `\n\n--- WHM database account created automatically ---\nAccount domain (internal, not a real site): ${acct.domain}\nUsername: ${acct.username}\nPassword: ${acct.password}\ncPanel login: https://${acct.domain}:2083\nDatabase limit: ${maxsql}\n\nLogin details ${emailResult.ok ? 'were emailed directly to the customer' : `FAILED to send to the customer (${emailResult.reason}) — forward manually`} (${order.email}).`;
+    } else {
+      message += `\n\n--- WHM database account creation FAILED ---\nReason: ${acct.reason}${acct.raw ? `\nDetails: ${JSON.stringify(acct.raw.metadata || acct.raw)}` : ''}\nYou'll need to create this account manually in WHM on package nadine14_${order.pkg} and send the customer (${order.email}) their login.`;
     }
   } else if (outcome === 'paid' && order && order.type === 'domain' && order.domain) {
     const reg = await attemptDomainRegistration(order);
@@ -333,8 +364,11 @@ async function handleCheckoutInitiate(req, res) {
   if (phoneDigits.length < 9) return sendJson(res, 400, { error: 'A valid mobile money phone number is required.' });
   if (!OPERATORS.has(operator)) return sendJson(res, 400, { error: 'Select MTN, Airtel or Zamtel.' });
   if (type === 'hosting') {
-    if (!pkg || !PACKAGES[pkg]) return sendJson(res, 400, { error: 'Missing or invalid hosting package.' });
+    if (!pkg || !HOSTING_PACKAGES[pkg]) return sendJson(res, 400, { error: 'Missing or invalid hosting package.' });
     if (!domain || !/^[a-z0-9.-]+\.[a-z]{2,}$/.test(domain)) return sendJson(res, 400, { error: 'A valid domain is required to set up hosting.' });
+  }
+  if (type === 'database' && (!pkg || !DATABASE_PACKAGES[pkg])) {
+    return sendJson(res, 400, { error: 'Missing or invalid database package.' });
   }
 
   const needsRegistrant = type === 'domain' || (type === 'hosting' && domainOption === 'new');

@@ -62,6 +62,7 @@ SERVICES OVERVIEW
 - Cloud hosting — cPanel hosting, priced in Zambian Kwacha (ZMW). Customer picks a billing period at checkout: Monthly, 6 Months (save 10%), 1 Year (save 15%), 2 Years (save 20%) or 3 Years (save 25%) — the longer the period, the bigger the discount.
 - Domain registration & transfers.
 - Business email hosting.
+- Standalone database hosting (PostgreSQL/MySQL) — for an app or website hosted anywhere, not tied to buying web hosting from us.
 
 HOSTING PLANS (base price shown is per month, billed monthly by default)
 - Nadine Cloud — Avara — K99/mo: 1 website, 5 GB storage, 25 GB bandwidth, 5 email accounts, 2 databases, free SSL, cPanel, standard support.
@@ -70,6 +71,13 @@ HOSTING PLANS (base price shown is per month, billed monthly by default)
 - Nadine Cloud — Zyra — K499/mo: 5 websites, 40 GB storage, 300 GB bandwidth, 50 email accounts, 20 databases, Website Builder included, free SSL, premium support.
 - Website Builder is only included on Veyra and Zyra, not Avara or Elora.
 - Included free on every hosting plan: free SSL certificate, automatic backups, free website migration, cPanel, worldwide support, and Python app support (Django/Flask and other WSGI apps via cPanel's Python Selector — fine for most small business apps, though background workers like Celery or apps needing a dedicated server should message us first to check fit).
+
+DATABASE HOSTING (standalone, billed monthly, at /database)
+- Nadine Cloud — Orin — K79/mo: 1 database, 2 GB storage.
+- Nadine Cloud — Kaia — K149/mo (most popular): 3 databases, 5 GB storage.
+- Nadine Cloud — Velora — K249/mo: 5 databases, 15 GB storage, priority support.
+- Nadine Cloud — Zenix — K399/mo: 10 databases, 30 GB storage, premium support.
+- Every plan includes PostgreSQL and MySQL support, daily backups and secure connections. No website or hosting plan needed — customer gets a cPanel login and creates their own database(s) via the Database Wizard, then connects their own app to it from wherever it's hosted.
 
 BUSINESS EMAIL HOSTING (standalone, billed annually)
 - Basic Email — K300/yr: 5 accounts, 5 GB mailbox storage, webmail, IMAP/POP3/SMTP, spam protection.

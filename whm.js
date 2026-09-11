@@ -4,12 +4,25 @@ const WHM_HOST = 'https://secure375.servconfig.com:2087';
 const WHM_USER = 'nadine14';
 const WHM_PKG_PREFIX = 'nadine14_';
 
-const PACKAGES = {
+const HOSTING_PACKAGES = {
   avara: { QUOTA: 5000, BWLIMIT: 25000, MAXPOP: 5, MAXADDON: 0, MAXSQL: 2 },
   elora: { QUOTA: 10000, BWLIMIT: 75000, MAXPOP: 15, MAXADDON: 0, MAXSQL: 5 },
   veyra: { QUOTA: 20000, BWLIMIT: 150000, MAXPOP: 30, MAXADDON: 2, MAXSQL: 10 },
   zyra: { QUOTA: 40000, BWLIMIT: 300000, MAXPOP: 50, MAXADDON: 4, MAXSQL: 20 },
 };
+
+// Standalone database hosting (no website/email included) — the customer
+// gets a cPanel login and creates their own MySQL/PostgreSQL databases via
+// cPanel's Database Wizard, up to MAXSQL, same self-serve model as email
+// accounts on the hosting packages above.
+const DATABASE_PACKAGES = {
+  orin: { QUOTA: 2000, BWLIMIT: 10000, MAXPOP: 0, MAXADDON: 0, MAXSQL: 1 },
+  kaia: { QUOTA: 5000, BWLIMIT: 25000, MAXPOP: 0, MAXADDON: 0, MAXSQL: 3 },
+  velora: { QUOTA: 15000, BWLIMIT: 75000, MAXPOP: 0, MAXADDON: 0, MAXSQL: 5 },
+  zenix: { QUOTA: 30000, BWLIMIT: 150000, MAXPOP: 0, MAXADDON: 0, MAXSQL: 10 },
+};
+
+const PACKAGES = { ...HOSTING_PACKAGES, ...DATABASE_PACKAGES };
 
 async function whmRequest(pathAndQuery) {
   const token = process.env.WHM_API_TOKEN;
@@ -109,4 +122,4 @@ async function createAccount({ domain, pkgSlug, contactemail }) {
   }
 }
 
-module.exports = { whmRequest, ensurePackagesExist, createAccount, PACKAGES };
+module.exports = { whmRequest, ensurePackagesExist, createAccount, PACKAGES, HOSTING_PACKAGES, DATABASE_PACKAGES };
