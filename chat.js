@@ -77,6 +77,8 @@ DATABASE HOSTING (standalone, billed monthly, at /database)
 - Nadine Cloud — Kaia — K149/mo (most popular): 3 databases, 5 GB storage.
 - Nadine Cloud — Velora — K249/mo: 5 databases, 15 GB storage, priority support.
 - Nadine Cloud — Zenix — K399/mo: 10 databases, 30 GB storage, premium support.
+- Nadine Cloud — Astra — K649/mo: 20 databases, 60 GB storage, premium support.
+- Nadine Cloud — Vantis — K999/mo: 40 databases, 120 GB storage, dedicated support.
 - Every plan includes PostgreSQL and MySQL support, daily backups and secure connections. No website or hosting plan needed — customer gets a cPanel login and creates their own database(s) via the Database Wizard, then connects their own app to it from wherever it's hosted.
 
 BUSINESS EMAIL HOSTING (standalone, billed annually)

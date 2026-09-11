@@ -237,6 +237,10 @@ header .wrap{max-width:1440px}
 .plan:nth-child(2) h3{color:var(--copper)}
 .plan:nth-child(3) h3{color:var(--violet)}
 .plan:nth-child(4) h3{color:var(--ok)}
+.plan:nth-child(5) .plan-icon{background:rgba(59,121,224,.14);color:var(--blue)}
+.plan:nth-child(6) .plan-icon{background:rgba(23,105,255,.16);color:var(--copper)}
+.plan:nth-child(5) h3{color:var(--blue)}
+.plan:nth-child(6) h3{color:var(--copper)}
 .plan .for{font-size:13.5px;color:var(--text-mute);margin-bottom:18px}
 .plan-stats{display:grid;grid-template-columns:1fr 1fr;gap:12px 16px;margin:0 0 18px;padding:14px 16px;background:var(--surface-2);border-radius:10px}
 .plan.featured .plan-stats{background:rgba(255,255,255,.6)}
