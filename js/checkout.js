@@ -71,6 +71,14 @@
     domainConfirmField.querySelector('input').required = true;
     applyDomainOptionCopy();
     document.getElementById('ckPlanSub').textContent = "Tell us the domain to use — double-check the spelling, this is exactly what we'll set up.";
+  } else if (type === 'wordpress' || type === 'builder' || type === 'ssl') {
+    domainField.hidden = false;
+    domainField.querySelector('input').required = true;
+    domainConfirmField.hidden = false;
+    domainConfirmField.querySelector('input').required = true;
+    domainField.firstChild.textContent = type === 'ssl' ? 'Domain this certificate is for' : 'Domain for this account';
+    domainField.querySelector('input').placeholder = 'yourbusiness.com (no www)';
+    document.getElementById('ckPlanSub').textContent = "Tell us the domain to use — double-check the spelling, this is exactly what we'll set up.";
   }
 
   function domainsMatch(){

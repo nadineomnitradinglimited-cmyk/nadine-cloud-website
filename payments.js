@@ -1,6 +1,11 @@
 const crypto = require('crypto');
 const { sendEmail } = require('./email');
-const { createAccount, HOSTING_PACKAGES, DATABASE_PACKAGES } = require('./whm');
+const { createAccount, HOSTING_PACKAGES, DATABASE_PACKAGES, WORDPRESS_PACKAGES, BUILDER_PACKAGES } = require('./whm');
+
+// SSL and Care Plans are fully manual products — no WHM package, no
+// automatic provisioning. Just used to validate the `pkg` sent at checkout.
+const SSL_PRODUCTS = new Set(['ssl-standard', 'ssl-wildcard', 'ssl-ev']);
+const CARE_PRODUCTS = new Set(['care-essential', 'care-growth', 'care-premium']);
 const { generateReceiptPdf } = require('./receipt');
 const { isConfigured: dbConfigured, getPool, ensureSchema } = require('./db');
 const { checkAvailability, registerDomain } = require('./namecheap');
@@ -199,6 +204,46 @@ async function emailDatabaseDetailsToCustomer(order, acct, maxsql) {
   return result;
 }
 
+async function emailWordPressDetailsToCustomer(order, acct) {
+  const result = await sendEmail({
+    to: order.email,
+    subject: `Your Nadine Cloud WordPress hosting is ready — ${acct.domain}`,
+    text: `Hi ${order.name},\n\nYour hosting account is set up.\n\ncPanel login: https://${acct.domain}:2083\nUsername: ${acct.username}\nPassword: ${acct.password}\n\nWe're installing WordPress for you now — you'll get a separate email with your WordPress admin login within a few hours.\n\nWe'd recommend logging in to cPanel and changing your password once you're in.\n\nAny trouble, reach us on WhatsApp at +260 77 034 6698.\n\n— Nadine Cloud`,
+  });
+  if (!result.ok) console.error(`WordPress account email not delivered to customer for ${acct.domain}:`, result.reason);
+  return result;
+}
+
+async function emailBuilderDetailsToCustomer(order, acct) {
+  const result = await sendEmail({
+    to: order.email,
+    subject: `Your Nadine Cloud Website Builder account is ready — ${acct.domain}`,
+    text: `Hi ${order.name},\n\nYour hosting account is set up.\n\ncPanel login: https://${acct.domain}:2083\nUsername: ${acct.username}\nPassword: ${acct.password}\n\nWe're enabling Website Builder for you now — it'll appear in cPanel within a few hours, and you can start building your site right from there.\n\nWe'd recommend logging in and changing your cPanel password once you're in.\n\nAny trouble, reach us on WhatsApp at +260 77 034 6698.\n\n— Nadine Cloud`,
+  });
+  if (!result.ok) console.error(`Website Builder account email not delivered to customer for ${acct.domain}:`, result.reason);
+  return result;
+}
+
+async function emailSslOrderConfirmation(order) {
+  const result = await sendEmail({
+    to: order.email,
+    subject: `Your Nadine Cloud SSL certificate order — ${order.domain}`,
+    text: `Hi ${order.name},\n\nThanks for your order — we're setting up your SSL certificate for ${order.domain} now. This can take up to 24 hours depending on the certificate type (Wildcard and Extended Validation need extra verification). We'll email you once it's live on your site.\n\nAny questions, reach us on WhatsApp at +260 77 034 6698.\n\n— Nadine Cloud`,
+  });
+  if (!result.ok) console.error(`SSL confirmation email not delivered for ${order.domain}:`, result.reason);
+  return result;
+}
+
+async function emailCarePlanConfirmation(order) {
+  const result = await sendEmail({
+    to: order.email,
+    subject: `Welcome to your Nadine Cloud Care Plan — ${order.plan}`,
+    text: `Hi ${order.name},\n\nThanks for signing up for ${order.plan}. Our team will reach out within 24 hours to onboard your website onto the plan and confirm what we'll need access to.\n\nAny questions in the meantime, reach us on WhatsApp at +260 77 034 6698.\n\n— Nadine Cloud`,
+  });
+  if (!result.ok) console.error(`Care plan confirmation email not delivered for ${order.email}:`, result.reason);
+  return result;
+}
+
 async function notifyOrder(reference, outcome, reason) {
   if (notified.has(reference)) return;
   notified.add(reference);
@@ -248,6 +293,28 @@ async function notifyOrder(reference, outcome, reason) {
     } else {
       message += `\n\n--- WHM database account creation FAILED ---\nReason: ${acct.reason}${acct.raw ? `\nDetails: ${JSON.stringify(acct.raw.metadata || acct.raw)}` : ''}\nYou'll need to create this account manually in WHM on package nadine14_${order.pkg} and send the customer (${order.email}) their login.`;
     }
+  } else if (outcome === 'paid' && order && order.type === 'wordpress' && order.pkg && order.domain) {
+    const acct = await createAccount({ domain: order.domain, pkgSlug: order.pkg, contactemail: order.email });
+    if (acct.ok) {
+      const emailResult = await emailWordPressDetailsToCustomer(order, acct);
+      message += `\n\n--- WHM account created automatically (WordPress hosting) ---\nDomain: ${acct.domain}\nUsername: ${acct.username}\nPassword: ${acct.password}\ncPanel login: https://${acct.domain}:2083\n\nACTION NEEDED: install WordPress via Softaculous in cPanel for this account, then email the customer (${order.email}) their WordPress admin login.\n\nHosting login details ${emailResult.ok ? 'were emailed directly to the customer' : `FAILED to send to the customer (${emailResult.reason}) — forward manually`}.`;
+    } else {
+      message += `\n\n--- WHM account creation FAILED (WordPress hosting) ---\nReason: ${acct.reason}${acct.raw ? `\nDetails: ${JSON.stringify(acct.raw.metadata || acct.raw)}` : ''}\nCreate this account manually in WHM for ${order.domain} on package nadine14_${order.pkg}, install WordPress, then send the customer (${order.email}) their logins.`;
+    }
+  } else if (outcome === 'paid' && order && order.type === 'builder' && order.pkg && order.domain) {
+    const acct = await createAccount({ domain: order.domain, pkgSlug: order.pkg, contactemail: order.email });
+    if (acct.ok) {
+      const emailResult = await emailBuilderDetailsToCustomer(order, acct);
+      message += `\n\n--- WHM account created automatically (Website Builder) ---\nDomain: ${acct.domain}\nUsername: ${acct.username}\nPassword: ${acct.password}\ncPanel login: https://${acct.domain}:2083\n\nACTION NEEDED: enable the Website Builder feature for this account in WHM's Feature Manager.\n\nLogin details ${emailResult.ok ? 'were emailed directly to the customer' : `FAILED to send to the customer (${emailResult.reason}) — forward manually`}.`;
+    } else {
+      message += `\n\n--- WHM account creation FAILED (Website Builder) ---\nReason: ${acct.reason}${acct.raw ? `\nDetails: ${JSON.stringify(acct.raw.metadata || acct.raw)}` : ''}\nCreate this account manually in WHM for ${order.domain} on package nadine14_${order.pkg}.`;
+    }
+  } else if (outcome === 'paid' && order && order.type === 'ssl' && order.domain) {
+    const sslEmailResult = await emailSslOrderConfirmation(order);
+    message += `\n\n--- ACTION NEEDED: SSL certificate order ---\nDomain: ${order.domain}\nCertificate type: ${order.pkg}\nPurchase and issue the certificate (e.g. via Namecheap), install it via WHM's SSL/TLS Manager for ${order.domain}, then email the customer (${order.email}) to confirm it's live.\n\nOrder confirmation ${sslEmailResult.ok ? 'was emailed to the customer' : `FAILED to send (${sslEmailResult.reason})`}.`;
+  } else if (outcome === 'paid' && order && order.type === 'care' && order.pkg) {
+    const careEmailResult = await emailCarePlanConfirmation(order);
+    message += `\n\n--- ACTION NEEDED: new Care Plan customer ---\nPlan: ${order.plan}\nReach out to ${order.name} (${order.email}) to onboard them — get site access and confirm what's covered.\n\nWelcome email ${careEmailResult.ok ? 'was sent to the customer' : `FAILED to send (${careEmailResult.reason})`}.`;
   } else if (outcome === 'paid' && order && order.type === 'domain' && order.domain) {
     const reg = await attemptDomainRegistration(order);
     if (reg.ok) {
@@ -369,6 +436,21 @@ async function handleCheckoutInitiate(req, res) {
   }
   if (type === 'database' && (!pkg || !DATABASE_PACKAGES[pkg])) {
     return sendJson(res, 400, { error: 'Missing or invalid database package.' });
+  }
+  if (type === 'wordpress') {
+    if (!pkg || !WORDPRESS_PACKAGES[pkg]) return sendJson(res, 400, { error: 'Missing or invalid WordPress hosting package.' });
+    if (!domain || !/^[a-z0-9.-]+\.[a-z]{2,}$/.test(domain)) return sendJson(res, 400, { error: 'A valid domain is required to set up WordPress hosting.' });
+  }
+  if (type === 'builder') {
+    if (!pkg || !BUILDER_PACKAGES[pkg]) return sendJson(res, 400, { error: 'Missing or invalid Website Builder package.' });
+    if (!domain || !/^[a-z0-9.-]+\.[a-z]{2,}$/.test(domain)) return sendJson(res, 400, { error: 'A valid domain is required to set up Website Builder.' });
+  }
+  if (type === 'ssl') {
+    if (!pkg || !SSL_PRODUCTS.has(pkg)) return sendJson(res, 400, { error: 'Missing or invalid SSL certificate type.' });
+    if (!domain || !/^[a-z0-9.-]+\.[a-z]{2,}$/.test(domain)) return sendJson(res, 400, { error: 'A valid domain is required for an SSL certificate.' });
+  }
+  if (type === 'care' && (!pkg || !CARE_PRODUCTS.has(pkg))) {
+    return sendJson(res, 400, { error: 'Missing or invalid care plan.' });
   }
 
   const needsRegistrant = type === 'domain' || (type === 'hosting' && domainOption === 'new');

@@ -24,7 +24,24 @@ const DATABASE_PACKAGES = {
   vantis: { QUOTA: 120000, BWLIMIT: 600000, MAXPOP: 0, MAXADDON: 0, MAXSQL: 40 },
 };
 
-const PACKAGES = { ...HOSTING_PACKAGES, ...DATABASE_PACKAGES };
+// Managed WordPress hosting — same cPanel account mechanics as regular
+// hosting; WordPress itself gets installed via Softaculous in cPanel
+// after account creation, which stays a manual step for now (not enough
+// certainty about this account's Softaculous API details to automate it).
+const WORDPRESS_PACKAGES = {
+  wpstarter: { QUOTA: 10000, BWLIMIT: 50000, MAXPOP: 3, MAXADDON: 0, MAXSQL: 2 },
+  wpgrowth: { QUOTA: 20000, BWLIMIT: 100000, MAXPOP: 5, MAXADDON: 0, MAXSQL: 3 },
+  wppro: { QUOTA: 40000, BWLIMIT: 200000, MAXPOP: 10, MAXADDON: 2, MAXSQL: 5 },
+};
+
+// Standalone Website Builder — a cheap cPanel account; enabling the actual
+// Website Builder feature for it is a manual step in WHM's Feature Manager
+// for the same reason as the WordPress install above.
+const BUILDER_PACKAGES = {
+  builder: { QUOTA: 2000, BWLIMIT: 10000, MAXPOP: 1, MAXADDON: 0, MAXSQL: 1 },
+};
+
+const PACKAGES = { ...HOSTING_PACKAGES, ...DATABASE_PACKAGES, ...WORDPRESS_PACKAGES, ...BUILDER_PACKAGES };
 
 async function whmRequest(pathAndQuery) {
   const token = process.env.WHM_API_TOKEN;
@@ -124,4 +141,7 @@ async function createAccount({ domain, pkgSlug, contactemail }) {
   }
 }
 
-module.exports = { whmRequest, ensurePackagesExist, createAccount, PACKAGES, HOSTING_PACKAGES, DATABASE_PACKAGES };
+module.exports = {
+  whmRequest, ensurePackagesExist, createAccount, PACKAGES,
+  HOSTING_PACKAGES, DATABASE_PACKAGES, WORDPRESS_PACKAGES, BUILDER_PACKAGES,
+};

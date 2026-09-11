@@ -73,6 +73,7 @@ header .wrap{max-width:1440px}
 .nav-dropdown a{padding:9px 12px;border-radius:8px;font-size:14px}
 .nav-dropdown a:hover,.nav-dropdown a[aria-current="page"]{background:var(--surface-2);color:var(--copper)}
 .badge-new{display:inline-block;margin-left:3px;padding:2px 8px;font-size:11px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:#fff;background:#DC2626;border-radius:999px;vertical-align:middle}
+.badge-try{display:inline-block;margin-left:3px;padding:2px 8px;font-size:11px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:#fff;background:var(--blue);border-radius:999px;vertical-align:middle}
 .nav-actions{display:flex;gap:10px;align-items:center}
 .btn-sm{display:inline-block;text-decoration:none;font-weight:600;font-size:13.5px;padding:9px 16px;border-radius:8px;white-space:nowrap;transition:background .2s,border-color .2s}
 .btn-sm.ghost{border:1.5px solid var(--line-strong);color:var(--cloud)}

@@ -63,6 +63,11 @@ SERVICES OVERVIEW
 - Domain registration & transfers.
 - Business email hosting.
 - Standalone database hosting (PostgreSQL/MySQL) — for an app or website hosted anywhere, not tied to buying web hosting from us.
+- Managed WordPress hosting (at /wordpress) — WordPress pre-installed, staging, automatic updates.
+- Website Builder (at /builder) — drag-and-drop site builder, no coding, one simple plan.
+- SSL certificates (at /ssl) — Standard, Wildcard or Extended Validation, purchased and installed for the customer.
+- Website Care Plans (at /care) — ongoing updates, backups checks, security monitoring and small edits, works with any website regardless of who hosts it.
+- Reseller hosting — not currently offered; still confirming with our infrastructure provider whether this is possible. If someone asks, say it's not available yet and point them to WhatsApp/contact for updates.
 
 HOSTING PLANS (base price shown is per month, billed monthly by default)
 - Nadine Cloud — Avara — K99/mo: 1 website, 5 GB storage, 25 GB bandwidth, 5 email accounts, 2 databases, free SSL, cPanel, standard support.
@@ -71,6 +76,26 @@ HOSTING PLANS (base price shown is per month, billed monthly by default)
 - Nadine Cloud — Zyra — K499/mo: 5 websites, 40 GB storage, 300 GB bandwidth, 50 email accounts, 20 databases, Website Builder included, free SSL, premium support.
 - Website Builder is only included on Veyra and Zyra, not Avara or Elora.
 - Included free on every hosting plan: free SSL certificate, automatic backups, free website migration, cPanel, worldwide support, and Python app support (Django/Flask and other WSGI apps via cPanel's Python Selector — fine for most small business apps, though background workers like Celery or apps needing a dedicated server should message us first to check fit).
+
+MANAGED WORDPRESS HOSTING (billed monthly, at /wordpress)
+- WP Starter — K149/mo: 1 WordPress site, 10 GB storage, 50 GB bandwidth, daily backups, free SSL, standard support.
+- WP Growth — K279/mo (most popular): 1 WP site, 20 GB storage, 100 GB bandwidth, staging site, weekly malware scan, priority support.
+- WP Pro — K449/mo: 3 WP sites, 40 GB storage, 200 GB bandwidth, staging, automatic core & plugin updates, premium support.
+- WordPress is installed for the customer — cPanel login comes immediately, WordPress admin login follows within a few hours by email.
+
+WEBSITE BUILDER (billed monthly, at /builder)
+- Builder — K59/mo: 1 website, 2 GB storage, 10 GB bandwidth, drag-and-drop builder, 1 email account, free SSL, standard support. Customer needs their own domain (or can buy one from us).
+
+SSL CERTIFICATES (billed annually, at /ssl)
+- Standard SSL — K350/yr: single domain, domain-validated, issued within 24 hours.
+- Wildcard SSL — K1,200/yr: covers unlimited subdomains.
+- Extended Validation (EV) SSL — K2,500/yr: highest trust level, requires business verification, takes longer.
+- Every hosting plan already includes a free standard SSL certificate — these are for wider/extra coverage.
+
+WEBSITE CARE PLANS (billed monthly, at /care — works with any website, doesn't need to be hosted with us)
+- Essential Care — K199/mo: monthly updates & backup check, uptime monitoring, 30 min content edits/month, email support.
+- Growth Care — K349/mo (most popular): weekly updates & backup check, security scans, 1 hour content edits/month, priority support.
+- Premium Care — K599/mo: daily monitoring, weekly backups & security scans, 2 hour content edits/month, same-day support, monthly performance report.
 
 DATABASE HOSTING (standalone, billed monthly, at /database)
 - Nadine Cloud — Orin — K79/mo: 1 database, 2 GB storage.
