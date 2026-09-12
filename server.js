@@ -18,6 +18,10 @@ const PORT = process.env.PORT || 3000;
 const RUST_API_HOST = process.env.RUST_API_HOST || 'nadine-api-rs.railway.internal';
 const RUST_API_PORT = Number(process.env.RUST_API_PORT) || 8080;
 const USE_RUST_API = process.env.USE_RUST_API !== 'false';
+// Separate toggle for auth specifically — higher stakes (real user
+// accounts/sessions) than domain-check/contact/chat, so it can be rolled
+// back independently without affecting those.
+const USE_RUST_AUTH = process.env.USE_RUST_AUTH !== 'false';
 
 function proxyToRust(req, res, targetPath) {
   const chunks = [];
@@ -125,22 +129,26 @@ const server = http.createServer((req, res) => {
   }
 
   if (req.method === 'POST' && urlPath === '/api/auth/signup') {
-    handleSignup(req, res);
+    if (USE_RUST_AUTH) proxyToRust(req, res, req.url);
+    else handleSignup(req, res);
     return;
   }
 
   if (req.method === 'POST' && urlPath === '/api/auth/login') {
-    handleLogin(req, res);
+    if (USE_RUST_AUTH) proxyToRust(req, res, req.url);
+    else handleLogin(req, res);
     return;
   }
 
   if (req.method === 'POST' && urlPath === '/api/auth/logout') {
-    handleLogout(req, res);
+    if (USE_RUST_AUTH) proxyToRust(req, res, req.url);
+    else handleLogout(req, res);
     return;
   }
 
   if (req.method === 'GET' && urlPath === '/api/auth/me') {
-    handleMe(req, res);
+    if (USE_RUST_AUTH) proxyToRust(req, res, req.url);
+    else handleMe(req, res);
     return;
   }
 
@@ -202,4 +210,5 @@ server.listen(PORT, () => {
   console.log(`NAMECHEAP_USERNAME configured: ${Boolean(process.env.NAMECHEAP_USERNAME)}`);
   console.log(`NAMECHEAP_SANDBOX: ${process.env.NAMECHEAP_SANDBOX || '(not set)'}`);
   console.log(`USE_RUST_API: ${USE_RUST_API} (domain-check, contact, chat -> ${RUST_API_HOST}:${RUST_API_PORT})`);
+  console.log(`USE_RUST_AUTH: ${USE_RUST_AUTH} (signup, login, logout, me -> ${RUST_API_HOST}:${RUST_API_PORT})`);
 });
