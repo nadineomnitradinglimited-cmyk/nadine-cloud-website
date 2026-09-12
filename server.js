@@ -158,6 +158,22 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  if (req.method === 'POST' && urlPath === '/api/admin/cleanup-migration-test-users') {
+    // temporary one-off route: deletes the throwaway live-proxy auth test
+    // account. Remove once used.
+    require('./db').getPool()
+      .query("DELETE FROM users WHERE email LIKE '%live-proxy-auth-test-%@example.com' RETURNING email")
+      .then((result) => {
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ deleted: result.rows.map((r) => r.email) }));
+      })
+      .catch((err) => {
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: String(err) }));
+      });
+    return;
+  }
+
   // Clean URLs: /hosting.html is only ever reached via this redirect, so a
   // page never actually renders at its .html address -- redirect it to the
   // extension-less URL instead. The Google Search Console verification file
