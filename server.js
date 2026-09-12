@@ -53,6 +53,46 @@ function attemptProxy(body, headers, req, res, targetPath, retriesLeft) {
   proxyReq.end(body);
 }
 
+// Phase 3, shadow mode: fire a copy of real checkout/webhook traffic at the
+// Rust service's shadow endpoints purely for comparison logging. This is
+// deliberately best-effort and one-way — no response from Rust is ever
+// read by the caller, awaited, or allowed to affect the real request in
+// any way, and it can never be retried into a duplicate side effect
+// because the shadow endpoints themselves never call Lenco, WHM, or
+// Namecheap's registration API. If USE_RUST_SHADOW is off, or the mirror
+// request errors, nothing happens beyond a log line.
+const USE_RUST_SHADOW = process.env.USE_RUST_SHADOW === 'true';
+
+// Attaches a passive listener alongside whatever listeners the real
+// handler (payments.js) attaches of its own accord. Node broadcasts each
+// 'data'/'end' event to every listener registered before the stream
+// starts flowing, so this does not consume, delay, or otherwise alter
+// what the real handler sees on `req` -- it only takes its own copy.
+function mirrorRequestBody(req, targetPath) {
+  if (!USE_RUST_SHADOW) return;
+  const chunks = [];
+  req.on('data', (chunk) => chunks.push(chunk));
+  req.on('end', () => {
+    mirrorToRustShadow(Buffer.concat(chunks), { ...req.headers }, targetPath);
+  });
+}
+
+function mirrorToRustShadow(body, headers, targetPath) {
+  if (!USE_RUST_SHADOW) return;
+  const shadowHeaders = { ...headers, host: RUST_API_HOST };
+  if (body.length) shadowHeaders['content-length'] = String(body.length);
+  else delete shadowHeaders['content-length'];
+  const shadowReq = http.request(
+    { host: RUST_API_HOST, port: RUST_API_PORT, path: targetPath, method: 'POST', headers: shadowHeaders, timeout: 5000, agent: false },
+    (shadowRes) => {
+      shadowRes.resume(); // drain, we don't care about the body
+    }
+  );
+  shadowReq.on('timeout', () => shadowReq.destroy());
+  shadowReq.on('error', (err) => console.error(`Shadow mirror error for ${targetPath}:`, err.message));
+  shadowReq.end(body);
+}
+
 function proxyToRust(req, res, targetPath) {
   const chunks = [];
   req.on('data', (chunk) => chunks.push(chunk));
@@ -115,6 +155,7 @@ const server = http.createServer((req, res) => {
   const urlPath = req.url.split('?')[0];
 
   if (req.method === 'POST' && urlPath === '/api/checkout') {
+    mirrorRequestBody(req, '/api/shadow/checkout');
     handleCheckoutInitiate(req, res);
     return;
   }
@@ -132,6 +173,7 @@ const server = http.createServer((req, res) => {
   }
 
   if (req.method === 'POST' && urlPath === '/api/lenco-webhook') {
+    mirrorRequestBody(req, '/api/shadow/lenco-webhook');
     handleLencoWebhook(req, res);
     return;
   }
@@ -225,4 +267,5 @@ server.listen(PORT, () => {
   console.log(`NAMECHEAP_SANDBOX: ${process.env.NAMECHEAP_SANDBOX || '(not set)'}`);
   console.log(`USE_RUST_API: ${USE_RUST_API} (domain-check, contact, chat -> ${RUST_API_HOST}:${RUST_API_PORT})`);
   console.log(`USE_RUST_AUTH: ${USE_RUST_AUTH} (signup, login, logout, me -> ${RUST_API_HOST}:${RUST_API_PORT})`);
+  console.log(`USE_RUST_SHADOW: ${USE_RUST_SHADOW} (checkout, lenco-webhook mirrored, fire-and-forget, to ${RUST_API_HOST}:${RUST_API_PORT})`);
 });

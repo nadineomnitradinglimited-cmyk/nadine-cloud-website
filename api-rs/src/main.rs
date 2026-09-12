@@ -1,9 +1,11 @@
 mod auth;
 mod chat;
+mod checkout_shadow;
 mod contact;
 mod domain_check;
 mod email;
 mod rate_limit;
+mod webhook_shadow;
 
 use std::net::SocketAddr;
 use std::sync::Arc;
@@ -89,6 +91,14 @@ async fn main() {
         .route("/api/auth/login", post(auth::handle_login))
         .route("/api/auth/logout", post(auth::handle_logout))
         .route("/api/auth/me", get(auth::handle_me))
+        // Phase 3, shadow mode only: these two never touch Lenco, WHM, or
+        // Namecheap's registration API. Node stays fully authoritative for
+        // real checkout/payment handling — these exist purely so mirrored
+        // (fire-and-forget, non-blocking) copies of real traffic can be
+        // compared against what Node actually decided, before any of this
+        // logic is ever trusted with a live cutover.
+        .route("/api/shadow/checkout", post(checkout_shadow::handle_checkout_shadow))
+        .route("/api/shadow/lenco-webhook", post(webhook_shadow::handle_webhook_shadow))
         .with_state(state)
         .layer(cors)
         .layer(TraceLayer::new_for_http());
