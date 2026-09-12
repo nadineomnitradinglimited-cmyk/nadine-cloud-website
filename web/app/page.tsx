@@ -1,69 +1,554 @@
-import Image from "next/image";
+import Link from "next/link";
+import Header from "./components/Header";
+import Footer from "./components/Footer";
+import DomainLookup from "./components/DomainLookup";
 
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
+    <>
+      <Header />
+
+      <section className="hero" id="top">
+        <div className="hero-graphic" aria-hidden="true">
+          <img
+            src="/assets/hero-city.jpg"
+            alt=""
+            className="hero-servers-img"
+          />
+          <svg
+            className="hero-globe-overlay"
+            viewBox="0 0 600 600"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M40 260 Q220 120 420 240"
+              stroke="#1769FF"
+              strokeWidth={1.6}
+              strokeDasharray="4 5"
+              opacity={0.55}
+            />
+            <path
+              d="M60 420 Q260 500 460 380"
+              stroke="#2F8CFF"
+              strokeWidth={1.6}
+              strokeDasharray="4 5"
+              opacity={0.5}
+            />
+            <circle className="pulse-dot" cx={40} cy={260} r={6} fill="#7047FF" />
+            <circle className="pulse-dot" cx={420} cy={240} r={5} fill="#7047FF" />
+            <circle className="pulse-dot" cx={60} cy={420} r={5} fill="#2F8CFF" />
+            <circle className="pulse-dot" cx={460} cy={380} r={6} fill="#2F8CFF" />
+          </svg>
+        </div>
+        <div className="hero-inner">
+          <div style={{ marginBottom: 18 }}>
+            <span className="hero-badge">One cloud. Endless possibilities.</span>
+          </div>
+          <span className="eyebrow">Web design · Hosting · Domains — Worldwide</span>
+          <h1>
+            Your business, <em>online</em> and under one roof.
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+          <p className="lead">
+            Nadine Cloud designs your website, hosts it on fast NVMe servers,
+            and manages your domain and business email — so you deal with one
+            team, one invoice, zero headaches.
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        <DomainLookup />
+      </section>
+
+      <div className="strip">
+        <div className="wrap">
+          <span>Free SSL on every site</span>
+          <span>Daily backups</span>
+          <span>Worldwide support</span>
+          <span>WhatsApp support</span>
         </div>
-      </main>
-    </div>
+      </div>
+
+      <section className="stats-bar">
+        <div className="wrap stats-row">
+          <div className="stat">
+            <div className="ic">
+              <svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                <rect x={3} y={4} width={18} height={14} rx={2} />
+                <path d="M3 9h18M8 21h8" />
+              </svg>
+            </div>
+            <div>
+              <span className="num" data-count="10" data-suffix="+">0+</span>
+              <span className="label">Websites &amp; systems delivered</span>
+            </div>
+          </div>
+          <div className="stat">
+            <div className="ic">
+              <svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                <path d="M12 3 4 6.5v5c0 5 3.4 8.7 8 9.5 4.6-.8 8-4.5 8-9.5v-5L12 3Z" />
+                <path d="m9 12 2 2 4-4" />
+              </svg>
+            </div>
+            <div>
+              <span className="num" data-count="99.9" data-suffix="%">0%</span>
+              <span className="label">Hosting uptime</span>
+            </div>
+          </div>
+          <div className="stat">
+            <div className="ic">
+              <svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                <circle cx={12} cy={12} r={9} />
+                <path d="M3 12h18M12 3c3 3.5 3 14 0 18-3-4-3-14.5 0-18Z" />
+              </svg>
+            </div>
+            <div>
+              <span className="num">24/7</span>
+              <span className="label">Support, worldwide</span>
+            </div>
+          </div>
+          <div className="stat">
+            <div className="ic">
+              <svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                <path d="M12 2 3 6v6c0 5 3.8 8.7 9 10 5.2-1.3 9-5 9-10V6l-9-4Z" />
+              </svg>
+            </div>
+            <div>
+              <span className="num" data-count="100" data-suffix="%">0%</span>
+              <span className="label">Free SSL &amp; daily backups</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="section">
+        <div className="wrap">
+          <div className="section-head">
+            <span className="eyebrow">Get started</span>
+            <h2>Everything you need, in one place</h2>
+            <p>Pick what you need today — bundle it all together whenever you&apos;re ready.</p>
+          </div>
+          <div className="offer-cards">
+            <div className="offer-card">
+              <div className="ic">
+                <svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#1769FF" strokeWidth={2}>
+                  <circle cx={11} cy={12} r={8} />
+                  <path d="M3 12h16M11 4c2.4 3 2.4 13 0 16-2.4-3-2.4-13 0-16Z" />
+                  <path d="m17 15.5 1.5 1.5 3-3" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </div>
+              <h3>Domains</h3>
+              <p>Register or transfer .com, .co.zm, .org and more.</p>
+              <div className="offer-price">
+                <span className="from">From</span> <b className="amt-live" data-zmw="450">ZMW 450</b> <span className="per">/yr</span>
+                <small className="price-note" hidden></small>
+              </div>
+              <Link className="cta" href="/domains">Search domains</Link>
+            </div>
+            <div className="offer-card featured">
+              <div className="ic">
+                <svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#1769FF" strokeWidth={2}>
+                  <path d="M7 18a4 4 0 0 1-.5-7.97A5 5 0 0 1 16 8.5a4.5 4.5 0 0 1-.5 9.5H7Z" />
+                  <path d="M9 21h.01M12 21h.01M15 21h.01" />
+                </svg>
+              </div>
+              <h3>Hosting</h3>
+              <p>Fast NVMe cPanel hosting with free SSL and backups.</p>
+              <div className="offer-price">
+                <span className="from">From</span> <b className="amt-live" data-zmw="99">ZMW 99</b> <span className="per">/mo</span>
+                <small className="price-note" hidden></small>
+              </div>
+              <Link className="cta" href="/hosting">View plans</Link>
+            </div>
+            <div className="offer-card">
+              <div className="ic">
+                <svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#1769FF" strokeWidth={2}>
+                  <rect x={3} y={4} width={18} height={14} rx={2} />
+                  <path d="M3 9h18" />
+                  <path d="m13.5 15.5 4-4 2 2-4 4h-2v-2Z" />
+                </svg>
+              </div>
+              <h3>Web design</h3>
+              <p>Modern, mobile-first websites built to convert visitors.</p>
+              <div className="offer-price">
+                <span className="from">Fixed-price</span> <span className="per">quotes</span>
+              </div>
+              <Link className="cta" href="/services">Get a quote</Link>
+            </div>
+            <div className="offer-card">
+              <div className="ic">
+                <svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#1769FF" strokeWidth={2}>
+                  <path d="M4 6h16v12H4z" />
+                  <path d="m4 7 8 6 8-6" />
+                </svg>
+              </div>
+              <h3>Business email</h3>
+              <p>Professional email at your own domain address.</p>
+              <div className="offer-price">
+                <span className="from">From</span> <b className="amt-live" data-zmw="300">ZMW 300</b> <span className="per">/yr</span>
+                <small className="price-note" hidden></small>
+              </div>
+              <Link className="cta" href="/hosting">Get email</Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="section" id="services">
+        <div className="wrap">
+          <div className="section-head">
+            <span className="eyebrow">What we do</span>
+            <h2>Everything a business needs to get online</h2>
+            <p>From your first flyer-ready website to a full online system — designed, hosted and maintained by the same team.</p>
+          </div>
+          <div className="services-grid">
+            <div className="svc">
+              <div className="ic">
+                <svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke="#1769FF" strokeWidth={2}>
+                  <rect x={3} y={4} width={18} height={14} rx={2} />
+                  <path d="M3 9h18" />
+                  <path d="m13.5 15.5 4-4 2 2-4 4h-2v-2Z" />
+                </svg>
+              </div>
+              <h3>Web design</h3>
+              <p>Modern, mobile-first websites for shops, clinics, ministries, schools and NGOs — built to convert visitors into customers.</p>
+            </div>
+            <div className="svc">
+              <div className="ic">
+                <svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke="#1769FF" strokeWidth={2}>
+                  <path d="M7 18a4 4 0 0 1-.5-7.97A5 5 0 0 1 16 8.5a4.5 4.5 0 0 1-.5 9.5H7Z" />
+                  <path d="M9 21h.01M12 21h.01M15 21h.01" />
+                </svg>
+              </div>
+              <h3>Cloud hosting</h3>
+              <p>Fast NVMe cPanel hosting with free SSL, daily backups and 99.9% uptime — your site stays live and loads quickly.</p>
+            </div>
+            <div className="svc">
+              <div className="ic">
+                <svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke="#1769FF" strokeWidth={2}>
+                  <circle cx={11} cy={12} r={8} />
+                  <path d="M3 12h16M11 4c2.4 3 2.4 13 0 16-2.4-3-2.4-13 0-16Z" />
+                  <path d="m17 15.5 1.5 1.5 3-3" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </div>
+              <h3>Domains &amp; DNS</h3>
+              <p>Register or transfer .com, .co.zm, .org and more. We handle the DNS so your domain, email and website just work.</p>
+            </div>
+            <div className="svc">
+              <div className="ic">
+                <svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke="#1769FF" strokeWidth={2}>
+                  <path d="M4 6h16v12H4z" />
+                  <path d="m4 7 8 6 8-6" />
+                </svg>
+              </div>
+              <h3>Business email &amp; databases</h3>
+              <p>Professional email at your own domain (you@yourbusiness.co.zm) plus MySQL databases for your apps and systems.</p>
+            </div>
+            <div className="svc">
+              <div className="ic">
+                <svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke="#1769FF" strokeWidth={2}>
+                  <ellipse cx={12} cy={5} rx={8} ry={3} />
+                  <path d="M4 5v6c0 1.66 3.58 3 8 3s8-1.34 8-3V5" />
+                  <path d="M4 11v6c0 1.66 3.58 3 8 3s8-1.34 8-3v-6" />
+                </svg>
+              </div>
+              <h3>Custom business systems</h3>
+              <p>POS, inventory, pharmacy, patient management and school systems — built around how your business actually works.</p>
+            </div>
+            <div className="svc">
+              <div className="ic">
+                <svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke="#1769FF" strokeWidth={2}>
+                  <path d="M12 3v4M12 17v4M3 12h4M17 12h4" />
+                  <circle cx={12} cy={12} r={5} />
+                </svg>
+              </div>
+              <h3>Branding &amp; support</h3>
+              <p>Logos and graphics to match your new site, plus ongoing maintenance so nothing ever falls through the cracks.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="section pricing" id="hosting">
+        <div className="wrap">
+          <div className="section-head">
+            <span className="eyebrow">Nadine Cloud Hosting</span>
+            <h2>Hosting plans built for your growth</h2>
+            <p>Every plan includes free SSL, free website migration, cPanel access and worldwide support. Pay monthly, or save more with a longer billing period.</p>
+          </div>
+          <div className="billing-toggle" role="group" aria-label="Billing period">
+            <button type="button" className="billing-opt active" data-period="mo">Monthly</button>
+            <button type="button" className="billing-opt" data-period="6mo">6 Months<span className="save-tag">Save 10%</span></button>
+            <button type="button" className="billing-opt" data-period="yr">1 Year<span className="save-tag">Save 15%</span></button>
+            <button type="button" className="billing-opt" data-period="2yr">2 Years<span className="save-tag">Save 20%</span></button>
+            <button type="button" className="billing-opt" data-period="3yr">3 Years<span className="save-tag">Save 25%</span></button>
+          </div>
+          <div className="plans">
+            <div className="plan">
+              <div className="plan-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx={12} cy={12} r={9} />
+                  <path d="M3 12h18M12 3c3 3.5 3 14 0 18-3-4-3-14.5 0-18Z" />
+                </svg>
+              </div>
+              <h3>Nadine Cloud — Avara</h3>
+              <div className="for">Everything you need to get started</div>
+              <div className="price">
+                <span className="amt amt-live" data-zmw="99">ZMW 99</span> <span className="per">/month</span>
+                <small className="price-note" hidden></small>
+              </div>
+              <div className="price-equiv" hidden></div>
+              <div className="price-savings" hidden></div>
+              <div className="plan-stats">
+                <div><span className="n">1</span><span className="l">Website</span></div>
+                <div><span className="n">5 GB</span><span className="l">Storage</span></div>
+              </div>
+              <ul>
+                <li>5 Email Accounts</li>
+                <li>Free SSL Certificate</li>
+                <li>Automatic Backups</li>
+              </ul>
+              <a className="cta" href="/checkout?type=hosting&pkg=avara&plan=Nadine+Cloud+%E2%80%94+Avara&amount=99&period=mo">Get Avara</a>
+              <div className="other-billing"></div>
+            </div>
+            <div className="plan featured">
+              <div className="plan-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                  <path d="m12 2 2.9 6.3 6.9.6-5.2 4.6 1.6 6.8L12 16.9l-6.2 3.4 1.6-6.8-5.2-4.6 6.9-.6Z" />
+                </svg>
+              </div>
+              <h3>Nadine Cloud — Elora</h3>
+              <div className="for">Our most popular plan</div>
+              <div className="price">
+                <span className="amt amt-live" data-zmw="179">ZMW 179</span> <span className="per">/month</span>
+                <small className="price-note" hidden></small>
+              </div>
+              <div className="price-equiv" hidden></div>
+              <div className="price-savings" hidden></div>
+              <div className="plan-stats">
+                <div><span className="n">1</span><span className="l">Website</span></div>
+                <div><span className="n">10 GB</span><span className="l">Storage</span></div>
+              </div>
+              <ul>
+                <li>15 Email Accounts</li>
+                <li>Free SSL Certificate</li>
+                <li>Automatic Backups</li>
+              </ul>
+              <a className="cta" href="/checkout?type=hosting&pkg=elora&plan=Nadine+Cloud+%E2%80%94+Elora&amount=179&period=mo">Get Elora</a>
+              <div className="other-billing"></div>
+            </div>
+            <div className="plan">
+              <div className="plan-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                  <path d="m12 2 9 5-9 5-9-5 9-5Z" />
+                  <path d="m3 12 9 5 9-5" />
+                  <path d="m3 17 9 5 9-5" />
+                </svg>
+              </div>
+              <h3>Nadine Cloud — Veyra</h3>
+              <div className="for">For businesses running more than one site</div>
+              <div className="price">
+                <span className="amt amt-live" data-zmw="299">ZMW 299</span> <span className="per">/month</span>
+                <small className="price-note" hidden></small>
+              </div>
+              <div className="price-equiv" hidden></div>
+              <div className="price-savings" hidden></div>
+              <div className="plan-stats">
+                <div><span className="n">3</span><span className="l">Websites</span></div>
+                <div><span className="n">20 GB</span><span className="l">Storage</span></div>
+              </div>
+              <ul>
+                <li>Website Builder</li>
+                <li>Automatic Backups</li>
+                <li>Priority Support</li>
+              </ul>
+              <a className="cta" href="/checkout?type=hosting&pkg=veyra&plan=Nadine+Cloud+%E2%80%94+Veyra&amount=299&period=mo">Get Veyra</a>
+              <div className="other-billing"></div>
+            </div>
+            <div className="plan">
+              <div className="plan-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx={12} cy={8} r={6} />
+                  <path d="M9 13.5 7 22l5-3 5 3-2-8.5" />
+                </svg>
+              </div>
+              <h3>Nadine Cloud — Zyra</h3>
+              <div className="for">Our most powerful plan</div>
+              <div className="price">
+                <span className="amt amt-live" data-zmw="499">ZMW 499</span> <span className="per">/month</span>
+                <small className="price-note" hidden></small>
+              </div>
+              <div className="price-equiv" hidden></div>
+              <div className="price-savings" hidden></div>
+              <div className="plan-stats">
+                <div><span className="n">5</span><span className="l">Websites</span></div>
+                <div><span className="n">40 GB</span><span className="l">Storage</span></div>
+              </div>
+              <ul>
+                <li>Website Builder</li>
+                <li>Automatic Backups</li>
+                <li>Premium Support</li>
+              </ul>
+              <a className="cta" href="/checkout?type=hosting&pkg=zyra&plan=Nadine+Cloud+%E2%80%94+Zyra&amount=499&period=mo">Get Zyra</a>
+              <div className="other-billing"></div>
+            </div>
+          </div>
+          <p className="pricing-note">* Prices shown are the total for the selected billing period, charged once at checkout. Pay by mobile money, or bank transfer on request. See <Link href="/hosting" style={{ color: "var(--copper-bright)" }}>full plan details &amp; email hosting</Link>.</p>
+        </div>
+      </section>
+
+      <section className="section" id="work" style={{ background: "var(--sky)" }}>
+        <div className="wrap">
+          <div className="section-head">
+            <span className="eyebrow">Our work</span>
+            <h2>Built by us, trusted by clients</h2>
+            <p>A few of the platforms and websites designed and delivered by our team. <Link href="/work" style={{ color: "var(--copper)" }}>See the full portfolio →</Link></p>
+          </div>
+          <div className="portfolio-grid">
+            <div className="work"><b>Royal South Luangwa Safari Lodge</b><span>Luxury safari lodge website with a modern responsive design and Progressive Web App (PWA).</span><br /><span className="tag">Tourism</span></div>
+            <div className="work"><b>Nadine Express Cargo</b><span>Freight forwarding and cargo tracking platform with shipment management and customer services.</span><br /><span className="tag">Logistics</span></div>
+            <div className="work"><b>Urban Ex Logistics</b><span>Freight forwarding company website for shipping between China and Zambia.</span><br /><span className="tag">Logistics</span></div>
+            <div className="work"><b>Optic Zone Opticians</b><span>Patient management system with appointment scheduling, prescriptions, customer database, and reporting.</span><br /><span className="tag">Healthcare</span></div>
+            <div className="work"><b>Destined for Greatness Ministries</b><span>Church website with live sermon streaming, a media library, and online giving.</span><br /><span className="tag">Church</span></div>
+            <div className="work"><b>Chatbot Money Lenders</b><span>Money lending platform website with online loan applications and customer support.</span><br /><span className="tag">Finance</span></div>
+            <div className="work"><b>ZMRS</b><span>Corporate website for a mining company.</span><br /><span className="tag">Mining</span></div>
+          </div>
+        </div>
+      </section>
+
+      <div className="trust-strip">
+        <div className="wrap">
+          <span className="eyebrow">Real projects, real clients</span>
+          <div className="trust-names">
+            <span>Royal South Luangwa</span>
+            <span>Nadine Express Cargo</span>
+            <span>Urban Ex Logistics</span>
+            <span>Optic Zone Opticians</span>
+            <span>MedMorph Pharmacy</span>
+            <span>Destined for Greatness Ministries</span>
+          </div>
+        </div>
+      </div>
+
+      <section className="section" style={{ background: "var(--sky)" }}>
+        <div className="wrap">
+          <div className="section-head">
+            <span className="eyebrow">Beyond websites</span>
+            <h2>Other solutions we&apos;ve delivered</h2>
+            <p>Custom software built around how your business actually works.</p>
+          </div>
+          <div className="chip-row">
+            <span className="chip">Corporate Websites</span>
+            <span className="chip">E-Commerce Websites</span>
+            <span className="chip">Progressive Web Apps (PWAs)</span>
+            <span className="chip">School Management Systems</span>
+            <span className="chip">Point of Sale (POS) Systems</span>
+            <span className="chip">Inventory &amp; Stock Management Systems</span>
+            <span className="chip">Accounting &amp; Business Management Systems</span>
+            <span className="chip">Pharmacy Management Systems</span>
+            <span className="chip">Medical &amp; Patient Database Systems</span>
+            <span className="chip">Church Websites</span>
+            <span className="chip">Custom Web Applications</span>
+            <span className="chip">Company Portals</span>
+            <span className="chip">Domain Registration</span>
+            <span className="chip">Business Email Hosting</span>
+            <span className="chip">Web Hosting Solutions</span>
+            <span className="chip">Website Maintenance &amp; Support</span>
+            <span className="chip">Branding &amp; Graphic Design</span>
+          </div>
+        </div>
+      </section>
+
+      <section className="section">
+        <div className="wrap">
+          <div className="section-head">
+            <span className="eyebrow">Why us</span>
+            <h2>Why businesses choose Nadine Cloud</h2>
+          </div>
+          <div className="included-grid">
+            <div>Modern &amp; Responsive Designs</div>
+            <div>Fast, Secure &amp; Reliable Hosting</div>
+            <div>Business Email Solutions</div>
+            <div>Free SSL Certificates</div>
+            <div>Cloud-Based Applications</div>
+            <div>Ongoing Technical Support</div>
+            <div>Custom Software Development</div>
+            <div>Worldwide Support</div>
+          </div>
+          <p style={{ fontFamily: "var(--mono)", fontSize: 12, letterSpacing: ".05em", textTransform: "uppercase", color: "var(--text-mute)", textAlign: "center", margin: "44px 0 20px" }}>Built on trusted technology</p>
+          <div className="tech-row">
+            <span className="tech-badge"><svg viewBox="0 0 24 24" fill="currentColor" style={{ color: "#FF6C2C" }}><path d="M4.586 9.346a.538.538 0 00-.34.113.561.561 0 00-.197.299L2.74 14.654h.922a.528.528 0 00.332-.113.561.561 0 00.2-.291l.968-3.604h.744a.677.677 0 01.317.077.703.703 0 01.24.199.732.732 0 01.129.281.65.65 0 01-.01.326.698.698 0 01-.676.526h-.385a.538.538 0 00-.337.113.561.561 0 00-.2.291l-.24.896h1.201a1.939 1.939 0 001.62-.867 1.988 1.988 0 00.265-.586l.027-.1a1.854 1.854 0 00.026-.907 1.973 1.973 0 00-1.031-1.34 1.875 1.875 0 00-.88-.21H4.587zm18.447 0a.401.401 0 00-.25.082.377.377 0 00-.14.217l-1.334 5.01a1.7 1.7 0 00.57-.096 1.806 1.806 0 00.496-.266 1.74 1.74 0 00.385-.408 1.648 1.648 0 00.234-.531l.996-3.696a.23.23 0 00-.045-.217.246.246 0 00-.2-.095h-.712zM8.381 10.643l-.133.503a.564.564 0 00-.006.26.544.544 0 00.1.221.552.552 0 00.185.154.53.53 0 00.252.06h2.157a.101.101 0 01.084.038.098.098 0 01.015.088l-.02.072-.324 1.201-.013.055a.172.172 0 01-.067.105.205.205 0 01-.127.04H9.178a.147.147 0 01-.12-.057.136.136 0 01-.027-.13c.022-.074.071-.112.147-.112h.808a.53.53 0 00.332-.112.564.564 0 00.2-.293l.132-.498H8.84a1.131 1.131 0 00-.38.065 1.152 1.152 0 00-.323.176 1.194 1.194 0 00-.256.271 1.052 1.052 0 00-.156.346l-.028.1a1.095 1.095 0 00-.013.533 1.203 1.203 0 00.212.464 1.141 1.141 0 00.918.453l2.157.006a.899.899 0 00.875-.67l.525-1.95a1.101 1.101 0 00.01-.514 1.114 1.114 0 00-.205-.444 1.149 1.149 0 00-.377-.312 1.048 1.048 0 00-.498-.12H8.38zm-6.397.01a1.924 1.924 0 00-.638.107 1.989 1.989 0 00-.553.295 1.962 1.962 0 00-.7 1.045l-.027.1a1.936 1.936 0 00-.023.905 1.955 1.955 0 00.361.786 1.986 1.986 0 00.668.554 1.875 1.875 0 00.88.21h.464l.266-.983a.23.23 0 00-.043-.215.239.239 0 00-.198-.096h-.423a.702.702 0 01-.319-.074.67.67 0 01-.24-.195.732.732 0 01-.127-.281.706.706 0 01.01-.34.73.73 0 01.256-.377.675.675 0 01.42-.14h.697a.538.538 0 00.338-.114.561.561 0 00.199-.297l.232-.89h-1.5zm11.08 0l-.982 3.689a.23.23 0 00.045.217.238.238 0 00.195.095h.711a.413.413 0 00.248-.08.363.363 0 00.143-.21l.644-2.41h.745a.678.678 0 01.318.075.708.708 0 01.238.2.735.735 0 01.129.28.65.65 0 01-.01.327l-.398 1.506a.243.243 0 00.24.312h.713a.403.403 0 00.244-.08.366.366 0 00.143-.213l.332-1.248a1.897 1.897 0 00.029-.908 1.955 1.955 0 00-.361-.79 1.987 1.987 0 00-.668-.554 1.889 1.889 0 00-.885-.209h-1.813zm5.793 0a1.458 1.458 0 00-.488.081 1.489 1.489 0 00-.752.58 1.493 1.493 0 00-.205.454l-.406 1.505a1.018 1.018 0 00-.016.508 1.139 1.139 0 00.205.446 1.095 1.095 0 00.377.312 1.071 1.071 0 00.498.115h2.502a.528.528 0 00.332-.113.561.561 0 00.2-.291l.21-.791h-2.748a.2.2 0 01-.191-.252l.299-1.127a.34.34 0 01.113-.162.281.281 0 01.18-.064h1.232a.153.153 0 01.147.193l-.026.1c-.022.075-.071.113-.146.113h-.81a.538.538 0 00-.339.111.526.526 0 00-.191.293l-.133.49h2.004a.887.887 0 00.547-.181.864.864 0 00.32-.483l.12-.45a1.11 1.11 0 00.013-.513 1.076 1.076 0 00-.203-.443 1.146 1.146 0 00-.375-.313 1.047 1.047 0 00-.498-.119h-1.772Z" /></svg>cPanel</span>
+            <span className="tech-badge"><svg viewBox="0 0 24 24" fill="currentColor" style={{ color: "#777BB4" }}><path d="M7.01 10.207h-.944l-.515 2.648h.838c.556 0 .97-.105 1.242-.314.272-.21.455-.559.55-1.049.092-.47.05-.802-.124-.995-.175-.193-.523-.29-1.047-.29zM12 5.688C5.373 5.688 0 8.514 0 12s5.373 6.313 12 6.313S24 15.486 24 12c0-3.486-5.373-6.312-12-6.312zm-3.26 7.451c-.261.25-.575.438-.917.551-.336.108-.765.164-1.285.164H5.357l-.327 1.681H3.652l1.23-6.326h2.65c.797 0 1.378.209 1.744.628.366.418.476 1.002.33 1.752a2.836 2.836 0 0 1-.305.847c-.143.255-.33.49-.561.703zm4.024.715l.543-2.799c.063-.318.039-.536-.068-.651-.107-.116-.336-.174-.687-.174H11.46l-.704 3.625H9.388l1.23-6.327h1.367l-.327 1.682h1.218c.767 0 1.295.134 1.586.401s.378.7.263 1.299l-.572 2.944h-1.389zm7.597-2.265a2.782 2.782 0 0 1-.305.847c-.143.255-.33.49-.561.703a2.44 2.44 0 0 1-.917.551c-.336.108-.765.164-1.286.164h-1.18l-.327 1.682h-1.378l1.23-6.326h2.649c.797 0 1.378.209 1.744.628.366.417.477 1.001.331 1.751zM17.766 10.207h-.943l-.516 2.648h.838c.557 0 .971-.105 1.242-.314.272-.21.455-.559.551-1.049.092-.47.049-.802-.125-.995s-.524-.29-1.047-.29z" /></svg>PHP</span>
+            <span className="tech-badge"><svg viewBox="0 0 24 24" fill="currentColor" style={{ color: "#4479A1" }}><path d="M16.405 5.501c-.115 0-.193.014-.274.033v.013h.014c.054.104.146.18.214.273.054.107.1.214.154.32l.014-.015c.094-.066.14-.172.14-.333-.04-.047-.046-.094-.08-.14-.04-.067-.126-.1-.18-.153zM5.77 18.695h-.927a50.854 50.854 0 00-.27-4.41h-.008l-1.41 4.41H2.45l-1.4-4.41h-.01a72.892 72.892 0 00-.195 4.41H0c.055-1.966.192-3.81.41-5.53h1.15l1.335 4.064h.008l1.347-4.064h1.095c.242 2.015.384 3.86.428 5.53zm4.017-4.08c-.378 2.045-.876 3.533-1.492 4.46-.482.716-1.01 1.073-1.583 1.073-.153 0-.34-.046-.566-.138v-.494c.11.017.24.026.386.026.268 0 .483-.075.647-.222.197-.18.295-.382.295-.605 0-.155-.077-.47-.23-.944L6.23 14.615h.91l.727 2.36c.164.536.233.91.205 1.123.4-1.064.678-2.227.835-3.483zm12.325 4.08h-2.63v-5.53h.885v4.85h1.745zm-3.32.135l-1.016-.5c.09-.076.177-.158.255-.25.433-.506.648-1.258.648-2.253 0-1.83-.718-2.746-2.155-2.746-.704 0-1.254.232-1.65.697-.43.508-.646 1.256-.646 2.245 0 .972.19 1.686.574 2.14.35.41.877.615 1.583.615.264 0 .506-.033.725-.098l1.325.772.36-.622zM15.5 17.588c-.225-.36-.337-.94-.337-1.736 0-1.393.424-2.09 1.27-2.09.443 0 .77.167.977.5.224.362.336.936.336 1.723 0 1.404-.424 2.108-1.27 2.108-.445 0-.77-.167-.978-.5zm-1.658-.425c0 .47-.172.856-.516 1.156-.344.3-.803.45-1.384.45-.543 0-1.064-.172-1.573-.515l.237-.476c.438.22.833.328 1.19.328.332 0 .593-.073.783-.22a.754.754 0 00.3-.615c0-.33-.23-.61-.648-.845-.388-.213-1.163-.657-1.163-.657-.422-.307-.632-.636-.632-1.177 0-.45.157-.81.47-1.085.315-.278.72-.415 1.22-.415.512 0 .98.136 1.4.41l-.213.476a2.726 2.726 0 00-1.064-.23c-.283 0-.502.068-.654.206a.685.685 0 00-.248.524c0 .328.234.61.666.85.393.215 1.187.67 1.187.67.433.305.648.63.648 1.168zm9.382-5.852c-.535-.014-.95.04-1.297.188-.1.04-.26.04-.274.167.055.053.063.14.11.214.08.134.218.313.346.407.14.11.28.216.427.31.26.16.555.255.81.416.145.094.293.213.44.313.073.05.12.14.214.172v-.02c-.046-.06-.06-.147-.105-.214-.067-.067-.134-.127-.2-.193a3.223 3.223 0 00-.695-.675c-.214-.146-.682-.35-.77-.595l-.013-.014c.146-.013.32-.066.46-.106.227-.06.435-.047.67-.106.106-.027.213-.06.32-.094v-.06c-.12-.12-.21-.283-.334-.395a8.867 8.867 0 00-1.104-.823c-.21-.134-.476-.22-.697-.334-.08-.04-.214-.06-.26-.127-.12-.146-.19-.34-.275-.514a17.69 17.69 0 01-.547-1.163c-.12-.262-.193-.523-.34-.763-.69-1.137-1.437-1.826-2.586-2.5-.247-.14-.543-.2-.856-.274-.167-.008-.334-.02-.5-.027-.11-.047-.216-.174-.31-.235-.38-.24-1.364-.76-1.644-.072-.18.434.267.862.422 1.082.115.153.26.328.34.5.047.116.06.235.107.356.106.294.207.622.347.897.073.14.153.287.247.413.054.073.146.107.167.227-.094.136-.1.334-.154.5-.24.757-.146 1.693.194 2.25.107.166.362.534.703.393.3-.12.234-.5.32-.835.02-.08.007-.133.048-.187v.015c.094.188.188.367.274.555.206.328.566.668.867.895.16.12.287.328.487.402v-.02h-.015c-.043-.058-.1-.086-.154-.133a3.445 3.445 0 01-.35-.4 8.76 8.76 0 01-.747-1.218c-.11-.21-.202-.436-.29-.643-.04-.08-.04-.2-.107-.24-.1.146-.247.273-.32.453-.127.288-.14.642-.188 1.01-.027.007-.014 0-.027.014-.214-.052-.287-.274-.367-.46-.2-.475-.233-1.238-.06-1.785.047-.14.247-.582.167-.716-.042-.127-.174-.2-.247-.303a2.478 2.478 0 01-.24-.427c-.16-.374-.24-.788-.414-1.162-.08-.173-.22-.354-.334-.513-.127-.18-.267-.307-.368-.52-.033-.073-.08-.194-.027-.274.014-.054.042-.075.094-.09.088-.072.335.022.422.062.247.1.455.194.662.334.094.066.195.193.315.226h.14c.214.047.455.014.655.073.355.114.675.28.962.46a5.953 5.953 0 012.085 2.286c.08.154.115.295.188.455.14.33.313.663.455.982.14.315.275.636.476.897.1.14.502.213.682.286.133.06.34.115.46.188.23.14.454.3.67.454.11.076.443.243.463.378z" /></svg>MySQL</span>
+            <span className="tech-badge"><svg viewBox="0 0 24 24" fill="currentColor" style={{ color: "#21759B" }}><path d="M21.469 6.825c.84 1.537 1.318 3.3 1.318 5.175 0 3.979-2.156 7.456-5.363 9.325l3.295-9.527c.615-1.54.82-2.771.82-3.864 0-.405-.026-.78-.07-1.11m-7.981.105c.647-.03 1.232-.105 1.232-.105.582-.075.514-.93-.067-.899 0 0-1.755.135-2.88.135-1.064 0-2.85-.15-2.85-.15-.585-.03-.661.855-.075.885 0 0 .54.061 1.125.09l1.68 4.605-2.37 7.08L5.354 6.9c.649-.03 1.234-.1 1.234-.1.585-.075.516-.93-.065-.896 0 0-1.746.138-2.874.138-.2 0-.438-.008-.69-.015C4.911 3.15 8.235 1.215 12 1.215c2.809 0 5.365 1.072 7.286 2.833-.046-.003-.091-.009-.141-.009-1.06 0-1.812.923-1.812 1.914 0 .89.513 1.643 1.06 2.531.411.72.89 1.643.89 2.977 0 .915-.354 1.994-.821 3.479l-1.075 3.585-3.9-11.61.001.014zM12 22.784c-1.059 0-2.081-.153-3.048-.437l3.237-9.406 3.315 9.087c.024.053.05.101.078.149-1.12.393-2.325.609-3.582.609M1.211 12c0-1.564.336-3.05.935-4.39L7.29 21.709C3.694 19.96 1.212 16.271 1.211 12M12 0C5.385 0 0 5.385 0 12s5.385 12 12 12 12-5.385 12-12S18.615 0 12 0" /></svg>WordPress</span>
+            <span className="tech-badge"><svg viewBox="0 0 24 24" fill="currentColor" style={{ color: "#F38020" }}><path d="M16.5088 16.8447c.1475-.5068.0908-.9707-.1553-1.3154-.2246-.3164-.6045-.499-1.0615-.5205l-8.6592-.1123a.1559.1559 0 0 1-.1333-.0713c-.0283-.042-.0351-.0986-.021-.1553.0278-.084.1123-.1484.2036-.1562l8.7359-.1123c1.0351-.0489 2.1601-.8868 2.5537-1.9136l.499-1.3013c.0215-.0561.0293-.1128.0147-.168-.5625-2.5463-2.835-4.4453-5.5499-4.4453-2.5039 0-4.6284 1.6177-5.3876 3.8614-.4927-.3658-1.1187-.5625-1.794-.499-1.2026.119-2.1665 1.083-2.2861 2.2856-.0283.31-.0069.6128.0635.894C1.5683 13.171 0 14.7754 0 16.752c0 .1748.0142.3515.0352.5273.0141.083.0844.1475.1689.1475h15.9814c.0909 0 .1758-.0645.2032-.1553l.12-.4268zm2.7568-5.5634c-.0771 0-.1611 0-.2383.0112-.0566 0-.1054.0415-.127.0976l-.3378 1.1744c-.1475.5068-.0918.9707.1543 1.3164.2256.3164.6055.498 1.0625.5195l1.8437.1133c.0557 0 .1055.0263.1329.0703.0283.043.0351.1074.0214.1562-.0283.084-.1132.1485-.204.1553l-1.921.1123c-1.041.0488-2.1582.8867-2.5527 1.914l-.1406.3585c-.0283.0713.0215.1416.0986.1416h6.5977c.0771 0 .1474-.0489.169-.126.1122-.4082.1757-.837.1757-1.2803 0-2.6025-2.125-4.727-4.7344-4.727" /></svg>Cloudflare</span>
+          </div>
+          <p style={{ fontFamily: "var(--mono)", fontSize: 12, letterSpacing: ".05em", textTransform: "uppercase", color: "var(--text-mute)", textAlign: "center", margin: "32px 0 20px" }}>Pay how you like</p>
+          <div className="tech-row">
+            <span className="tech-badge payment-badge" style={{ borderColor: "rgba(255,204,0,.4)" }}><span className="pm-dot" style={{ background: "#FFCC00" }}></span>MTN Mobile Money</span>
+            <span className="tech-badge payment-badge" style={{ borderColor: "rgba(237,28,36,.4)" }}><span className="pm-dot" style={{ background: "#ED1C24" }}></span>Airtel Money</span>
+            <span className="tech-badge payment-badge" style={{ borderColor: "rgba(0,166,81,.4)" }}><span className="pm-dot" style={{ background: "#00A651" }}></span>Zamtel Kwacha</span>
+            <span className="tech-badge payment-badge" style={{ opacity: 0.6 }}><span className="pm-dot" style={{ background: "var(--text-mute)" }}></span>Card — coming soon</span>
+          </div>
+        </div>
+      </section>
+
+      <section className="section network-section">
+        <div className="wrap">
+          <div className="section-head" style={{ marginBottom: 0 }}>
+            <span className="eyebrow">Worldwide</span>
+            <h2>Wherever your business is, we can build it.</h2>
+            <p>Nadine Cloud is a remote-first team — every website, hosting account and support conversation happens online. Whether you&apos;re down the road or on the other side of the world, the process is the same: message us, tell us what you need, and we take it from there.</p>
+          </div>
+          <div className="network-list">
+            <div>100% remote — no office visit required</div>
+            <div>WhatsApp, email and calls, wherever you are</div>
+            <div>Prices shown in your local currency</div>
+            <div>Support around the clock</div>
+          </div>
+        </div>
+      </section>
+
+      <section className="section" id="faq" style={{ background: "var(--sky)" }}>
+        <div className="wrap">
+          <div className="section-head">
+            <span className="eyebrow">Questions</span>
+            <h2>Frequently asked questions</h2>
+            <p>Anything else, just ask us on WhatsApp.</p>
+          </div>
+          <div className="faq">
+            <details className="faq-item" open>
+              <summary>What can Nadine Cloud build for my business?</summary>
+              <p>Anything from a marketing website to a full custom system — POS, inventory, pharmacy and patient management, school management, business portals and more. If it runs online, we can build it.</p>
+            </details>
+            <details className="faq-item">
+              <summary>Do I need to buy hosting and design separately?</summary>
+              <p>No — website design, hosting, domains and business email are all handled by the same team, so you get one invoice and one point of contact instead of juggling providers.</p>
+            </details>
+            <details className="faq-item">
+              <summary>Do you work with international clients?</summary>
+              <p>Yes — we build, host and support websites for businesses worldwide. Everything is handled remotely over WhatsApp, email and calls.</p>
+            </details>
+            <details className="faq-item">
+              <summary>How do I get a quote?</summary>
+              <p>Tell us what you need on WhatsApp or through the contact form and we&apos;ll reply the same day with a plan and a price.</p>
+            </details>
+          </div>
+        </div>
+      </section>
+
+      <section className="section cta-band">
+        <div className="wrap">
+          <span className="eyebrow">Let&apos;s get you online</span>
+          <h2>Ready to launch your business online?</h2>
+          <p>Tell us what you need — a new website, hosting, or a domain — and we&apos;ll reply the same day.</p>
+          <div className="actions">
+            <Link className="btn-primary" href="/contact">Get a quote</Link>
+            <a className="btn-ghost" href="https://wa.me/260770346698?text=Hi%20Nadine%20Cloud%2C%20I%27d%20like%20to%20get%20my%20business%20online." target="_blank" rel="noopener">Chat on WhatsApp</a>
+          </div>
+        </div>
+      </section>
+
+      <Footer />
+    </>
   );
 }
