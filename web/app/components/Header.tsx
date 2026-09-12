@@ -23,9 +23,15 @@ function NavCaret() {
 
 interface HeaderProps {
   getStartedHref?: string;
+  hideTalkToSales?: boolean;
+  hideGetStarted?: boolean;
 }
 
-export default function Header({ getStartedHref = "/hosting#hosting" }: HeaderProps) {
+export default function Header({
+  getStartedHref = "/hosting#hosting",
+  hideTalkToSales = false,
+  hideGetStarted = false,
+}: HeaderProps) {
   const pathname = usePathname();
   const current = (href: string) =>
     pathname === href ? "page" : undefined;
@@ -127,20 +133,24 @@ export default function Header({ getStartedHref = "/hosting#hosting" }: HeaderPr
           </ul>
         </nav>
         <div className="nav-actions">
-          <a
-            className="btn-sm ghost"
-            href="https://wa.me/260770346698?text=Hi%20Nadine%20Cloud%2C%20I%27d%20like%20to%20talk%20to%20sales."
-            target="_blank"
-            rel="noopener"
-          >
-            Talk to sales
-          </a>
-          <Link className="btn-sm ghost" href="/account">
+          {!hideTalkToSales && (
+            <a
+              className="btn-sm ghost"
+              href="https://wa.me/260770346698?text=Hi%20Nadine%20Cloud%2C%20I%27d%20like%20to%20talk%20to%20sales."
+              target="_blank"
+              rel="noopener"
+            >
+              Talk to sales
+            </a>
+          )}
+          <Link className="btn-sm ghost" href="/account" aria-current={current("/account")}>
             Account
           </Link>
-          <Link className="btn-sm solid" href={getStartedHref}>
-            Get started
-          </Link>
+          {!hideGetStarted && (
+            <Link className="btn-sm solid" href={getStartedHref}>
+              Get started
+            </Link>
+          )}
           <button className="menu-btn" aria-label="Menu">
             ☰
           </button>
