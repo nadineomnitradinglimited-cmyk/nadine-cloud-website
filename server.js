@@ -23,6 +23,36 @@ const USE_RUST_API = process.env.USE_RUST_API !== 'false';
 // back independently without affecting those.
 const USE_RUST_AUTH = process.env.USE_RUST_AUTH !== 'false';
 
+function attemptProxy(body, headers, req, res, targetPath, retriesLeft) {
+  // agent: false forces a brand-new connection per attempt instead of
+  // reusing Node's default keep-alive pool — a pooled socket over
+  // Railway's private network occasionally goes stale (the peer closes it
+  // without Node noticing in time), which surfaced as intermittent
+  // ECONNREFUSED bursts in production. One retry on top of that covers
+  // the rest of that class of transient failure.
+  const proxyReq = http.request(
+    { host: RUST_API_HOST, port: RUST_API_PORT, path: targetPath, method: req.method, headers, timeout: 10000, agent: false },
+    (proxyRes) => {
+      res.writeHead(proxyRes.statusCode, proxyRes.headers);
+      proxyRes.pipe(res);
+    }
+  );
+  proxyReq.on('timeout', () => proxyReq.destroy(new Error('Rust API request timed out')));
+  proxyReq.on('error', (err) => {
+    if (retriesLeft > 0) {
+      console.error(`Rust API proxy error for ${targetPath} (retrying):`, err.message);
+      attemptProxy(body, headers, req, res, targetPath, retriesLeft - 1);
+      return;
+    }
+    console.error(`Rust API proxy error for ${targetPath}:`, err.message);
+    if (!res.headersSent) {
+      res.writeHead(502, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Something went wrong — please try again.' }));
+    }
+  });
+  proxyReq.end(body);
+}
+
 function proxyToRust(req, res, targetPath) {
   const chunks = [];
   req.on('data', (chunk) => chunks.push(chunk));
@@ -31,23 +61,7 @@ function proxyToRust(req, res, targetPath) {
     const headers = { ...req.headers, host: RUST_API_HOST };
     if (body.length) headers['content-length'] = String(body.length);
     else delete headers['content-length'];
-
-    const proxyReq = http.request(
-      { host: RUST_API_HOST, port: RUST_API_PORT, path: targetPath, method: req.method, headers, timeout: 10000 },
-      (proxyRes) => {
-        res.writeHead(proxyRes.statusCode, proxyRes.headers);
-        proxyRes.pipe(res);
-      }
-    );
-    proxyReq.on('timeout', () => proxyReq.destroy(new Error('Rust API request timed out')));
-    proxyReq.on('error', (err) => {
-      console.error(`Rust API proxy error for ${targetPath}:`, err.message);
-      if (!res.headersSent) {
-        res.writeHead(502, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: 'Something went wrong — please try again.' }));
-      }
-    });
-    proxyReq.end(body);
+    attemptProxy(body, headers, req, res, targetPath, 1);
   });
   req.on('error', (err) => console.error(`Request stream error proxying ${targetPath}:`, err.message));
 }
