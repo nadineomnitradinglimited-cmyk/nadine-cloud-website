@@ -1,6 +1,20 @@
 import Link from "next/link";
 
-export default function Footer() {
+type LinkItem = { href: string; label: string };
+
+interface FooterProps {
+  productsExtra?: LinkItem[];
+  supportLinks?: LinkItem[];
+}
+
+const DEFAULT_SUPPORT: LinkItem[] = [
+  { href: "/hosting#security", label: "Security" },
+  { href: "/hosting#migrate", label: "Migrate your hosting" },
+  { href: "/hosting#faq", label: "Help center" },
+  { href: "/contact", label: "Contact us" },
+];
+
+export default function Footer({ productsExtra = [], supportLinks = DEFAULT_SUPPORT }: FooterProps) {
   return (
     <footer>
       <div className="wrap">
@@ -30,6 +44,11 @@ export default function Footer() {
               <li>
                 <Link href="/hosting">Cloud hosting</Link>
               </li>
+              {productsExtra.map((item) => (
+                <li key={item.href}>
+                  <Link href={item.href}>{item.label}</Link>
+                </li>
+              ))}
               <li>
                 <Link href="/domains">Domains</Link>
               </li>
@@ -44,18 +63,11 @@ export default function Footer() {
           <div>
             <h4>Support</h4>
             <ul>
-              <li>
-                <Link href="/hosting#security">Security</Link>
-              </li>
-              <li>
-                <Link href="/hosting#migrate">Migrate your hosting</Link>
-              </li>
-              <li>
-                <Link href="/hosting#faq">Help center</Link>
-              </li>
-              <li>
-                <Link href="/contact">Contact us</Link>
-              </li>
+              {supportLinks.map((item) => (
+                <li key={item.href}>
+                  <Link href={item.href}>{item.label}</Link>
+                </li>
+              ))}
             </ul>
           </div>
           <div>

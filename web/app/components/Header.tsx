@@ -21,7 +21,11 @@ function NavCaret() {
   );
 }
 
-export default function Header() {
+interface HeaderProps {
+  getStartedHref?: string;
+}
+
+export default function Header({ getStartedHref = "/hosting#hosting" }: HeaderProps) {
   const pathname = usePathname();
   const current = (href: string) =>
     pathname === href ? "page" : undefined;
@@ -134,7 +138,7 @@ export default function Header() {
           <Link className="btn-sm ghost" href="/account">
             Account
           </Link>
-          <Link className="btn-sm solid" href="/hosting#hosting">
+          <Link className="btn-sm solid" href={getStartedHref}>
             Get started
           </Link>
           <button className="menu-btn" aria-label="Menu">
