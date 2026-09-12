@@ -12,6 +12,7 @@ use std::time::Duration;
 use axum::http::HeaderMap;
 use axum::{Json, Router, extract::State, routing::{get, post}};
 use serde_json::{Value, json};
+use socket2::{Domain, Socket, Type};
 use sqlx::postgres::{PgPool, PgPoolOptions};
 use tower_http::cors::{Any, CorsLayer};
 use tower_http::trace::TraceLayer;
@@ -96,16 +97,44 @@ async fn main() {
         .ok()
         .and_then(|p| p.parse().ok())
         .unwrap_or(8787);
-    let addr = SocketAddr::from(([0, 0, 0, 0], port));
 
-    tracing::info!("nadine-api (Rust) listening on {addr}");
-    let listener = tokio::net::TcpListener::bind(addr).await.unwrap();
-    axum::serve(
-        listener,
-        app.into_make_service_with_connect_info::<SocketAddr>(),
-    )
-    .await
-    .unwrap();
+    // Bind both address families explicitly, on two separate sockets, with
+    // the IPv6 one forced to v6-only via IPV6_V6ONLY — so it can coexist
+    // with the IPv4 socket on the same port regardless of the platform's
+    // default dual-stack behaviour (which varies, and isn't something to
+    // gamble on). Railway's private network uses IPv6 addresses; the
+    // public edge uses IPv4. Binding only 0.0.0.0 meant private-network
+    // connections were refused outright whenever DNS resolved the AAAA
+    // record instead of the A record — the intermittent failure seen in
+    // production that this whole dual-listener setup exists to fix.
+    let addr_v4 = SocketAddr::from((std::net::Ipv4Addr::UNSPECIFIED, port));
+    let addr_v6 = SocketAddr::from((std::net::Ipv6Addr::UNSPECIFIED, port));
+
+    let listener_v4 = bind_listener(addr_v4, false).expect("failed to bind IPv4 listener");
+    tracing::info!("nadine-api (Rust) listening on {addr_v4} (IPv4)");
+
+    let listener_v6 = bind_listener(addr_v6, true).expect("failed to bind IPv6 (v6-only) listener");
+    tracing::info!("nadine-api (Rust) listening on {addr_v6} (IPv6)");
+
+    let app_v6 = app.clone();
+    let serve_v4 = axum::serve(listener_v4, app.into_make_service_with_connect_info::<SocketAddr>());
+    let serve_v6 = axum::serve(listener_v6, app_v6.into_make_service_with_connect_info::<SocketAddr>());
+    let (r4, r6) = tokio::join!(serve_v4, serve_v6);
+    r4.unwrap();
+    r6.unwrap();
+}
+
+fn bind_listener(addr: SocketAddr, v6_only: bool) -> std::io::Result<tokio::net::TcpListener> {
+    let domain = if addr.is_ipv4() { Domain::IPV4 } else { Domain::IPV6 };
+    let socket = Socket::new(domain, Type::STREAM, None)?;
+    if addr.is_ipv6() {
+        socket.set_only_v6(v6_only)?;
+    }
+    socket.set_reuse_address(true)?;
+    socket.bind(&addr.into())?;
+    socket.listen(1024)?;
+    socket.set_nonblocking(true)?;
+    tokio::net::TcpListener::from_std(socket.into())
 }
 
 async fn health() -> Json<Value> {

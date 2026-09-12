@@ -1218,6 +1218,7 @@ dependencies = [
  "scrypt",
  "serde",
  "serde_json",
+ "socket2",
  "sqlx",
  "subtle",
  "tokio",
