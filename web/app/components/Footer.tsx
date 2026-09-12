@@ -1,4 +1,3 @@
-import Link from "next/link";
 
 type LinkItem = { href: string; label: string };
 
@@ -39,24 +38,24 @@ export default function Footer({ productsExtra = [], supportLinks = DEFAULT_SUPP
             <h4>Products</h4>
             <ul>
               <li>
-                <Link href="/services">Web design</Link>
+                <a href="/services">Web design</a>
               </li>
               <li>
-                <Link href="/hosting">Cloud hosting</Link>
+                <a href="/hosting">Cloud hosting</a>
               </li>
               {productsExtra.map((item) => (
                 <li key={item.href}>
-                  <Link href={item.href}>{item.label}</Link>
+                  <a href={item.href}>{item.label}</a>
                 </li>
               ))}
               <li>
-                <Link href="/domains">Domains</Link>
+                <a href="/domains">Domains</a>
               </li>
               <li>
-                <Link href="/hosting#email">Business email</Link>
+                <a href="/hosting#email">Business email</a>
               </li>
               <li>
-                <Link href="/marketing">Marketing</Link>
+                <a href="/marketing">Marketing</a>
               </li>
             </ul>
           </div>
@@ -65,7 +64,7 @@ export default function Footer({ productsExtra = [], supportLinks = DEFAULT_SUPP
             <ul>
               {supportLinks.map((item) => (
                 <li key={item.href}>
-                  <Link href={item.href}>{item.label}</Link>
+                  <a href={item.href}>{item.label}</a>
                 </li>
               ))}
             </ul>
@@ -74,16 +73,16 @@ export default function Footer({ productsExtra = [], supportLinks = DEFAULT_SUPP
             <h4>Company</h4>
             <ul>
               <li>
-                <Link href="/work">Our work</Link>
+                <a href="/work">Our work</a>
               </li>
               <li>
-                <Link href="/terms">Terms of service</Link>
+                <a href="/terms">Terms of service</a>
               </li>
               <li>
-                <Link href="/privacy">Privacy policy</Link>
+                <a href="/privacy">Privacy policy</a>
               </li>
               <li>
-                <Link href="/refund">Refund policy</Link>
+                <a href="/refund">Refund policy</a>
               </li>
             </ul>
           </div>

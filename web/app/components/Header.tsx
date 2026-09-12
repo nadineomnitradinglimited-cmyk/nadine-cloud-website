@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 function NavCaret() {
@@ -39,7 +38,7 @@ export default function Header({
   return (
     <header>
       <div className="wrap nav">
-        <Link className="logo" href="/" aria-label="Nadine Cloud home">
+        <a className="logo" href="/" aria-label="Nadine Cloud home">
           <svg
             className="logo-mark"
             viewBox="0 0 30 30"
@@ -56,79 +55,79 @@ export default function Header({
             />
           </svg>
           Nadine<span className="logo-accent">Cloud</span>
-        </Link>
+        </a>
         <nav>
           <ul className="nav-links" id="navLinks">
             <li>
-              <Link href="/services" aria-current={current("/services")}>
+              <a href="/services" aria-current={current("/services")}>
                 Web Design <span className="badge-new">New</span>
-              </Link>
+              </a>
             </li>
             <li>
-              <Link href="/domains" aria-current={current("/domains")}>
+              <a href="/domains" aria-current={current("/domains")}>
                 Domains
-              </Link>
+              </a>
             </li>
             <li className="has-dropdown">
-              <Link href="/hosting" aria-current={current("/hosting")}>
+              <a href="/hosting" aria-current={current("/hosting")}>
                 Hosting <NavCaret />
-              </Link>
+              </a>
               <div className="nav-dropdown">
-                <Link href="/hosting#hosting">Hosting Plans</Link>
-                <Link href="/hosting#email">Business Email</Link>
-                <Link href="/wordpress">
+                <a href="/hosting#hosting">Hosting Plans</a>
+                <a href="/hosting#email">Business Email</a>
+                <a href="/wordpress">
                   Managed WordPress <span className="badge-new">New</span>
-                </Link>
-                <Link href="/builder">
+                </a>
+                <a href="/builder">
                   Website Builder <span className="badge-new">New</span>
-                </Link>
-                <Link href="/ssl">
+                </a>
+                <a href="/ssl">
                   SSL Certificates <span className="badge-new">New</span>
-                </Link>
-                <Link href="/care">
+                </a>
+                <a href="/care">
                   Care Plans <span className="badge-new">New</span>
-                </Link>
-                <Link href="/hosting#security">Security</Link>
-                <Link href="/hosting#migrate">Free Migration</Link>
-                <Link href="/hosting#faq">Help Center</Link>
+                </a>
+                <a href="/hosting#security">Security</a>
+                <a href="/hosting#migrate">Free Migration</a>
+                <a href="/hosting#faq">Help Center</a>
               </div>
             </li>
             <li className="has-dropdown">
-              <Link href="/database" aria-current={current("/database")}>
+              <a href="/database" aria-current={current("/database")}>
                 Database <span className="badge-new">New</span> <NavCaret />
-              </Link>
+              </a>
               <div className="nav-dropdown">
-                <Link href="/database#plans">Database Plans</Link>
-                <Link href="/database#faq">Help Center</Link>
+                <a href="/database#plans">Database Plans</a>
+                <a href="/database#faq">Help Center</a>
               </div>
             </li>
             <li className="has-dropdown">
-              <Link href="/marketing" aria-current={current("/marketing")}>
+              <a href="/marketing" aria-current={current("/marketing")}>
                 Marketing <span className="badge-new">New</span> <NavCaret />
-              </Link>
+              </a>
               <div className="nav-dropdown">
-                <Link href="/marketing#seo">SEO Setup &amp; Optimization</Link>
-                <Link href="/marketing#social">Social Media Management</Link>
-                <Link href="/marketing#email-marketing">
+                <a href="/marketing#seo">SEO Setup &amp; Optimization</a>
+                <a href="/marketing#social">Social Media Management</a>
+                <a href="/marketing#email-marketing">
                   Email Marketing Campaigns
-                </Link>
-                <Link href="/marketing#ads">Paid Ads Management</Link>
+                </a>
+                <a href="/marketing#ads">Paid Ads Management</a>
               </div>
             </li>
             <li>
-              <Link href="/domains#transfer">
+              <a href="/domains#transfer">
                 Transfer <span className="badge-try">Try Me</span>
-              </Link>
+              </a>
             </li>
             <li>
-              <Link href="/work" aria-current={current("/work")}>
+              <a href="/work" aria-current={current("/work")}>
                 Our work
-              </Link>
+              </a>
             </li>
             <li>
-              <Link href="/contact" aria-current={current("/contact")}>
+              <a href="/contact" aria-current={current("/contact")}>
                 Contact
-              </Link>
+              </a>
             </li>
           </ul>
         </nav>
@@ -143,13 +142,13 @@ export default function Header({
               Talk to sales
             </a>
           )}
-          <Link className="btn-sm ghost" href="/account" aria-current={current("/account")}>
+          <a className="btn-sm ghost" href="/account" aria-current={current("/account")}>
             Account
-          </Link>
+          </a>
           {!hideGetStarted && (
-            <Link className="btn-sm solid" href={getStartedHref}>
+            <a className="btn-sm solid" href={getStartedHref}>
               Get started
-            </Link>
+            </a>
           )}
           <button className="menu-btn" aria-label="Menu">
             ☰

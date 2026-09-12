@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 
@@ -116,7 +117,7 @@ export default function Checkout() {
       </section>
 
       <Footer />
-      <script src="/js/checkout.js" />
+      <Script src="/js/checkout.js" strategy="afterInteractive" />
     </>
   );
 }

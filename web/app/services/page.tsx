@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 
@@ -110,7 +109,7 @@ export default function Services() {
           <h2>Tell us about your business</h2>
           <p>Get a fixed quote for your website within a day — no obligation.</p>
           <div className="actions">
-            <Link className="btn-primary" href="/contact">Request a quote</Link>
+            <a className="btn-primary" href="/contact">Request a quote</a>
             <a className="btn-ghost" href="https://wa.me/260770346698?text=Hi%20Nadine%20Cloud%2C%20I%27d%20like%20a%20quote%20for%20a%20website." target="_blank" rel="noopener">Chat on WhatsApp</a>
           </div>
         </div>

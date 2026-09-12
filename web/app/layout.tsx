@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -23,10 +24,20 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       </head>
       <body>
         {children}
-        <script src="/js/main.js" />
-        <script src="/js/currency.js" defer />
-        <script src="/js/billing-toggle.js" defer />
-        <script src="/js/chat-widget.js" />
+        {/* afterInteractive: these vanilla scripts mutate the DOM (inject
+            the chat widget, wire up nav/forms). Running them during the
+            browser's initial HTML parse -- before React finishes
+            hydrating -- caused a hydration mismatch (React error #418)
+            that made React discard and rebuild the affected DOM, wiping
+            out the chat widget and orphaning main.js's element
+            references (the stat counters never animated as a result).
+            afterInteractive defers execution until just after hydration
+            completes, so these scripts only ever touch a DOM React
+            already considers settled. */}
+        <Script src="/js/main.js" strategy="afterInteractive" />
+        <Script src="/js/currency.js" strategy="afterInteractive" />
+        <Script src="/js/billing-toggle.js" strategy="afterInteractive" />
+        <Script src="/js/chat-widget.js" strategy="afterInteractive" />
       </body>
     </html>
   );

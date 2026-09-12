@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 
@@ -56,7 +57,7 @@ export default function Account() {
       </section>
 
       <Footer />
-      <script src="/js/account.js" />
+      <Script src="/js/account.js" strategy="afterInteractive" />
     </>
   );
 }

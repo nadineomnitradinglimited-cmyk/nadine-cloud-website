@@ -1,4 +1,3 @@
-import Link from "next/link";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import DomainLookup from "./components/DomainLookup";
@@ -142,7 +141,7 @@ export default function Home() {
                 <span className="from">From</span> <b className="amt-live" data-zmw="450">ZMW 450</b> <span className="per">/yr</span>
                 <small className="price-note" hidden></small>
               </div>
-              <Link className="cta" href="/domains">Search domains</Link>
+              <a className="cta" href="/domains">Search domains</a>
             </div>
             <div className="offer-card featured">
               <div className="ic">
@@ -157,7 +156,7 @@ export default function Home() {
                 <span className="from">From</span> <b className="amt-live" data-zmw="99">ZMW 99</b> <span className="per">/mo</span>
                 <small className="price-note" hidden></small>
               </div>
-              <Link className="cta" href="/hosting">View plans</Link>
+              <a className="cta" href="/hosting">View plans</a>
             </div>
             <div className="offer-card">
               <div className="ic">
@@ -172,7 +171,7 @@ export default function Home() {
               <div className="offer-price">
                 <span className="from">Fixed-price</span> <span className="per">quotes</span>
               </div>
-              <Link className="cta" href="/services">Get a quote</Link>
+              <a className="cta" href="/services">Get a quote</a>
             </div>
             <div className="offer-card">
               <div className="ic">
@@ -187,7 +186,7 @@ export default function Home() {
                 <span className="from">From</span> <b className="amt-live" data-zmw="300">ZMW 300</b> <span className="per">/yr</span>
                 <small className="price-note" hidden></small>
               </div>
-              <Link className="cta" href="/hosting">Get email</Link>
+              <a className="cta" href="/hosting">Get email</a>
             </div>
           </div>
         </div>
@@ -392,7 +391,7 @@ export default function Home() {
               <div className="other-billing"></div>
             </div>
           </div>
-          <p className="pricing-note">* Prices shown are the total for the selected billing period, charged once at checkout. Pay by mobile money, or bank transfer on request. See <Link href="/hosting" style={{ color: "var(--copper-bright)" }}>full plan details &amp; email hosting</Link>.</p>
+          <p className="pricing-note">* Prices shown are the total for the selected billing period, charged once at checkout. Pay by mobile money, or bank transfer on request. See <a href="/hosting" style={{ color: "var(--copper-bright)" }}>full plan details &amp; email hosting</a>.</p>
         </div>
       </section>
 
@@ -401,7 +400,7 @@ export default function Home() {
           <div className="section-head">
             <span className="eyebrow">Our work</span>
             <h2>Built by us, trusted by clients</h2>
-            <p>A few of the platforms and websites designed and delivered by our team. <Link href="/work" style={{ color: "var(--copper)" }}>See the full portfolio →</Link></p>
+            <p>A few of the platforms and websites designed and delivered by our team. <a href="/work" style={{ color: "var(--copper)" }}>See the full portfolio →</a></p>
           </div>
           <div className="portfolio-grid">
             <div className="work"><b>Royal South Luangwa Safari Lodge</b><span>Luxury safari lodge website with a modern responsive design and Progressive Web App (PWA).</span><br /><span className="tag">Tourism</span></div>
@@ -542,7 +541,7 @@ export default function Home() {
           <h2>Ready to launch your business online?</h2>
           <p>Tell us what you need — a new website, hosting, or a domain — and we&apos;ll reply the same day.</p>
           <div className="actions">
-            <Link className="btn-primary" href="/contact">Get a quote</Link>
+            <a className="btn-primary" href="/contact">Get a quote</a>
             <a className="btn-ghost" href="https://wa.me/260770346698?text=Hi%20Nadine%20Cloud%2C%20I%27d%20like%20to%20get%20my%20business%20online." target="_blank" rel="noopener">Chat on WhatsApp</a>
           </div>
         </div>

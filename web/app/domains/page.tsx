@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import InlineDomainSearch from "../components/InlineDomainSearch";
@@ -93,10 +92,10 @@ export default function Domains() {
             <p>Your domain, hosting and business email — set up together, from the same team.</p>
           </div>
           <div className="cross-sell">
-            <Link href="/hosting"><b>Hosting</b><span>NVMe cPanel hosting from <span className="amt-live" data-zmw="600">ZMW 600</span>/yr</span></Link>
-            <Link href="/hosting"><b>Business email</b><span>Professional email at your domain, from <span className="amt-live" data-zmw="300">ZMW 300</span>/yr</span></Link>
-            <Link href="/services"><b>Web design</b><span>A website built and launched on your new domain</span></Link>
-            <Link href="/contact"><b>Talk to us</b><span>Not sure what you need? We&apos;ll help you figure it out</span></Link>
+            <a href="/hosting"><b>Hosting</b><span>NVMe cPanel hosting from <span className="amt-live" data-zmw="600">ZMW 600</span>/yr</span></a>
+            <a href="/hosting"><b>Business email</b><span>Professional email at your domain, from <span className="amt-live" data-zmw="300">ZMW 300</span>/yr</span></a>
+            <a href="/services"><b>Web design</b><span>A website built and launched on your new domain</span></a>
+            <a href="/contact"><b>Talk to us</b><span>Not sure what you need? We&apos;ll help you figure it out</span></a>
           </div>
         </div>
       </section>
@@ -134,7 +133,7 @@ export default function Domains() {
           <h2>Register or transfer your domain today</h2>
           <p>Message us the name you want and we&apos;ll confirm availability and pricing.</p>
           <div className="actions">
-            <Link className="btn-primary" href="/contact">Request a domain</Link>
+            <a className="btn-primary" href="/contact">Request a domain</a>
             <a className="btn-ghost" href="https://wa.me/260770346698?text=Hi%20Nadine%20Cloud%2C%20I%27d%20like%20to%20register%20a%20domain." target="_blank" rel="noopener">Chat on WhatsApp</a>
           </div>
         </div>

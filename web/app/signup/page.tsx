@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import Script from "next/script";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 
@@ -45,7 +45,7 @@ export default function Signup() {
               <div className="contact-card">
                 <h3>Already have an account?</h3>
                 <p>Log in to see your orders and receipts.</p>
-                <Link className="btn-ghost" href="/login">Log in</Link>
+                <a className="btn-ghost" href="/login">Log in</a>
               </div>
             </div>
           </div>
@@ -53,7 +53,7 @@ export default function Signup() {
       </section>
 
       <Footer />
-      <script src="/js/auth-forms.js" />
+      <Script src="/js/auth-forms.js" strategy="afterInteractive" />
     </>
   );
 }

@@ -1,4 +1,3 @@
-import Link from "next/link";
 import Header from "./components/Header";
 
 export default function NotFound() {
@@ -17,8 +16,8 @@ export default function NotFound() {
       <section className="section cta-band">
         <div className="wrap">
           <div className="actions">
-            <Link className="btn-primary" href="/">Back to home</Link>
-            <Link className="btn-ghost" href="/contact">Contact us</Link>
+            <a className="btn-primary" href="/">Back to home</a>
+            <a className="btn-ghost" href="/contact">Contact us</a>
           </div>
         </div>
       </section>

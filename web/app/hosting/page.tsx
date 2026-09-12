@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 
@@ -263,7 +262,7 @@ export default function Hosting() {
           <h2>Get your hosting set up today</h2>
           <p>Most accounts are activated the same day you order.</p>
           <div className="actions">
-            <Link className="btn-primary" href="/contact">Choose a plan</Link>
+            <a className="btn-primary" href="/contact">Choose a plan</a>
             <a className="btn-ghost" href="https://wa.me/260770346698?text=Hi%20Nadine%20Cloud%2C%20I%27d%20like%20to%20sign%20up%20for%20hosting." target="_blank" rel="noopener">Chat on WhatsApp</a>
           </div>
         </div>
