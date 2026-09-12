@@ -1,3 +1,4 @@
+mod auth;
 mod chat;
 mod contact;
 mod domain_check;
@@ -33,6 +34,7 @@ pub struct AppState {
     domain_check_limiter: RateLimiter,
     contact_limiter: RateLimiter,
     chat_limiter: RateLimiter,
+    auth_limiter: RateLimiter,
 }
 
 #[tokio::main]
@@ -68,6 +70,7 @@ async fn main() {
         domain_check_limiter: RateLimiter::new(Duration::from_secs(60), 10),
         contact_limiter: RateLimiter::new(Duration::from_secs(60), 5),
         chat_limiter: RateLimiter::new(Duration::from_secs(60), 8),
+        auth_limiter: RateLimiter::new(Duration::from_secs(60), 8),
     });
 
     let cors = CorsLayer::new()
@@ -81,6 +84,10 @@ async fn main() {
         .route("/api/domain-check", get(domain_check::handle_domain_check))
         .route("/api/contact", post(contact::handle_contact))
         .route("/api/chat", post(chat::handle_chat))
+        .route("/api/auth/signup", post(auth::handle_signup))
+        .route("/api/auth/login", post(auth::handle_login))
+        .route("/api/auth/logout", post(auth::handle_logout))
+        .route("/api/auth/me", get(auth::handle_me))
         .with_state(state)
         .layer(cors)
         .layer(TraceLayer::new_for_http());
