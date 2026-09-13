@@ -32,7 +32,8 @@ export default function Domains() {
     <>
       <Header />
 
-      <section className="page-hero">
+      <section className="page-hero has-photo">
+        <img src="/assets/hero-domains.jpg" alt="" className="page-hero-photo" aria-hidden="true" />
         <div className="wrap page-hero-inner">
           <span className="eyebrow">Domains</span>
           <h1>Your name, your address on the internet.</h1>
