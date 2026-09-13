@@ -292,9 +292,10 @@ export default function Home() {
               <h3>Nadine Cloud — Avara</h3>
               <div className="for">Everything you need to get started</div>
               <div className="price">
-                <span className="amt amt-live" data-zmw="99">ZMW 99</span> <span className="per">/month</span>
+                <span className="amt amt-live" data-zmw="50">ZMW 50</span> <span className="per">/first month</span>
                 <small className="price-note" hidden></small>
               </div>
+              <div style={{ fontFamily: "var(--mono)", fontSize: 12, color: "var(--text-mute)", marginBottom: 10 }}>then <span className="amt-live" data-zmw="99">ZMW 99</span>/month</div>
               <div className="price-equiv" hidden></div>
               <div className="price-savings" hidden></div>
               <div className="plan-stats">
@@ -306,7 +307,7 @@ export default function Home() {
                 <li>Free SSL Certificate</li>
                 <li>Automatic Backups</li>
               </ul>
-              <a className="cta" href="/checkout?type=hosting&pkg=avara&plan=Nadine+Cloud+%E2%80%94+Avara&amount=99&period=mo">Get Avara</a>
+              <a className="cta" href="/checkout?type=hosting&pkg=avara&plan=Nadine+Cloud+%E2%80%94+Avara&amount=50&period=mo">Get Avara</a>
               <div className="other-billing"></div>
             </div>
             <div className="plan featured">
