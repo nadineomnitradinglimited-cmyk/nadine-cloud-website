@@ -125,6 +125,11 @@ export default function Header({
               </a>
             </li>
             <li>
+              <a href="/about" aria-current={current("/about")}>
+                About
+              </a>
+            </li>
+            <li>
               <a href="/contact" aria-current={current("/contact")}>
                 Contact
               </a>

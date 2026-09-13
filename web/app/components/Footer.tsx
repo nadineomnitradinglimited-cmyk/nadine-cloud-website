@@ -73,6 +73,9 @@ export default function Footer({ productsExtra = [], supportLinks = DEFAULT_SUPP
             <h4>Company</h4>
             <ul>
               <li>
+                <a href="/about">About us</a>
+              </li>
+              <li>
                 <a href="/work">Our work</a>
               </li>
               <li>
