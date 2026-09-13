@@ -656,6 +656,15 @@ async function handleAdminPromoCodes(req, res) {
     return;
   }
 
+  if (req.method === 'DELETE') {
+    const url = new URL(req.url, 'http://internal');
+    const code = (url.searchParams.get('code') || '').trim().toUpperCase();
+    if (!code) return sendJson(res, 400, { error: 'A code is required.' });
+    await getPool().query('DELETE FROM promo_codes WHERE code = $1', [code]);
+    sendJson(res, 200, { ok: true });
+    return;
+  }
+
   let raw;
   try {
     raw = await readBody(req, 2000);

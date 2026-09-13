@@ -177,7 +177,7 @@ const server = http.createServer((req, res) => {
     return;
   }
 
-  if (urlPath === '/api/admin/promo-codes' && (req.method === 'GET' || req.method === 'POST')) {
+  if (urlPath === '/api/admin/promo-codes' && (req.method === 'GET' || req.method === 'POST' || req.method === 'DELETE')) {
     handleAdminPromoCodes(req, res);
     return;
   }
