@@ -183,6 +183,19 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  // TEMPORARY: remove after use -- cleans up the throwaway account created
+  // by the pre-launch site check.
+  if (req.method === 'POST' && urlPath === '/api/admin/cleanup-sitecheck-user') {
+    if (req.headers['x-admin-secret'] !== process.env.ADMIN_SECRET) {
+      res.writeHead(401); res.end(); return;
+    }
+    const { getPool, ensureSchema } = require('./db');
+    ensureSchema().then(() => getPool().query("DELETE FROM users WHERE email LIKE 'sitecheck-test-%@example.com'"))
+      .then((r) => { res.writeHead(200, { 'Content-Type': 'application/json' }); res.end(JSON.stringify({ deleted: r.rowCount })); })
+      .catch((err) => { res.writeHead(500); res.end(String(err)); });
+    return;
+  }
+
   if (req.method === 'POST' && urlPath === '/api/lenco-webhook') {
     mirrorRequestBody(req, '/api/shadow/lenco-webhook');
     handleLencoWebhook(req, res);
