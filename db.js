@@ -52,7 +52,8 @@ async function ensureSchema() {
       expires_at TIMESTAMPTZ,
       promo_code TEXT,
       discount_amount NUMERIC NOT NULL DEFAULT 0,
-      reminder_sent_at TIMESTAMPTZ
+      reminder_sent_at TIMESTAMPTZ,
+      reminder_count INTEGER NOT NULL DEFAULT 0
     );
     CREATE TABLE IF NOT EXISTS promo_codes (
       code TEXT PRIMARY KEY,
@@ -82,6 +83,7 @@ async function ensureSchema() {
       ALTER TABLE orders ADD COLUMN IF NOT EXISTS promo_code TEXT;
       ALTER TABLE orders ADD COLUMN IF NOT EXISTS discount_amount NUMERIC NOT NULL DEFAULT 0;
       ALTER TABLE orders ADD COLUMN IF NOT EXISTS reminder_sent_at TIMESTAMPTZ;
+      ALTER TABLE orders ADD COLUMN IF NOT EXISTS reminder_count INTEGER NOT NULL DEFAULT 0;
     `);
     return true;
   });

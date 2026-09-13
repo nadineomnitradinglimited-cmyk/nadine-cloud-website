@@ -11,7 +11,7 @@ const RESEND_API = 'https://api.resend.com/emails';
 const NOTIFY_TO = 'info@nadinecloud.com';
 const FROM = 'Nadine Cloud <info@nadinecloud.com>';
 
-async function sendEmail({ subject, text, to, attachments, replyTo }) {
+async function sendEmail({ subject, text, html, to, attachments, replyTo }) {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
     console.error('RESEND_API_KEY not configured — email not sent:', subject);
@@ -19,6 +19,7 @@ async function sendEmail({ subject, text, to, attachments, replyTo }) {
   }
 
   const payload = { from: FROM, to: [to || NOTIFY_TO], subject, text };
+  if (html) payload.html = html;
   if (attachments && attachments.length) payload.attachments = attachments;
   if (replyTo) payload.reply_to = [replyTo];
 
@@ -40,4 +41,35 @@ async function sendEmail({ subject, text, to, attachments, replyTo }) {
   }
 }
 
-module.exports = { sendEmail };
+// Shared branded template for customer-facing emails. Email clients strip
+// most modern CSS, so this deliberately uses old-school inline styles and
+// table-free but simple block markup that Gmail/Outlook/Apple Mail all
+// render consistently, rather than the site's real stylesheet.
+function renderEmail({ heading, bodyHtml, ctaText, ctaUrl }) {
+  const cta = ctaText && ctaUrl
+    ? `<div style="text-align:center;margin:32px 0 8px">
+        <a href="${ctaUrl}" style="display:inline-block;background:#1769FF;color:#ffffff;text-decoration:none;font-family:Arial,Helvetica,sans-serif;font-weight:bold;font-size:15px;padding:14px 32px;border-radius:8px">${ctaText}</a>
+      </div>`
+    : '';
+  return `<!doctype html>
+<html>
+<body style="margin:0;padding:0;background:#F0F3F8;font-family:Arial,Helvetica,sans-serif;">
+  <div style="max-width:520px;margin:0 auto;padding:32px 16px;">
+    <div style="text-align:center;margin-bottom:24px;">
+      <span style="font-family:Arial,Helvetica,sans-serif;font-weight:800;font-size:20px;color:#0B1220;">Nadine<span style="color:#1769FF;">Cloud</span></span>
+    </div>
+    <div style="background:#ffffff;border-radius:16px;padding:32px;box-shadow:0 1px 2px rgba(11,18,32,.05);">
+      <h1 style="font-family:Arial,Helvetica,sans-serif;font-size:22px;font-weight:800;color:#0B1220;margin:0 0 16px;">${heading}</h1>
+      <div style="font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#45566B;">${bodyHtml}</div>
+      ${cta}
+    </div>
+    <p style="text-align:center;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#78899C;margin-top:24px;">
+      Nadine Cloud — a service of Nadine Omni Trading Limited<br>
+      Questions? <a href="https://wa.me/260770346698" style="color:#1769FF;">Message us on WhatsApp</a>
+    </p>
+  </div>
+</body>
+</html>`;
+}
+
+module.exports = { sendEmail, renderEmail };

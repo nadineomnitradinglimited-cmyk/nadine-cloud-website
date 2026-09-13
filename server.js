@@ -6,6 +6,7 @@ const { handleCheckoutInitiate, handleCheckoutStatus, handleLencoWebhook, handle
 const { handleContact } = require('./contact');
 const { handleSignup, handleLogin, handleLogout, handleMe } = require('./auth');
 const { handleDomainCheck } = require('./namecheap');
+const { startReminderScheduler } = require('./reminders');
 
 const ROOT = __dirname;
 const PORT = process.env.PORT || 3000;
@@ -278,4 +279,6 @@ server.listen(PORT, () => {
   console.log(`USE_RUST_API: ${USE_RUST_API} (domain-check, contact, chat -> ${RUST_API_HOST}:${RUST_API_PORT})`);
   console.log(`USE_RUST_AUTH: ${USE_RUST_AUTH} (signup, login, logout, me -> ${RUST_API_HOST}:${RUST_API_PORT})`);
   console.log(`USE_RUST_SHADOW: ${USE_RUST_SHADOW} (checkout, lenco-webhook mirrored, fire-and-forget, to ${RUST_API_HOST}:${RUST_API_PORT})`);
+  startReminderScheduler();
+  console.log('Renewal reminder scheduler started (daily check, first run in 1 minute).');
 });
