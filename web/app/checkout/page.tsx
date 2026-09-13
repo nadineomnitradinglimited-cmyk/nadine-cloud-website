@@ -93,6 +93,13 @@ export default function Checkout() {
                 <label>Mobile money phone number
                   <input type="tel" name="phone" required placeholder="09XXXXXXXX" maxLength={20} />
                 </label>
+                <label>Promo code (optional)
+                  <div style={{ display: "flex", gap: 8 }}>
+                    <input type="text" id="promoCode" placeholder="e.g. FLYER50" maxLength={40} style={{ flex: 1, textTransform: "uppercase" }} />
+                    <button type="button" id="promoApply" className="btn-sm ghost" style={{ flex: "none" }}>Apply</button>
+                  </div>
+                </label>
+                <p id="promoStatus" className="form-status" role="status" aria-live="polite"></p>
                 <button type="submit" className="btn-primary" id="ckSubmit">Pay <span id="ckAmountLabel">now</span></button>
                 <p id="ckStatus" className="form-status" role="status" aria-live="polite"></p>
               </form>

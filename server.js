@@ -2,7 +2,7 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const { handleChat } = require('./chat');
-const { handleCheckoutInitiate, handleCheckoutStatus, handleLencoWebhook, handleReceiptDownload } = require('./payments');
+const { handleCheckoutInitiate, handleCheckoutStatus, handleLencoWebhook, handleReceiptDownload, handleValidatePromo, handleAdminPromoCodes } = require('./payments');
 const { handleContact } = require('./contact');
 const { handleSignup, handleLogin, handleLogout, handleMe } = require('./auth');
 const { handleDomainCheck } = require('./namecheap');
@@ -169,6 +169,16 @@ const server = http.createServer((req, res) => {
   if (req.method === 'GET' && urlPath.startsWith('/api/checkout/receipt/')) {
     const reference = decodeURIComponent(urlPath.slice('/api/checkout/receipt/'.length));
     handleReceiptDownload(req, res, reference);
+    return;
+  }
+
+  if (req.method === 'GET' && urlPath === '/api/checkout/validate-promo') {
+    handleValidatePromo(req, res, new URLSearchParams(req.url.split('?')[1] || ''));
+    return;
+  }
+
+  if (urlPath === '/api/admin/promo-codes' && (req.method === 'GET' || req.method === 'POST')) {
+    handleAdminPromoCodes(req, res);
     return;
   }
 

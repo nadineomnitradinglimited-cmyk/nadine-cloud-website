@@ -47,9 +47,44 @@ async function ensureSchema() {
       email TEXT,
       status TEXT NOT NULL DEFAULT 'pending',
       created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-      paid_at TIMESTAMPTZ
+      paid_at TIMESTAMPTZ,
+      period TEXT,
+      expires_at TIMESTAMPTZ,
+      promo_code TEXT,
+      discount_amount NUMERIC NOT NULL DEFAULT 0,
+      reminder_sent_at TIMESTAMPTZ
     );
-  `).then(() => true);
+    CREATE TABLE IF NOT EXISTS promo_codes (
+      code TEXT PRIMARY KEY,
+      discount_type TEXT NOT NULL CHECK (discount_type IN ('percent', 'fixed')),
+      discount_value NUMERIC NOT NULL,
+      max_uses INTEGER,
+      used_count INTEGER NOT NULL DEFAULT 0,
+      active BOOLEAN NOT NULL DEFAULT true,
+      expires_at TIMESTAMPTZ,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+    );
+    CREATE TABLE IF NOT EXISTS push_subscriptions (
+      id SERIAL PRIMARY KEY,
+      user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      endpoint TEXT NOT NULL UNIQUE,
+      p256dh TEXT NOT NULL,
+      auth TEXT NOT NULL,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+    );
+  `).then(async () => {
+    // orders existed before these columns did -- ALTER for anyone whose table
+    // predates this migration (CREATE TABLE IF NOT EXISTS won't add columns
+    // to an already-existing table).
+    await getPool().query(`
+      ALTER TABLE orders ADD COLUMN IF NOT EXISTS period TEXT;
+      ALTER TABLE orders ADD COLUMN IF NOT EXISTS expires_at TIMESTAMPTZ;
+      ALTER TABLE orders ADD COLUMN IF NOT EXISTS promo_code TEXT;
+      ALTER TABLE orders ADD COLUMN IF NOT EXISTS discount_amount NUMERIC NOT NULL DEFAULT 0;
+      ALTER TABLE orders ADD COLUMN IF NOT EXISTS reminder_sent_at TIMESTAMPTZ;
+    `);
+    return true;
+  });
   return schemaReady;
 }
 

@@ -21,13 +21,65 @@ async function persistOrder(reference, order) {
     const userResult = await getPool().query('SELECT id FROM users WHERE email = $1', [order.email]);
     const userId = userResult.rows[0] ? userResult.rows[0].id : null;
     await getPool().query(
-      `INSERT INTO orders (reference, user_id, plan, amount, type, pkg, domain, domain_option, email, status)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 'pending')
+      `INSERT INTO orders (reference, user_id, plan, amount, type, pkg, domain, domain_option, email, status, period, expires_at, promo_code, discount_amount)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 'pending', $10, $11, $12, $13)
        ON CONFLICT (reference) DO NOTHING`,
-      [reference, userId, order.plan, order.amount, order.type, order.pkg, order.domain, order.domainOption, order.email]
+      [reference, userId, order.plan, order.amount, order.type, order.pkg, order.domain, order.domainOption, order.email,
+       order.period || null, order.expiresAt || null, order.promoCode || null, order.discountAmount || 0]
     );
   } catch (err) {
     console.error('persistOrder failed (non-fatal):', err);
+  }
+}
+
+// Recurring products are billed for a fixed term at checkout (no
+// auto-charge — the customer approves every payment). This just works out
+// when that term ends, so a reminder can be sent a week beforehand.
+const PERIOD_MONTHS = { mo: 1, '6mo': 6, yr: 12, '2yr': 24, '3yr': 36 };
+// Domains, SSL certs and business email are always annual regardless of
+// what (if anything) was passed as the period.
+const ANNUAL_TYPES = new Set(['domain', 'ssl', 'email']);
+
+function computeExpiryDate(type, period) {
+  const months = PERIOD_MONTHS[period] || (ANNUAL_TYPES.has(type) ? 12 : null);
+  if (!months) return null;
+  const d = new Date();
+  d.setMonth(d.getMonth() + months);
+  return d;
+}
+
+// Never trust a client-supplied discount — always re-derive it server-side
+// from the stored code so a tampered request can't change what's charged.
+async function validatePromoCode(rawCode, subtotal) {
+  const code = typeof rawCode === 'string' ? rawCode.trim().toUpperCase().slice(0, 40) : '';
+  if (!code) return { ok: false, reason: 'No promo code given.' };
+  if (!dbConfigured()) return { ok: false, reason: 'Promo codes aren’t available right now.' };
+  try {
+    await ensureSchema();
+    const result = await getPool().query('SELECT * FROM promo_codes WHERE code = $1', [code]);
+    const row = result.rows[0];
+    if (!row) return { ok: false, reason: 'That promo code isn’t valid.' };
+    if (!row.active) return { ok: false, reason: 'That promo code is no longer active.' };
+    if (row.expires_at && new Date(row.expires_at) < new Date()) return { ok: false, reason: 'That promo code has expired.' };
+    if (row.max_uses != null && row.used_count >= row.max_uses) return { ok: false, reason: 'That promo code has already been fully redeemed.' };
+
+    let discount = row.discount_type === 'percent'
+      ? subtotal * (Number(row.discount_value) / 100)
+      : Number(row.discount_value);
+    discount = Math.min(Math.max(discount, 0), subtotal - 1); // always leave at least ZMW 1 payable
+    return { ok: true, code, discountAmount: Math.round(discount * 100) / 100 };
+  } catch (err) {
+    console.error('validatePromoCode failed:', err);
+    return { ok: false, reason: 'Could not check that promo code — please try again.' };
+  }
+}
+
+async function redeemPromoCode(code) {
+  if (!code || !dbConfigured()) return;
+  try {
+    await getPool().query('UPDATE promo_codes SET used_count = used_count + 1 WHERE code = $1', [code]);
+  } catch (err) {
+    console.error('redeemPromoCode failed (non-fatal):', err);
   }
 }
 
@@ -326,6 +378,7 @@ async function notifyOrder(reference, outcome, reason) {
 
   if (order && outcome === 'paid') {
     order.paidAt = Date.now();
+    if (order.promoCode) await redeemPromoCode(order.promoCode);
   }
   updateOrderStatus(reference, outcome, order && order.paidAt ? new Date(order.paidAt) : null);
 
@@ -423,6 +476,8 @@ async function handleCheckoutInitiate(req, res) {
   const stateProvince = typeof parsed.stateProvince === 'string' ? parsed.stateProvince.trim().slice(0, 100) : '';
   const postalCode = typeof parsed.postalCode === 'string' ? parsed.postalCode.trim().slice(0, 20) : '';
   const country = typeof parsed.country === 'string' ? parsed.country.trim().toUpperCase().slice(0, 10) : '';
+  const period = typeof parsed.period === 'string' ? parsed.period.trim().slice(0, 10) : '';
+  const promoCodeInput = typeof parsed.promoCode === 'string' ? parsed.promoCode.trim().slice(0, 40) : '';
 
   if (!plan) return sendJson(res, 400, { error: 'Missing plan.' });
   if (!Number.isFinite(amount) || amount <= 0 || amount > 20000) return sendJson(res, 400, { error: 'Invalid amount.' });
@@ -461,6 +516,16 @@ async function handleCheckoutInitiate(req, res) {
     }
   }
 
+  let discountAmount = 0;
+  let promoCode = null;
+  if (promoCodeInput) {
+    const promo = await validatePromoCode(promoCodeInput, amount);
+    if (!promo.ok) return sendJson(res, 400, { error: promo.reason });
+    discountAmount = promo.discountAmount;
+    promoCode = promo.code;
+  }
+  const chargeAmount = Math.round((amount - discountAmount) * 100) / 100;
+
   const reference = genReference();
 
   let lenco;
@@ -468,7 +533,7 @@ async function handleCheckoutInitiate(req, res) {
     lenco = await lencoRequest('/collections/mobile-money', {
       method: 'POST',
       body: JSON.stringify({
-        amount,
+        amount: chargeAmount,
         reference,
         phone: phoneDigits,
         operator,
@@ -494,11 +559,15 @@ async function handleCheckoutInitiate(req, res) {
   }
 
   const orderRecord = {
-    plan, amount, name, email, phone: phoneDigits,
+    plan, amount: chargeAmount, name, email, phone: phoneDigits,
     domain: domain || null, type: type || null, pkg: pkg || null,
     domainOption: type === 'hosting' ? domainOption : null,
     registrant: needsRegistrant ? { address1, city, stateProvince, postalCode, country } : null,
     createdAt: Date.now(),
+    period: period || null,
+    expiresAt: computeExpiryDate(type, period),
+    promoCode,
+    discountAmount,
   };
   pendingOrders.set(reference, orderRecord);
   persistOrder(reference, orderRecord);
@@ -534,6 +603,95 @@ async function handleCheckoutStatus(req, res, reference) {
   } else if (status === 'failed') {
     console.error(`Checkout ${reference} failed:`, reasonForFailure || '(no reason given)');
     notifyOrder(reference, 'failed', reasonForFailure).catch(() => {});
+  }
+}
+
+// Lets the checkout page show the real discounted total before the customer
+// submits payment, without letting them (or a tampered request) dictate the
+// discount themselves -- this re-runs the exact same server-side validation
+// handleCheckoutInitiate uses.
+async function handleValidatePromo(req, res, query) {
+  const code = (query.get('code') || '').trim();
+  const amount = Number(query.get('amount'));
+  if (!Number.isFinite(amount) || amount <= 0) {
+    sendJson(res, 400, { error: 'Invalid amount.' });
+    return;
+  }
+  const promo = await validatePromoCode(code, amount);
+  if (!promo.ok) {
+    sendJson(res, 400, { error: promo.reason });
+    return;
+  }
+  sendJson(res, 200, {
+    code: promo.code,
+    discountAmount: promo.discountAmount,
+    finalAmount: Math.round((amount - promo.discountAmount) * 100) / 100,
+  });
+}
+
+// Minimal, persistent admin tool for creating/listing promo codes -- unlike
+// the one-off migration routes used earlier in this project, code creation
+// is an ongoing operational need, so this stays in place rather than being
+// removed after one use. Protected by a shared-secret header rather than a
+// full admin login system, since it's the only admin action that exists.
+function isAdminAuthorized(req) {
+  const secret = process.env.ADMIN_SECRET;
+  return Boolean(secret) && req.headers['x-admin-secret'] === secret;
+}
+
+async function handleAdminPromoCodes(req, res) {
+  if (!isAdminAuthorized(req)) {
+    sendJson(res, 401, { error: 'Unauthorized.' });
+    return;
+  }
+  if (!dbConfigured()) {
+    sendJson(res, 503, { error: 'Database not configured.' });
+    return;
+  }
+  await ensureSchema();
+
+  if (req.method === 'GET') {
+    const result = await getPool().query('SELECT * FROM promo_codes ORDER BY created_at DESC');
+    sendJson(res, 200, { codes: result.rows });
+    return;
+  }
+
+  let raw;
+  try {
+    raw = await readBody(req, 2000);
+  } catch {
+    sendJson(res, 413, { error: 'Request too large.' });
+    return;
+  }
+  let parsed;
+  try {
+    parsed = JSON.parse(raw);
+  } catch {
+    sendJson(res, 400, { error: 'Invalid request.' });
+    return;
+  }
+
+  const code = typeof parsed.code === 'string' ? parsed.code.trim().toUpperCase().slice(0, 40) : '';
+  const discountType = parsed.discountType === 'fixed' ? 'fixed' : 'percent';
+  const discountValue = Number(parsed.discountValue);
+  const maxUses = parsed.maxUses != null ? Number(parsed.maxUses) : null;
+  const expiresAt = parsed.expiresAt ? new Date(parsed.expiresAt) : null;
+
+  if (!code) return sendJson(res, 400, { error: 'A code is required.' });
+  if (!Number.isFinite(discountValue) || discountValue <= 0) return sendJson(res, 400, { error: 'A positive discountValue is required.' });
+  if (discountType === 'percent' && discountValue > 100) return sendJson(res, 400, { error: 'Percent discount cannot exceed 100.' });
+
+  try {
+    await getPool().query(
+      `INSERT INTO promo_codes (code, discount_type, discount_value, max_uses, expires_at)
+       VALUES ($1, $2, $3, $4, $5)
+       ON CONFLICT (code) DO UPDATE SET discount_type = $2, discount_value = $3, max_uses = $4, expires_at = $5, active = true`,
+      [code, discountType, discountValue, maxUses, expiresAt]
+    );
+    sendJson(res, 200, { ok: true, code });
+  } catch (err) {
+    console.error('Create promo code failed:', err);
+    sendJson(res, 500, { error: 'Could not save that promo code.' });
   }
 }
 
@@ -586,4 +744,4 @@ async function handleLencoWebhook(req, res) {
   sendJson(res, 200, { received: true });
 }
 
-module.exports = { handleCheckoutInitiate, handleCheckoutStatus, handleLencoWebhook, handleReceiptDownload };
+module.exports = { handleCheckoutInitiate, handleCheckoutStatus, handleLencoWebhook, handleReceiptDownload, handleValidatePromo, handleAdminPromoCodes };
