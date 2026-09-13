@@ -31,7 +31,8 @@ export default function Hosting() {
     <>
       <Header />
 
-      <section className="page-hero">
+      <section className="page-hero has-photo">
+        <img src="/assets/hero-hosting.jpg" alt="" className="page-hero-photo" aria-hidden="true" />
         <div className="wrap page-hero-inner">
           <span className="eyebrow">One Cloud. Endless Possibilities.</span>
           <h1>Hosting plans built to grow with your business.</h1>
