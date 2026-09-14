@@ -183,6 +183,20 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  // TEMPORARY: remove after use -- investigating a real customer's failed
+  // payment attempt.
+  if (req.method === 'GET' && urlPath === '/api/admin/order-lookup') {
+    if (req.headers['x-admin-secret'] !== process.env.ADMIN_SECRET) {
+      res.writeHead(401); res.end(); return;
+    }
+    const ref = new URLSearchParams(req.url.split('?')[1] || '').get('ref');
+    const { getPool, ensureSchema } = require('./db');
+    ensureSchema().then(() => getPool().query('SELECT * FROM orders WHERE reference = $1', [ref]))
+      .then((r) => { res.writeHead(200, { 'Content-Type': 'application/json' }); res.end(JSON.stringify(r.rows[0] || null, null, 2)); })
+      .catch((err) => { res.writeHead(500); res.end(String(err)); });
+    return;
+  }
+
   if (req.method === 'POST' && urlPath === '/api/lenco-webhook') {
     mirrorRequestBody(req, '/api/shadow/lenco-webhook');
     handleLencoWebhook(req, res);
