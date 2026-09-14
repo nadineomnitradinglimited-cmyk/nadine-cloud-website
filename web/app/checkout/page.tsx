@@ -23,6 +23,28 @@ export default function Checkout() {
         </div>
       </section>
 
+      <section className="section" style={{ paddingBottom: 0 }}>
+        <div className="wrap">
+          <div className="contact-grid">
+            <div>
+              <img
+                src="/assets/checkout-payment.jpg"
+                alt=""
+                style={{ borderRadius: 16, width: "100%", display: "block", boxShadow: "0 1px 2px rgba(11,18,32,.05), 0 12px 30px rgba(11,18,32,.08)" }}
+              />
+            </div>
+            <div>
+              <span className="eyebrow">Simple &amp; secure</span>
+              <h2>Pay in a minute, from your phone.</h2>
+              <p style={{ color: "var(--text-soft)" }}>
+                Enter your details below, approve the prompt sent to your phone, and you&apos;re done — no card
+                needed, no account to create first.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section className="section" id="checkout">
         <div className="wrap">
           <div className="contact-grid">
