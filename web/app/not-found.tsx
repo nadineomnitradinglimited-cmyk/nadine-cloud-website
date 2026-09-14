@@ -25,7 +25,7 @@ export default function NotFound() {
       <footer>
         <div className="wrap">
           <div className="foot-bottom">
-            <span>© 2026 Nadine Omni Trading Limited. All rights reserved.</span>
+            <span>© 2026 Nadine Cloud. All rights reserved.</span>
             <span>Serving clients worldwide</span>
           </div>
         </div>
