@@ -172,6 +172,7 @@ export default function Hosting() {
             <div>99.9% Uptime Guarantee</div>
             <div>Worldwide Support</div>
             <div>Fast NVMe SSD Cloud Servers</div>
+            <div>Git Version Control</div>
           </div>
         </div>
       </section>
@@ -246,6 +247,10 @@ export default function Hosting() {
             <details className="faq-item" id="python">
               <summary>Can I run a Python or Django app on my hosting?</summary>
               <p>Yes — every hosting plan includes cPanel&apos;s Python app tool, so you can deploy a Django, Flask or other Python web app on your domain, no extra setup fee. Great for most small business apps; if you need background workers (like Celery) or a dedicated server, message us first and we&apos;ll advise on the best fit.</p>
+            </details>
+            <details className="faq-item" id="git">
+              <summary>Can I deploy my site from GitHub or GitLab?</summary>
+              <p>Yes — every hosting plan includes cPanel&apos;s Git Version Control. Point it at your repo and pull your latest code straight into your hosting account, then deploy it with one click using a <code>.cpanel.yml</code> file. Great for developers and agencies who don&apos;t want to upload files by hand. Message us if you&apos;d like help setting up automatic deploys on every push.</p>
             </details>
             <details className="faq-item">
               <summary>What payment methods do you accept?</summary>
