@@ -63,16 +63,19 @@ export default function Domains() {
             <div className="tld-card">
               <span className="badge">Popular</span>
               <span className="ext">.com</span>
+              <span className="tagline">The classic choice — instantly recognized, trusted by customers everywhere.</span>
               <div className="price"><span className="from">From</span> <span className="amt amt-live" data-zmw="330">ZMW 330</span> <span className="per">/yr</span><small className="price-note" hidden></small></div>
               <a className="cta" href="/checkout?type=domain&plan=.com+domain+registration&amount=330">Register</a>
             </div>
             <div className="tld-card">
               <span className="ext">.org</span>
+              <span className="tagline">The domain for causes, communities and non-profits.</span>
               <div className="price"><span className="from">From</span> <span className="amt amt-live" data-zmw="315">ZMW 315</span> <span className="per">/yr</span><small className="price-note" hidden></small></div>
               <a className="cta" href="/checkout?type=domain&plan=.org+domain+registration&amount=315">Register</a>
             </div>
             <div className="tld-card">
               <span className="ext">.net</span>
+              <span className="tagline">A trusted alternative when the .com you want is taken.</span>
               <div className="price"><span className="from">From</span> <span className="amt amt-live" data-zmw="315">ZMW 315</span> <span className="per">/yr</span><small className="price-note" hidden></small></div>
               <a className="cta" href="/checkout?type=domain&plan=.net+domain+registration&amount=315">Register</a>
             </div>
