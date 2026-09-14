@@ -296,13 +296,14 @@ async function emailCarePlanConfirmation(order) {
   return result;
 }
 
-// Zyra bundles a free .com domain, but only on annual-or-longer billing --
-// a monthly Zyra signup still owes for the domain separately, same as
-// every other plan. Derived server-side from the stored order rather than
-// trusting anything the client claimed, since it decides whether staff
-// need to invoice the customer for the domain afterward.
+// Any hosting plan bundles a free .com domain on annual-or-longer billing.
+// Monthly signups -- including Avara's ZMW 50 first-month intro rate,
+// which is only ever period=mo -- still owe for the domain separately.
+// Derived server-side from the stored order rather than trusting anything
+// the client claimed, since it decides whether staff need to invoice the
+// customer for the domain afterward.
 function isFreeDomainEligible(order) {
-  return Boolean(order) && order.pkg === 'zyra' && ['yr', '2yr', '3yr'].includes(order.period);
+  return Boolean(order) && order.type === 'hosting' && ['yr', '2yr', '3yr'].includes(order.period);
 }
 
 async function notifyOrder(reference, outcome, reason) {

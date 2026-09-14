@@ -29,7 +29,18 @@
     hostingPlans.forEach(function(plan, planIdx){
       const amtEl = plan.querySelector('.price .amt[data-zmw]');
       if (!amtEl) return;
+      // data-zmw is always the real recurring monthly rate, used to work out
+      // every other billing period -- a plan showing a discounted first-month
+      // intro price (Avara) keeps that separately in data-intro-zmw, purely
+      // for display when "Monthly" is selected, so it never corrupts the
+      // 6-month/annual/etc. math.
       plan._baseMo = parseFloat(amtEl.getAttribute('data-zmw'));
+      plan._introMo = amtEl.hasAttribute('data-intro-zmw') ? parseFloat(amtEl.getAttribute('data-intro-zmw')) : null;
+      // Reset data-zmw to the intro price immediately (synchronously, before
+      // currency.js's async exchange-rate fetch resolves) -- otherwise a
+      // visitor seeing a converted non-ZMW currency would briefly get the
+      // real recurring rate's conversion instead of the intro price's.
+      if (plan._introMo !== null) amtEl.setAttribute('data-zmw', plan._introMo);
 
       const obEl = plan.querySelector('.other-billing');
       if (!obEl || !isFinite(plan._baseMo)) return;
@@ -37,7 +48,7 @@
       let html = '<div class="other-billing-label">Other billing options</div>';
       PERIOD_ORDER.forEach(function(key){
         const cfg = BILLING_PERIODS[key];
-        const { total } = priceFor(plan._baseMo, key);
+        const total = (key === 'mo' && plan._introMo !== null) ? plan._introMo : priceFor(plan._baseMo, key).total;
         html += '<label class="ob-option">' +
           '<input type="radio" name="' + radioName + '" value="' + key + '"' + (key === 'mo' ? ' checked' : '') + '>' +
           '<span class="ob-name">' + cfg.name + '</span>' +
@@ -67,14 +78,19 @@
         const perEl = plan.querySelector('.price .per');
         const equivEl = plan.querySelector('.price-equiv');
         const savingsEl = plan.querySelector('.price-savings');
+        const introEl = plan.querySelector('.intro-note');
         const cta = plan.querySelector('.cta');
         if (!amtEl || !cta) return;
 
-        const { total, perMonth } = priceFor(plan._baseMo, period);
+        const isIntroMonthly = period === 'mo' && plan._introMo !== null;
+        const computed = priceFor(plan._baseMo, period);
+        const total = isIntroMonthly ? plan._introMo : computed.total;
+        const perMonth = computed.perMonth;
 
         amtEl.setAttribute('data-zmw', total);
         amtEl.textContent = 'ZMW ' + total.toLocaleString();
-        if (perEl) perEl.textContent = cfg.per;
+        if (perEl) perEl.textContent = isIntroMonthly ? '/first month' : cfg.per;
+        if (introEl) introEl.hidden = !isIntroMonthly;
 
         if (equivEl) {
           if (period === 'mo') {

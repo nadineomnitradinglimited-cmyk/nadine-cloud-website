@@ -281,6 +281,7 @@ export default function Home() {
             <button type="button" className="billing-opt" data-period="2yr">2 Years<span className="save-tag">Save 20%</span></button>
             <button type="button" className="billing-opt" data-period="3yr">3 Years<span className="save-tag">Save 25%</span></button>
           </div>
+          <p style={{ fontFamily: "var(--mono)", fontSize: 12.5, color: "var(--ok)", marginBottom: 24 }}>✓ Choose 1 Year, 2 Years or 3 Years billing on any plan and get a free .com domain for the first year — excludes Avara&apos;s ZMW 50 first-month rate.</p>
           <div className="plans">
             <div className="plan">
               <div className="plan-icon">
@@ -292,10 +293,10 @@ export default function Home() {
               <h3>Nadine Cloud — Avara</h3>
               <div className="for">Everything you need to get started</div>
               <div className="price">
-                <span className="amt amt-live" data-zmw="50">ZMW 50</span> <span className="per">/first month</span>
+                <span className="amt amt-live" data-zmw="99" data-intro-zmw="50">ZMW 50</span> <span className="per">/first month</span>
                 <small className="price-note" hidden></small>
               </div>
-              <div style={{ fontFamily: "var(--mono)", fontSize: 12, color: "var(--text-mute)", marginBottom: 10 }}>then <span className="amt-live" data-zmw="99">ZMW 99</span>/month</div>
+              <div className="intro-note" style={{ fontFamily: "var(--mono)", fontSize: 12, color: "var(--text-mute)", marginBottom: 10 }}>then <span className="amt-live" data-zmw="99">ZMW 99</span>/month</div>
               <div className="price-equiv" hidden></div>
               <div className="price-savings" hidden></div>
               <div className="plan-stats">
@@ -385,7 +386,6 @@ export default function Home() {
               </div>
               <ul>
                 <li>Website Builder</li>
-                <li>Free .com Domain (annual billing+)</li>
                 <li>Automatic Backups</li>
                 <li>Premium Support</li>
               </ul>

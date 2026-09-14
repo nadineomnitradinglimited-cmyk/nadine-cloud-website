@@ -100,10 +100,11 @@
     registrantFields.querySelectorAll('input').forEach((el) => { el.required = required; });
   }
 
-  // Zyra includes a free .com domain, but only when billed annually or
-  // longer -- a monthly Zyra signup still pays for the domain separately,
-  // same as every other plan.
-  const freeDomainEligible = pkg === 'zyra' && (period === 'yr' || period === '2yr' || period === '3yr');
+  // Any hosting plan includes a free .com domain when billed annually or
+  // longer. Monthly signups -- including Avara's ZMW 50 first-month intro
+  // rate, which is only ever period=mo -- still pay for the domain
+  // separately.
+  const freeDomainEligible = type === 'hosting' && (period === 'yr' || period === '2yr' || period === '3yr');
 
   function applyDomainOptionCopy(){
     if (type !== 'hosting') return;
