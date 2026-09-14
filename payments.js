@@ -296,13 +296,23 @@ async function emailCarePlanConfirmation(order) {
   return result;
 }
 
+// Zyra bundles a free .com domain, but only on annual-or-longer billing --
+// a monthly Zyra signup still owes for the domain separately, same as
+// every other plan. Derived server-side from the stored order rather than
+// trusting anything the client claimed, since it decides whether staff
+// need to invoice the customer for the domain afterward.
+function isFreeDomainEligible(order) {
+  return Boolean(order) && order.pkg === 'zyra' && ['yr', '2yr', '3yr'].includes(order.period);
+}
+
 async function notifyOrder(reference, outcome, reason) {
   if (notified.has(reference)) return;
   notified.add(reference);
   const order = pendingOrders.get(reference);
   const reasonLine = reason ? `\nReason: ${reason}` : '';
+  const freeDomain = isFreeDomainEligible(order);
   const domainOptionLine = order && order.type === 'hosting'
-    ? `\nDomain option: ${order.domainOption === 'new' ? 'NEW — customer needs this domain registered' : 'Existing — customer already owns this domain'}`
+    ? `\nDomain option: ${order.domainOption === 'new' ? `NEW — ${freeDomain ? 'FREE, included with Zyra annual+ — do NOT invoice for this domain' : 'customer needs this domain registered and billed separately'}` : 'Existing — customer already owns this domain'}`
     : '';
   let message = order
     ? `Plan: ${order.plan}\nAmount: ZMW ${order.amount}\nCustomer: ${order.name} <${order.email}>\nPhone: ${order.phone}\nDomain requested: ${order.domain || '-'}${domainOptionLine}\nReference: ${reference}\nStatus: ${outcome}${reasonLine}`
@@ -324,7 +334,7 @@ async function notifyOrder(reference, outcome, reason) {
     // with a registration step in front of it.
     const reg = await attemptDomainRegistration(order);
     if (reg.ok) {
-      message += `\n\n--- Domain registered automatically ---\nDomain: ${reg.domain}\nNamecheap order: ${reg.orderId}\n\nProceeding to create the hosting account…`;
+      message += `\n\n--- Domain registered automatically ---\nDomain: ${reg.domain}\nNamecheap order: ${reg.orderId}\n${freeDomain ? 'Included free with Zyra annual+ — do NOT bill the customer for this domain.' : 'Not included in this plan — confirm domain price with the customer and invoice separately if not already covered.'}\n\nProceeding to create the hosting account…`;
       const acct = await createAccount({ domain: order.domain, pkgSlug: order.pkg, contactemail: order.email });
       if (acct.ok) {
         const emailResult = await emailAccountDetailsToCustomer(order, acct);

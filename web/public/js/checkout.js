@@ -100,6 +100,11 @@
     registrantFields.querySelectorAll('input').forEach((el) => { el.required = required; });
   }
 
+  // Zyra includes a free .com domain, but only when billed annually or
+  // longer -- a monthly Zyra signup still pays for the domain separately,
+  // same as every other plan.
+  const freeDomainEligible = pkg === 'zyra' && (period === 'yr' || period === '2yr' || period === '3yr');
+
   function applyDomainOptionCopy(){
     if (type !== 'hosting') return;
     const opt = (document.querySelector('input[name="domainOption"]:checked') || {}).value || 'existing';
@@ -107,6 +112,9 @@
       domainField.firstChild.textContent = 'Domain you’d like to register';
       domainField.querySelector('input').placeholder = 'yourbusiness.com';
       domainNewNote.hidden = false;
+      domainNewNote.textContent = freeDomainEligible
+        ? "Your first year of a .com domain is included free with Zyra. Choosing a different extension may cost extra — we'll confirm before registering."
+        : "This payment covers hosting only. We'll check availability and message you to confirm the exact domain price before registering it.";
       setRegistrantRequired(true);
     } else {
       domainField.firstChild.textContent = 'Domain for this hosting account';

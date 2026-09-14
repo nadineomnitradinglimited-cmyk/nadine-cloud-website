@@ -385,6 +385,7 @@ export default function Home() {
               </div>
               <ul>
                 <li>Website Builder</li>
+                <li>Free .com Domain (annual billing+)</li>
                 <li>Automatic Backups</li>
                 <li>Premium Support</li>
               </ul>

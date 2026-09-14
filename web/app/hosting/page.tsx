@@ -141,6 +141,7 @@ export default function Hosting() {
               <ul>
                 <li>20 Databases</li>
                 <li>Website Builder</li>
+                <li>Free .com Domain (annual billing+)</li>
                 <li>Free SSL Certificate</li>
                 <li>Automatic Backups</li>
                 <li>Premium Support</li>
