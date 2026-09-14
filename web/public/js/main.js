@@ -15,8 +15,8 @@
   window.addEventListener('hashchange', openTargetDetails);
 })();
 
-/* ---------- domain name search (live availability check via Namecheap, .co.zm excluded — that's ZICTA, not Namecheap) ---------- */
-const DOMAIN_PRICE_ZMW = { com: 450, net: 500, org: 450 };
+/* ---------- domain name search (live availability check via Namecheap) ---------- */
+const DOMAIN_PRICE_ZMW = { com: 330, net: 315, org: 315 };
 let domainLookupSeq = 0;
 
 function lookupDomain(){
@@ -24,7 +24,7 @@ function lookupDomain(){
   const out = document.getElementById('domResult');
   if (!input || !out) return;
   const raw = input.value.trim().toLowerCase().replace(/[^a-z0-9-]/g,'');
-  if(!raw){ out.textContent = 'Type a name to check .com, .co.zm, .org and more'; return; }
+  if(!raw){ out.textContent = 'Type a name to check .com, .org, .net and more'; return; }
 
   const seq = ++domainLookupSeq;
   out.textContent = 'Checking ' + raw + '.com, .net and .org…';
@@ -45,13 +45,12 @@ function lookupDomain(){
         }
         return '<span style="color:var(--text-mute)">✗ ' + r.domain + ' is already taken</span>';
       });
-      out.innerHTML = rows.join('<br>') +
-        '<br><span style="color:var(--text-mute)">.co.zm isn’t checked live yet — <a href="contact" style="color:#7047FF">message us</a> to confirm.</span>';
+      out.innerHTML = rows.join('<br>');
     })
     .catch(() => {
       if (seq !== domainLookupSeq) return;
       const waText = encodeURIComponent('Hi Nadine Cloud, is ' + raw + '.com available to register?');
-      out.innerHTML = 'We\'ll confirm if <strong>' + raw + '.com</strong> is available, from ZMW 450/yr' +
+      out.innerHTML = 'We\'ll confirm if <strong>' + raw + '.com</strong> is available, from ZMW 330/yr' +
         ' &nbsp;·&nbsp; <a href="https://wa.me/260770346698?text=' + waText + '" target="_blank" rel="noopener" style="color:#7047FF">Ask on WhatsApp</a>' +
         ' &nbsp;·&nbsp; <a href="contact" style="color:#7047FF">Contact form</a>';
     });

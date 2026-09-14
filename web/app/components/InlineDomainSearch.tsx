@@ -19,7 +19,7 @@ export default function InlineDomainSearch() {
         <button onClick={() => window.lookupDomain?.()}>Search domain</button>
       </div>
       <div className="lookup-result" id="domResult">
-        Type a name to check .com, .co.zm, .org and more
+        Type a name to check .com, .org, .net and more
       </div>
     </div>
   );

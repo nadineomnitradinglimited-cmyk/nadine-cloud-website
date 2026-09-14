@@ -5,7 +5,7 @@ import InlineDomainSearch from "../components/InlineDomainSearch";
 
 const TITLE = "Domain Registration — Nadine Cloud";
 const DESCRIPTION =
-  "Register or transfer .com, .co.zm, .org and more, starting from ZMW 450/year. We handle the DNS so your domain, email and website just work.";
+  "Register or transfer .com, .org, .net and more, starting from ZMW 315/year. We handle the DNS so your domain, email and website just work.";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -37,7 +37,7 @@ export default function Domains() {
         <div className="wrap page-hero-inner">
           <span className="eyebrow">Domains</span>
           <h1>Your name, your address on the internet.</h1>
-          <p>Register or transfer .com, .co.zm, .org and more, starting from ZMW 450/year. We handle the DNS so your domain, email and website just work.</p>
+          <p>Register or transfer .com, .org, .net and more, starting from ZMW 315/year. We handle the DNS so your domain, email and website just work.</p>
         </div>
       </section>
 
@@ -63,23 +63,18 @@ export default function Domains() {
             <div className="tld-card">
               <span className="badge">Popular</span>
               <span className="ext">.com</span>
-              <div className="price"><span className="from">From</span> <span className="amt amt-live" data-zmw="450">ZMW 450</span> <span className="per">/yr</span><small className="price-note" hidden></small></div>
-              <a className="cta" href="/checkout?type=domain&plan=.com+domain+registration&amount=450">Register</a>
-            </div>
-            <div className="tld-card">
-              <span className="ext">.co.zm</span>
-              <div className="price"><span className="from">From</span> <span className="amt amt-live" data-zmw="650">ZMW 650</span> <span className="per">/yr</span><small className="price-note" hidden></small></div>
-              <a className="cta" href="/checkout?type=domain&plan=.co.zm+domain+registration&amount=650">Register</a>
+              <div className="price"><span className="from">From</span> <span className="amt amt-live" data-zmw="330">ZMW 330</span> <span className="per">/yr</span><small className="price-note" hidden></small></div>
+              <a className="cta" href="/checkout?type=domain&plan=.com+domain+registration&amount=330">Register</a>
             </div>
             <div className="tld-card">
               <span className="ext">.org</span>
-              <div className="price"><span className="from">From</span> <span className="amt amt-live" data-zmw="450">ZMW 450</span> <span className="per">/yr</span><small className="price-note" hidden></small></div>
-              <a className="cta" href="/checkout?type=domain&plan=.org+domain+registration&amount=450">Register</a>
+              <div className="price"><span className="from">From</span> <span className="amt amt-live" data-zmw="315">ZMW 315</span> <span className="per">/yr</span><small className="price-note" hidden></small></div>
+              <a className="cta" href="/checkout?type=domain&plan=.org+domain+registration&amount=315">Register</a>
             </div>
             <div className="tld-card">
               <span className="ext">.net</span>
-              <div className="price"><span className="from">From</span> <span className="amt amt-live" data-zmw="500">ZMW 500</span> <span className="per">/yr</span><small className="price-note" hidden></small></div>
-              <a className="cta" href="/checkout?type=domain&plan=.net+domain+registration&amount=500">Register</a>
+              <div className="price"><span className="from">From</span> <span className="amt amt-live" data-zmw="315">ZMW 315</span> <span className="per">/yr</span><small className="price-note" hidden></small></div>
+              <a className="cta" href="/checkout?type=domain&plan=.net+domain+registration&amount=315">Register</a>
             </div>
           </div>
         </div>

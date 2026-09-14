@@ -136,9 +136,9 @@ export default function Home() {
                 </svg>
               </div>
               <h3>Domains</h3>
-              <p>Register or transfer .com, .co.zm, .org and more.</p>
+              <p>Register or transfer .com, .org, .net and more.</p>
               <div className="offer-price">
-                <span className="from">From</span> <b className="amt-live" data-zmw="450">ZMW 450</b> <span className="per">/yr</span>
+                <span className="from">From</span> <b className="amt-live" data-zmw="315">ZMW 315</b> <span className="per">/yr</span>
                 <small className="price-note" hidden></small>
               </div>
               <a className="cta" href="/domains">Search domains</a>
@@ -230,7 +230,7 @@ export default function Home() {
                 </svg>
               </div>
               <h3>Domains &amp; DNS</h3>
-              <p>Register or transfer .com, .co.zm, .org and more. We handle the DNS so your domain, email and website just work.</p>
+              <p>Register or transfer .com, .org, .net and more. We handle the DNS so your domain, email and website just work.</p>
             </div>
             <div className="svc">
               <div className="ic">
