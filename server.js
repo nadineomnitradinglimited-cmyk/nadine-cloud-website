@@ -183,40 +183,6 @@ const server = http.createServer((req, res) => {
     return;
   }
 
-  // TEMPORARY: remove after use -- pulling real Namecheap pricing to fix
-  // the displayed domain prices.
-  if (req.method === 'GET' && urlPath === '/api/admin/namecheap-pricing') {
-    if (req.headers['x-admin-secret'] !== process.env.ADMIN_SECRET) {
-      res.writeHead(401); res.end(); return;
-    }
-    (async () => {
-      try {
-        const ipRes = await fetch('https://api.ipify.org?format=text');
-        const clientIp = (await ipRes.text()).trim();
-        const params = new URLSearchParams({
-          ApiUser: process.env.NAMECHEAP_API_USER,
-          ApiKey: process.env.NAMECHEAP_API_KEY,
-          UserName: process.env.NAMECHEAP_USERNAME,
-          ClientIp: clientIp,
-          Command: 'namecheap.users.getPricing',
-          ProductType: 'DOMAIN',
-          ProductCategory: 'DOMAINS',
-          ActionName: 'REGISTER',
-        });
-        const sandbox = process.env.NAMECHEAP_SANDBOX === 'true';
-        const host = sandbox ? 'api.sandbox.namecheap.com' : 'api.namecheap.com';
-        const ncRes = await fetch(`https://${host}/xml.response?${params.toString()}`);
-        const xml = await ncRes.text();
-        res.writeHead(200, { 'Content-Type': 'application/xml' });
-        res.end(xml);
-      } catch (err) {
-        res.writeHead(500);
-        res.end(String(err));
-      }
-    })();
-    return;
-  }
-
   if (req.method === 'POST' && urlPath === '/api/lenco-webhook') {
     mirrorRequestBody(req, '/api/shadow/lenco-webhook');
     handleLencoWebhook(req, res);
