@@ -385,6 +385,24 @@ async function notifyOrder(reference, outcome, reason) {
     } else {
       message += `\n\n--- ACTION NEEDED: automatic registration failed ---\nDomain: ${order.domain}\nReason: ${reg.reason}\nRegister it manually and let the customer (${order.email}) know once it's done.`;
     }
+  } else if (outcome === 'paid' && order && order.type === 'bundle' && order.pkg && order.domain) {
+    // Launch bundle: domain + hosting + website builder for one fixed price.
+    // The domain is always included free (unlike hosting's annual-only rule)
+    // -- there's no domainOption toggle here, every bundle order is a new
+    // domain registration chained straight into the builder account.
+    const reg = await attemptDomainRegistration(order);
+    if (reg.ok) {
+      message += `\n\n--- Domain registered automatically (included free with Launch) ---\nDomain: ${reg.domain}\nNamecheap order: ${reg.orderId}\n\nProceeding to create the Website Builder hosting account…`;
+      const acct = await createAccount({ domain: order.domain, pkgSlug: order.pkg, contactemail: order.email });
+      if (acct.ok) {
+        const emailResult = await emailBuilderDetailsToCustomer(order, acct);
+        message += `\n\n--- WHM account created automatically (Website Builder) ---\nDomain: ${acct.domain}\nUsername: ${acct.username}\nPassword: ${acct.password}\ncPanel login: https://${acct.domain}:2083\n\nACTION NEEDED: enable the Website Builder feature for this account in WHM's Feature Manager.\n\nLogin details ${emailResult.ok ? 'were emailed directly to the customer' : `FAILED to send to the customer (${emailResult.reason}) — forward manually`}.`;
+      } else {
+        message += `\n\n--- WHM account creation FAILED (Website Builder) ---\nReason: ${acct.reason}${acct.raw ? `\nDetails: ${JSON.stringify(acct.raw.metadata || acct.raw)}` : ''}\nCreate this account manually in WHM for ${order.domain} on package nadine14_${order.pkg}.`;
+      }
+    } else {
+      message += `\n\n--- ACTION NEEDED: domain registration failed ---\nCustomer's Launch bundle includes ${order.domain}, registration failed.\nReason: ${reg.reason}\nRegister it manually, then create the WHM Website Builder account on package nadine14_${order.pkg}.`;
+    }
   }
 
   if (order && outcome === 'paid') {
@@ -518,8 +536,12 @@ async function handleCheckoutInitiate(req, res) {
   if (type === 'care' && (!pkg || !CARE_PRODUCTS.has(pkg))) {
     return sendJson(res, 400, { error: 'Missing or invalid care plan.' });
   }
+  if (type === 'bundle') {
+    if (!pkg || !BUILDER_PACKAGES[pkg]) return sendJson(res, 400, { error: 'Missing or invalid bundle package.' });
+    if (!domain || !/^[a-z0-9.-]+\.[a-z]{2,}$/.test(domain)) return sendJson(res, 400, { error: 'A valid domain is required for the Launch bundle.' });
+  }
 
-  const needsRegistrant = type === 'domain' || (type === 'hosting' && domainOption === 'new');
+  const needsRegistrant = type === 'domain' || type === 'bundle' || (type === 'hosting' && domainOption === 'new');
   if (needsRegistrant) {
     if (!domain) return sendJson(res, 400, { error: 'A domain name is required.' });
     if (!address1 || !city || !postalCode || !country || country === 'OTHER') {

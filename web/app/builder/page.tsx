@@ -47,10 +47,10 @@ export default function Builder() {
             <p>Perfect if you just want a simple site up fast, without hiring a designer or writing code.</p>
           </div>
           <div className="plans">
-            <div className="plan featured">
+            <div className="plan">
               <div className="plan-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><rect x={3} y={4} width={18} height={16} rx={2} /><path d="M3 9h18M8 4v16" /></svg></div>
               <h3>Nadine Cloud — Builder</h3>
-              <div className="for">Everything you need for a simple site</div>
+              <div className="for">Already have a domain? Just add hosting.</div>
               <div className="price"><span className="amt amt-live" data-zmw="59">ZMW 59</span> <span className="per">/month</span><small className="price-note" hidden></small></div>
               <div className="plan-stats">
                 <div><span className="n">1</span><span className="l">Website</span></div>
@@ -65,7 +65,26 @@ export default function Builder() {
               </ul>
               <a className="cta" href="/checkout?type=builder&pkg=builder&plan=Nadine+Cloud+%E2%80%94+Builder&amount=59&period=mo">Get Builder</a>
             </div>
+            <div className="plan featured">
+              <div className="plan-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><path d="m12 2 2.9 6.3 6.9.6-5.2 4.6 1.6 6.8L12 16.9l-6.2 3.4 1.6-6.8-5.2-4.6 6.9-.6Z" /></svg></div>
+              <h3>Nadine Cloud — Launch</h3>
+              <div className="for">No domain yet? This is the one-payment starter bundle</div>
+              <div className="price"><span className="amt amt-live" data-zmw="850">ZMW 850</span> <span className="per">/first year</span><small className="price-note" hidden></small></div>
+              <div className="plan-stats">
+                <div><span className="n">1</span><span className="l">Free .com domain</span></div>
+                <div><span className="n">1</span><span className="l">Year hosting</span></div>
+              </div>
+              <ul>
+                <li>Free .com domain (1st year)</li>
+                <li>Drag-and-Drop Website Builder</li>
+                <li>Free SSL Certificate</li>
+                <li>1 Email Account</li>
+                <li>Standard Support</li>
+              </ul>
+              <a className="cta" href="/checkout?type=bundle&pkg=builder&plan=Nadine+Cloud+%E2%80%94+Launch&amount=850&period=yr">Get Launch</a>
+            </div>
           </div>
+          <p className="pricing-note">* Launch renews at ZMW 59/month for hosting after the first year, plus your domain&apos;s standard renewal price — we&apos;ll remind you before either is due.</p>
         </div>
       </section>
 

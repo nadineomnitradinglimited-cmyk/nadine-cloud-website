@@ -141,6 +141,13 @@
     domainConfirmField.querySelector('input').required = true;
     applyDomainOptionCopy();
     document.getElementById('ckPlanSub').textContent = "Tell us the domain to use — double-check the spelling, this is exactly what we'll set up.";
+  } else if (type === 'bundle') {
+    domainField.hidden = false;
+    domainField.querySelector('input').required = true;
+    domainConfirmField.hidden = false;
+    domainConfirmField.querySelector('input').required = true;
+    setRegistrantRequired(true);
+    document.getElementById('ckPlanSub').textContent = "Tell us the domain you want — it's registered free as part of this bundle, then your hosting and website builder are set up on it.";
   } else if (type === 'wordpress' || type === 'builder' || type === 'ssl') {
     domainField.hidden = false;
     domainField.querySelector('input').required = true;

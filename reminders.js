@@ -14,6 +14,7 @@ const RENEWAL_PAGE = {
   care: '/care',
   domain: '/domains',
   email: '/hosting#email',
+  bundle: '/builder',
 };
 
 const SITE_URL = 'https://www.nadinecloud.com';
