@@ -142,6 +142,6 @@ async function createAccount({ domain, pkgSlug, contactemail }) {
 }
 
 module.exports = {
-  whmRequest, ensurePackagesExist, createAccount, PACKAGES,
+  whmRequest, ensurePackagesExist, createAccount, PACKAGES, WHM_HOST,
   HOSTING_PACKAGES, DATABASE_PACKAGES, WORDPRESS_PACKAGES, BUILDER_PACKAGES,
 };

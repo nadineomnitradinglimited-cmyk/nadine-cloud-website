@@ -7,6 +7,7 @@
   const amount = parseFloat(params.get('amount'));
   const type = params.get('type') || '';
   const pkg = params.get('pkg') || '';
+  const draftId = params.get('draftId') || '';
   const PERIOD_LABEL = { mo: '/month', '6mo': '/6 months', yr: '/year', '2yr': '/2 years', '3yr': '/3 years' };
   const PERIOD_BILLED = {
     mo: 'Billed monthly. ',
@@ -232,6 +233,7 @@
       type,
       pkg,
       period,
+      draftId,
       promoCode: appliedPromo ? appliedPromo.code : '',
       domain: fd.get('domain') || '',
       domainOption: type === 'hosting' ? (fd.get('domainOption') || 'existing') : '',

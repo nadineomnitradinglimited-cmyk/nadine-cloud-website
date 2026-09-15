@@ -9,6 +9,8 @@ const CARE_PRODUCTS = new Set(['care-essential', 'care-growth', 'care-premium'])
 const { generateReceiptPdf } = require('./receipt');
 const { isConfigured: dbConfigured, getPool, ensureSchema } = require('./db');
 const { checkAvailability, registerDomain } = require('./namecheap');
+const { loadDraft } = require('./ai-builder');
+const { deployDraftHtml } = require('./ftp-deploy');
 
 // Best-effort persistence to the database (if configured) so orders survive
 // a restart and show up on a customer's account page. Never blocks or
@@ -21,11 +23,11 @@ async function persistOrder(reference, order) {
     const userResult = await getPool().query('SELECT id FROM users WHERE email = $1', [order.email]);
     const userId = userResult.rows[0] ? userResult.rows[0].id : null;
     await getPool().query(
-      `INSERT INTO orders (reference, user_id, plan, amount, type, pkg, domain, domain_option, email, status, period, expires_at, promo_code, discount_amount)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 'pending', $10, $11, $12, $13)
+      `INSERT INTO orders (reference, user_id, plan, amount, type, pkg, domain, domain_option, email, status, period, expires_at, promo_code, discount_amount, draft_id)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 'pending', $10, $11, $12, $13, $14)
        ON CONFLICT (reference) DO NOTHING`,
       [reference, userId, order.plan, order.amount, order.type, order.pkg, order.domain, order.domainOption, order.email,
-       order.period || null, order.expiresAt || null, order.promoCode || null, order.discountAmount || 0]
+       order.period || null, order.expiresAt || null, order.promoCode || null, order.discountAmount || 0, order.draftId || null]
     );
   } catch (err) {
     console.error('persistOrder failed (non-fatal):', err);
@@ -306,6 +308,25 @@ function isFreeDomainEligible(order) {
   return Boolean(order) && order.type === 'hosting' && ['yr', '2yr', '3yr'].includes(order.period);
 }
 
+// Deploys an AI-generated draft into a freshly-created WHM/cPanel account,
+// if this order has one attached. Runs independently of (and after) the
+// WHM account creation and Website Builder feature-flag reminder -- the
+// static file going live in public_html has nothing to do with whether
+// that feature flag is separately flipped on. Returns a message fragment
+// to append to the staff notification; empty string when there's no draft.
+async function deployAiDraftIfAny(order, acct) {
+  if (!order.draftId) return '';
+  const draft = await loadDraft(order.draftId);
+  if (!draft) {
+    return `\n\n--- ACTION NEEDED: AI-generated site missing ---\nDraft: ${order.draftId}\nThe draft could not be found at deploy time -- ask the customer (${order.email}) to resend their site, or rebuild it with them.`;
+  }
+  const deployResult = await deployDraftHtml({ username: acct.username, password: acct.password, html: draft.html });
+  if (deployResult.ok) {
+    return `\n\n--- AI-generated site deployed automatically ---\nLive at: https://${acct.domain}`;
+  }
+  return `\n\n--- ACTION NEEDED: AI-generated site deployment FAILED ---\nDraft: ${order.draftId}\nReason: ${deployResult.reason}\nDownload it from /api/ai-builder/export/${order.draftId}?email=${encodeURIComponent(order.email)} and upload it into public_html manually via cPanel File Manager or FTP, then let the customer know.`;
+}
+
 async function notifyOrder(reference, outcome, reason) {
   if (notified.has(reference)) return;
   notified.add(reference);
@@ -369,6 +390,7 @@ async function notifyOrder(reference, outcome, reason) {
     if (acct.ok) {
       const emailResult = await emailBuilderDetailsToCustomer(order, acct);
       message += `\n\n--- WHM account created automatically (Website Builder) ---\nDomain: ${acct.domain}\nUsername: ${acct.username}\nPassword: ${acct.password}\ncPanel login: https://${acct.domain}:2083\n\nACTION NEEDED: enable the Website Builder feature for this account in WHM's Feature Manager.\n\nLogin details ${emailResult.ok ? 'were emailed directly to the customer' : `FAILED to send to the customer (${emailResult.reason}) — forward manually`}.`;
+      message += await deployAiDraftIfAny(order, acct);
     } else {
       message += `\n\n--- WHM account creation FAILED (Website Builder) ---\nReason: ${acct.reason}${acct.raw ? `\nDetails: ${JSON.stringify(acct.raw.metadata || acct.raw)}` : ''}\nCreate this account manually in WHM for ${order.domain} on package nadine14_${order.pkg}.`;
     }
@@ -397,6 +419,7 @@ async function notifyOrder(reference, outcome, reason) {
       if (acct.ok) {
         const emailResult = await emailBuilderDetailsToCustomer(order, acct);
         message += `\n\n--- WHM account created automatically (Website Builder) ---\nDomain: ${acct.domain}\nUsername: ${acct.username}\nPassword: ${acct.password}\ncPanel login: https://${acct.domain}:2083\n\nACTION NEEDED: enable the Website Builder feature for this account in WHM's Feature Manager.\n\nLogin details ${emailResult.ok ? 'were emailed directly to the customer' : `FAILED to send to the customer (${emailResult.reason}) — forward manually`}.`;
+        message += await deployAiDraftIfAny(order, acct);
       } else {
         message += `\n\n--- WHM account creation FAILED (Website Builder) ---\nReason: ${acct.reason}${acct.raw ? `\nDetails: ${JSON.stringify(acct.raw.metadata || acct.raw)}` : ''}\nCreate this account manually in WHM for ${order.domain} on package nadine14_${order.pkg}.`;
       }
@@ -507,6 +530,7 @@ async function handleCheckoutInitiate(req, res) {
   const country = typeof parsed.country === 'string' ? parsed.country.trim().toUpperCase().slice(0, 10) : '';
   const period = typeof parsed.period === 'string' ? parsed.period.trim().slice(0, 10) : '';
   const promoCodeInput = typeof parsed.promoCode === 'string' ? parsed.promoCode.trim().slice(0, 40) : '';
+  const draftIdInput = typeof parsed.draftId === 'string' ? parsed.draftId.trim().slice(0, 80) : '';
 
   if (!plan) return sendJson(res, 400, { error: 'Missing plan.' });
   if (!Number.isFinite(amount) || amount <= 0 || amount > 20000) return sendJson(res, 400, { error: 'Invalid amount.' });
@@ -539,6 +563,17 @@ async function handleCheckoutInitiate(req, res) {
   if (type === 'bundle') {
     if (!pkg || !BUILDER_PACKAGES[pkg]) return sendJson(res, 400, { error: 'Missing or invalid bundle package.' });
     if (!domain || !/^[a-z0-9.-]+\.[a-z]{2,}$/.test(domain)) return sendJson(res, 400, { error: 'A valid domain is required for the Launch bundle.' });
+  }
+
+  // The AI-generated draft is optional even on builder/bundle checkouts --
+  // a customer can still buy plain hosting/Launch without ever using the
+  // generator. When a draftId IS given, it must actually resolve to a real
+  // draft, or the customer would pay expecting a site that never deploys.
+  let draftId = null;
+  if (draftIdInput && (type === 'builder' || type === 'bundle')) {
+    const draft = await loadDraft(draftIdInput);
+    if (!draft) return sendJson(res, 400, { error: 'That AI-generated draft could not be found — please regenerate it.' });
+    draftId = draftIdInput;
   }
 
   const needsRegistrant = type === 'domain' || type === 'bundle' || (type === 'hosting' && domainOption === 'new');
@@ -601,6 +636,7 @@ async function handleCheckoutInitiate(req, res) {
     expiresAt: computeExpiryDate(type, period),
     promoCode,
     discountAmount,
+    draftId,
   };
   pendingOrders.set(reference, orderRecord);
   persistOrder(reference, orderRecord);

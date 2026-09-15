@@ -7,6 +7,7 @@ const { handleContact } = require('./contact');
 const { handleSignup, handleLogin, handleLogout, handleMe } = require('./auth');
 const { handleDomainCheck } = require('./namecheap');
 const { startReminderScheduler } = require('./reminders');
+const { handleGenerate, handleRefine, handlePreview, handleExport } = require('./ai-builder');
 
 const ROOT = __dirname;
 const PORT = process.env.PORT || 3000;
@@ -183,6 +184,27 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  if (req.method === 'POST' && urlPath === '/api/ai-builder/generate') {
+    handleGenerate(req, res);
+    return;
+  }
+
+  if (req.method === 'POST' && urlPath === '/api/ai-builder/refine') {
+    handleRefine(req, res);
+    return;
+  }
+
+  if (req.method === 'GET' && urlPath.startsWith('/api/ai-builder/preview/')) {
+    const draftId = decodeURIComponent(urlPath.slice('/api/ai-builder/preview/'.length));
+    handlePreview(req, res, draftId);
+    return;
+  }
+
+  if (req.method === 'GET' && urlPath.startsWith('/api/ai-builder/export/')) {
+    const draftId = decodeURIComponent(urlPath.slice('/api/ai-builder/export/'.length));
+    handleExport(req, res, draftId, new URLSearchParams(req.url.split('?')[1] || ''));
+    return;
+  }
 
   if (req.method === 'POST' && urlPath === '/api/lenco-webhook') {
     mirrorRequestBody(req, '/api/shadow/lenco-webhook');

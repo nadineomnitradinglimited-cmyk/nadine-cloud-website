@@ -73,6 +73,17 @@ async function ensureSchema() {
       auth TEXT NOT NULL,
       created_at TIMESTAMPTZ NOT NULL DEFAULT now()
     );
+    CREATE TABLE IF NOT EXISTS ai_drafts (
+      draft_id TEXT PRIMARY KEY,
+      business_prompt TEXT NOT NULL,
+      conversation JSONB NOT NULL DEFAULT '[]',
+      html TEXT NOT NULL,
+      generation_count INTEGER NOT NULL DEFAULT 1,
+      claimed_email TEXT,
+      deployed_at TIMESTAMPTZ,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+    );
   `).then(async () => {
     // orders existed before these columns did -- ALTER for anyone whose table
     // predates this migration (CREATE TABLE IF NOT EXISTS won't add columns
@@ -84,6 +95,7 @@ async function ensureSchema() {
       ALTER TABLE orders ADD COLUMN IF NOT EXISTS discount_amount NUMERIC NOT NULL DEFAULT 0;
       ALTER TABLE orders ADD COLUMN IF NOT EXISTS reminder_sent_at TIMESTAMPTZ;
       ALTER TABLE orders ADD COLUMN IF NOT EXISTS reminder_count INTEGER NOT NULL DEFAULT 0;
+      ALTER TABLE orders ADD COLUMN IF NOT EXISTS draft_id TEXT;
     `);
     return true;
   });

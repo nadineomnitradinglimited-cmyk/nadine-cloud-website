@@ -52,10 +52,11 @@ export default function Builder() {
             <div>
               <span className="eyebrow">Build from anywhere</span>
               <h2>No designer, no code — just you and your laptop.</h2>
-              <p style={{ color: "var(--text-soft)" }}>
+              <p style={{ color: "var(--text-soft)", marginBottom: 14 }}>
                 Drag, drop and publish from home, the office, or your phone — your site is hosted and live the
                 moment you&apos;re happy with it.
               </p>
+              <a className="btn-ghost" href="/builder/generate">Or describe your business and let AI build the first draft →</a>
             </div>
           </div>
         </div>
