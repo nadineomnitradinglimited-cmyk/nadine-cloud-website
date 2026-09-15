@@ -183,26 +183,6 @@ const server = http.createServer((req, res) => {
     return;
   }
 
-  // Temporary — investigating whether infor@nadinecloud.com can receive
-  // mail. Remove after use.
-  if (req.method === 'GET' && urlPath === '/api/admin/email-check') {
-    if (req.headers['x-admin-secret'] !== process.env.ADMIN_SECRET) {
-      res.writeHead(401); res.end('unauthorized'); return;
-    }
-    (async () => {
-      const { whmRequest } = require('./whm');
-      const domain = new URLSearchParams(req.url.split('?')[1] || '').get('domain') || 'nadinecloud.com';
-      const owner = await whmRequest(`/json-api/domainuserdata?api.version=1&domain=${encodeURIComponent(domain)}`);
-      const user = owner.body && owner.body.data && owner.body.data.userdata && owner.body.data.userdata.user;
-      let pops = null;
-      if (user) {
-        pops = await whmRequest(`/json-api/cpanel?cpanel_jsonapi_user=${encodeURIComponent(user)}&cpanel_jsonapi_apiversion=3&cpanel_jsonapi_module=Email&cpanel_jsonapi_func=list_pops&api.version=1`);
-      }
-      res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ owner: owner.body, resolvedUser: user || null, pops: pops && pops.body }, null, 2));
-    })().catch((err) => { res.writeHead(500); res.end(String(err)); });
-    return;
-  }
 
   if (req.method === 'POST' && urlPath === '/api/lenco-webhook') {
     mirrorRequestBody(req, '/api/shadow/lenco-webhook');
