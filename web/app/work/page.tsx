@@ -55,6 +55,7 @@ export default function Work() {
             <div className="work"><b>Destined for Greatness Ministries</b><span>Church website with live sermon streaming, a media library, and online giving.</span><br /><span className="tag">Church</span></div>
             <div className="work"><b>Chatbot Money Lenders</b><span>Money lending platform website with online loan applications and customer support.</span><br /><span className="tag">Finance</span></div>
             <div className="work"><b>ZMRS</b><span>Corporate website for a mining company.</span><br /><span className="tag">Mining</span></div>
+            <div className="work"><b>Zeton Investments</b><span>Corporate website for a Zambian investment house raising capital and facilitating trade across infrastructure and energy projects.</span><br /><span className="tag">Finance</span></div>
           </div>
         </div>
       </section>
