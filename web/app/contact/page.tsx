@@ -75,9 +75,9 @@ export default function Contact() {
                 <h3>Visit or call</h3>
                 <p><strong>Nadine Cloud</strong><br />A service of Nadine Omni Trading Limited<br />Serving clients worldwide</p>
                 <a className="mono" href="mailto:info@nadinecloud.com">info@nadinecloud.com</a><br />
-                <a className="mono" href="tel:+260770346698">+260 77 034 6698</a>
+                <a className="mono" href="tel:+260964068483">+260 964 068 483</a>
                 <br />
-                <a className="btn-wa" href="https://wa.me/260770346698?text=Hi%20Nadine%20Cloud%2C%20I%27d%20like%20to%20get%20my%20business%20online." target="_blank" rel="noopener">Chat on WhatsApp</a>
+                <a className="btn-wa" href="https://wa.me/260964068483?text=Hi%20Nadine%20Cloud%2C%20I%27d%20like%20to%20get%20my%20business%20online." target="_blank" rel="noopener">Chat on WhatsApp</a>
               </div>
               <div className="contact-card">
                 <h3>How ordering works</h3>

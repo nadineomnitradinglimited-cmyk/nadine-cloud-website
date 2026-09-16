@@ -159,7 +159,7 @@
       }
     } catch (err) {
       typingRow.remove();
-      addMessage('assistant', "Couldn't reach the server — please try WhatsApp at +260 77 034 6698.");
+      addMessage('assistant', "Couldn't reach the server — please try WhatsApp at +260 964 068 483.");
     } finally {
       sending = false;
       input.focus();

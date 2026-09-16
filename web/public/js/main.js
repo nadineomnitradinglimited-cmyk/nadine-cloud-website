@@ -41,7 +41,7 @@ function lookupDomain(){
         if (r.available) {
           const waText = encodeURIComponent('Hi Nadine Cloud, I\'d like to register ' + r.domain);
           return '<span class="ok">✓</span> <strong>' + r.domain + '</strong> is available' + (price ? ' — from ZMW ' + price + '/yr' : '') +
-            ' &nbsp;<a href="https://wa.me/260770346698?text=' + waText + '" target="_blank" rel="noopener" style="color:#7047FF">Register it</a>';
+            ' &nbsp;<a href="https://wa.me/260964068483?text=' + waText + '" target="_blank" rel="noopener" style="color:#7047FF">Register it</a>';
         }
         return '<span style="color:var(--text-mute)">✗ ' + r.domain + ' is already taken</span>';
       });
@@ -51,7 +51,7 @@ function lookupDomain(){
       if (seq !== domainLookupSeq) return;
       const waText = encodeURIComponent('Hi Nadine Cloud, is ' + raw + '.com available to register?');
       out.innerHTML = 'We\'ll confirm if <strong>' + raw + '.com</strong> is available, from ZMW 330/yr' +
-        ' &nbsp;·&nbsp; <a href="https://wa.me/260770346698?text=' + waText + '" target="_blank" rel="noopener" style="color:#7047FF">Ask on WhatsApp</a>' +
+        ' &nbsp;·&nbsp; <a href="https://wa.me/260964068483?text=' + waText + '" target="_blank" rel="noopener" style="color:#7047FF">Ask on WhatsApp</a>' +
         ' &nbsp;·&nbsp; <a href="contact" style="color:#7047FF">Contact form</a>';
     });
 }

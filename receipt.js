@@ -95,7 +95,7 @@ function generateReceiptPdf(order, meta) {
     doc.fillColor(TEXT_SOFT).font('Helvetica-Bold').fontSize(10).text('Thank you for your business.', marginX, footerY + 18);
     doc.fillColor(TEXT_MUTE).font('Helvetica').fontSize(9)
       .text('Nadine Cloud is a service of Nadine Omni Trading Limited.', marginX, footerY + 34)
-      .text('info@nadinecloud.com  ·  +260 77 034 6698  ·  www.nadinecloud.com', marginX, footerY + 48);
+      .text('info@nadinecloud.com  ·  +260 964 068 483  ·  www.nadinecloud.com', marginX, footerY + 48);
 
     doc.end();
   });

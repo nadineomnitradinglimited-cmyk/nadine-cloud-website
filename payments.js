@@ -238,7 +238,7 @@ async function emailAccountDetailsToCustomer(order, acct) {
   const result = await sendEmail({
     to: order.email,
     subject: `Your Nadine Cloud hosting is ready — ${acct.domain}`,
-    text: `Hi ${order.name},\n\nYour hosting account is set up and ready to go.\n\ncPanel login: https://${acct.domain}:2083\nUsername: ${acct.username}\nPassword: ${acct.password}\n\nWe'd recommend logging in and changing your password once you're in.\n\nAny trouble, reach us on WhatsApp at +260 77 034 6698.\n\n— Nadine Cloud`,
+    text: `Hi ${order.name},\n\nYour hosting account is set up and ready to go.\n\ncPanel login: https://${acct.domain}:2083\nUsername: ${acct.username}\nPassword: ${acct.password}\n\nWe'd recommend logging in and changing your password once you're in.\n\nAny trouble, reach us on WhatsApp at +260 964 068 483.\n\n— Nadine Cloud`,
   });
   if (!result.ok) {
     console.error(`Account details email not delivered to customer for ${acct.domain}:`, result.reason);
@@ -250,7 +250,7 @@ async function emailDatabaseDetailsToCustomer(order, acct, maxsql) {
   const result = await sendEmail({
     to: order.email,
     subject: `Your Nadine Cloud database hosting is ready — ${order.plan}`,
-    text: `Hi ${order.name},\n\nYour database hosting account is set up and ready to go.\n\ncPanel login: https://${acct.domain}:2083\nUsername: ${acct.username}\nPassword: ${acct.password}\n\nFrom there, go to MySQL Databases (or PostgreSQL Databases) and use the wizard to create your database(s) — your plan covers up to ${maxsql}. Each database gets its own username/password that your app connects with directly.\n\nWe'd recommend logging in and changing your cPanel password once you're in.\n\nAny trouble, reach us on WhatsApp at +260 77 034 6698.\n\n— Nadine Cloud`,
+    text: `Hi ${order.name},\n\nYour database hosting account is set up and ready to go.\n\ncPanel login: https://${acct.domain}:2083\nUsername: ${acct.username}\nPassword: ${acct.password}\n\nFrom there, go to MySQL Databases (or PostgreSQL Databases) and use the wizard to create your database(s) — your plan covers up to ${maxsql}. Each database gets its own username/password that your app connects with directly.\n\nWe'd recommend logging in and changing your cPanel password once you're in.\n\nAny trouble, reach us on WhatsApp at +260 964 068 483.\n\n— Nadine Cloud`,
   });
   if (!result.ok) {
     console.error(`Database account email not delivered to customer for ${acct.domain}:`, result.reason);
@@ -262,7 +262,7 @@ async function emailWordPressDetailsToCustomer(order, acct) {
   const result = await sendEmail({
     to: order.email,
     subject: `Your Nadine Cloud WordPress hosting is ready — ${acct.domain}`,
-    text: `Hi ${order.name},\n\nYour hosting account is set up.\n\ncPanel login: https://${acct.domain}:2083\nUsername: ${acct.username}\nPassword: ${acct.password}\n\nWe're installing WordPress for you now — you'll get a separate email with your WordPress admin login within a few hours.\n\nWe'd recommend logging in to cPanel and changing your password once you're in.\n\nAny trouble, reach us on WhatsApp at +260 77 034 6698.\n\n— Nadine Cloud`,
+    text: `Hi ${order.name},\n\nYour hosting account is set up.\n\ncPanel login: https://${acct.domain}:2083\nUsername: ${acct.username}\nPassword: ${acct.password}\n\nWe're installing WordPress for you now — you'll get a separate email with your WordPress admin login within a few hours.\n\nWe'd recommend logging in to cPanel and changing your password once you're in.\n\nAny trouble, reach us on WhatsApp at +260 964 068 483.\n\n— Nadine Cloud`,
   });
   if (!result.ok) console.error(`WordPress account email not delivered to customer for ${acct.domain}:`, result.reason);
   return result;
@@ -272,7 +272,7 @@ async function emailBuilderDetailsToCustomer(order, acct) {
   const result = await sendEmail({
     to: order.email,
     subject: `Your Nadine Cloud Website Builder account is ready — ${acct.domain}`,
-    text: `Hi ${order.name},\n\nYour hosting account is set up.\n\ncPanel login: https://${acct.domain}:2083\nUsername: ${acct.username}\nPassword: ${acct.password}\n\nWe're enabling Website Builder for you now — it'll appear in cPanel within a few hours, and you can start building your site right from there.\n\nWe'd recommend logging in and changing your cPanel password once you're in.\n\nAny trouble, reach us on WhatsApp at +260 77 034 6698.\n\n— Nadine Cloud`,
+    text: `Hi ${order.name},\n\nYour hosting account is set up.\n\ncPanel login: https://${acct.domain}:2083\nUsername: ${acct.username}\nPassword: ${acct.password}\n\nWe're enabling Website Builder for you now — it'll appear in cPanel within a few hours, and you can start building your site right from there.\n\nWe'd recommend logging in and changing your cPanel password once you're in.\n\nAny trouble, reach us on WhatsApp at +260 964 068 483.\n\n— Nadine Cloud`,
   });
   if (!result.ok) console.error(`Website Builder account email not delivered to customer for ${acct.domain}:`, result.reason);
   return result;
@@ -282,7 +282,7 @@ async function emailSslOrderConfirmation(order) {
   const result = await sendEmail({
     to: order.email,
     subject: `Your Nadine Cloud SSL certificate order — ${order.domain}`,
-    text: `Hi ${order.name},\n\nThanks for your order — we're setting up your SSL certificate for ${order.domain} now. This can take up to 24 hours depending on the certificate type (Wildcard and Extended Validation need extra verification). We'll email you once it's live on your site.\n\nAny questions, reach us on WhatsApp at +260 77 034 6698.\n\n— Nadine Cloud`,
+    text: `Hi ${order.name},\n\nThanks for your order — we're setting up your SSL certificate for ${order.domain} now. This can take up to 24 hours depending on the certificate type (Wildcard and Extended Validation need extra verification). We'll email you once it's live on your site.\n\nAny questions, reach us on WhatsApp at +260 964 068 483.\n\n— Nadine Cloud`,
   });
   if (!result.ok) console.error(`SSL confirmation email not delivered for ${order.domain}:`, result.reason);
   return result;
@@ -292,7 +292,7 @@ async function emailCarePlanConfirmation(order) {
   const result = await sendEmail({
     to: order.email,
     subject: `Welcome to your Nadine Cloud Care Plan — ${order.plan}`,
-    text: `Hi ${order.name},\n\nThanks for signing up for ${order.plan}. Our team will reach out within 24 hours to onboard your website onto the plan and confirm what we'll need access to.\n\nAny questions in the meantime, reach us on WhatsApp at +260 77 034 6698.\n\n— Nadine Cloud`,
+    text: `Hi ${order.name},\n\nThanks for signing up for ${order.plan}. Our team will reach out within 24 hours to onboard your website onto the plan and confirm what we'll need access to.\n\nAny questions in the meantime, reach us on WhatsApp at +260 964 068 483.\n\n— Nadine Cloud`,
   });
   if (!result.ok) console.error(`Care plan confirmation email not delivered for ${order.email}:`, result.reason);
   return result;

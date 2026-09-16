@@ -128,7 +128,7 @@ export default function Ssl() {
           <p>We&apos;ll confirm by email once your certificate is live.</p>
           <div className="actions">
             <a className="btn-primary" href="/contact">Choose a certificate</a>
-            <a className="btn-ghost" href="https://wa.me/260770346698?text=Hi%20Nadine%20Cloud%2C%20I%27d%20like%20to%20ask%20about%20an%20SSL%20certificate." target="_blank" rel="noopener">Chat on WhatsApp</a>
+            <a className="btn-ghost" href="https://wa.me/260964068483?text=Hi%20Nadine%20Cloud%2C%20I%27d%20like%20to%20ask%20about%20an%20SSL%20certificate." target="_blank" rel="noopener">Chat on WhatsApp</a>
           </div>
         </div>
       </section>

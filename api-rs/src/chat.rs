@@ -65,7 +65,7 @@ const SYSTEM_PROMPT: &str = r#"Your name is Nadine. You are the friendly support
 Only use the facts below when answering. Never invent prices, features or policies that aren't listed here. If someone asks something you don't have facts for (e.g. checking whether a specific domain name is available, order status, technical support for an existing account), say so plainly and point them to WhatsApp or the contact page instead of guessing.
 
 CONTACT
-- WhatsApp / phone: +260 77 034 6698
+- WhatsApp / phone: +260 964 068 483
 - Email: info@nadinecloud.com
 - Contact page: /contact (has a form too)
 
@@ -145,7 +145,7 @@ Terms of service, privacy policy and refund policy are published at /terms, /pri
 HOW TO REPLY
 - Keep answers short — a few sentences, plain text, no markdown headers or bullet-heavy formatting (this renders in a small chat bubble).
 - Be warm and direct, like a helpful local business owner, not a corporate bot.
-- When someone is ready to move forward (order hosting, register a domain, get a website quote), point them to WhatsApp (+260 77 034 6698) or /contact.
+- When someone is ready to move forward (order hosting, register a domain, get a website quote), point them to WhatsApp (+260 964 068 483) or /contact.
 - If asked about anything unrelated to Nadine Cloud's services, politely say that's outside what you can help with here and redirect to what you can do.
 
 HANDING OFF TO A REAL PERSON
@@ -333,7 +333,7 @@ pub async fn handle_chat(
             tracing::error!("ANTHROPIC_API_KEY not configured");
             return (
                 StatusCode::BAD_GATEWAY,
-                Json(json!({"error": "Something went wrong — please try WhatsApp at +260 77 034 6698."})),
+                Json(json!({"error": "Something went wrong — please try WhatsApp at +260 964 068 483."})),
             );
         }
     };
@@ -361,7 +361,7 @@ pub async fn handle_chat(
             tracing::error!("Chat error (request): {err:?}");
             return (
                 StatusCode::BAD_GATEWAY,
-                Json(json!({"error": "Something went wrong — please try WhatsApp at +260 77 034 6698."})),
+                Json(json!({"error": "Something went wrong — please try WhatsApp at +260 964 068 483."})),
             );
         }
     };
@@ -372,7 +372,7 @@ pub async fn handle_chat(
         tracing::error!("Chat error ({status}): {body_text}");
         return (
             StatusCode::BAD_GATEWAY,
-            Json(json!({"error": "Something went wrong — please try WhatsApp at +260 77 034 6698."})),
+            Json(json!({"error": "Something went wrong — please try WhatsApp at +260 964 068 483."})),
         );
     }
 
@@ -382,7 +382,7 @@ pub async fn handle_chat(
             tracing::error!("Chat error (parse): {err}");
             return (
                 StatusCode::BAD_GATEWAY,
-                Json(json!({"error": "Something went wrong — please try WhatsApp at +260 77 034 6698."})),
+                Json(json!({"error": "Something went wrong — please try WhatsApp at +260 964 068 483."})),
             );
         }
     };

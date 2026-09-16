@@ -559,7 +559,7 @@ export default function Home() {
           <p>Tell us what you need — a new website, hosting, or a domain — and we&apos;ll reply the same day.</p>
           <div className="actions">
             <a className="btn-primary" href="/contact">Get a quote</a>
-            <a className="btn-ghost" href="https://wa.me/260770346698?text=Hi%20Nadine%20Cloud%2C%20I%27d%20like%20to%20get%20my%20business%20online." target="_blank" rel="noopener">Chat on WhatsApp</a>
+            <a className="btn-ghost" href="https://wa.me/260964068483?text=Hi%20Nadine%20Cloud%2C%20I%27d%20like%20to%20get%20my%20business%20online." target="_blank" rel="noopener">Chat on WhatsApp</a>
           </div>
         </div>
       </section>

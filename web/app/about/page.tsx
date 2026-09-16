@@ -64,7 +64,7 @@ export default function About() {
               </p>
               <a
                 className="btn-wa"
-                href="https://wa.me/260770346698?text=Hi%20Nadine%20Cloud%2C%20I%27d%20like%20to%20get%20in%20touch."
+                href="https://wa.me/260964068483?text=Hi%20Nadine%20Cloud%2C%20I%27d%20like%20to%20get%20in%20touch."
                 target="_blank"
                 rel="noopener"
               >
@@ -120,7 +120,7 @@ export default function About() {
             <a className="btn-primary" href="/contact">Contact us</a>
             <a
               className="btn-ghost"
-              href="https://wa.me/260770346698?text=Hi%20Nadine%20Cloud%2C%20I%27d%20like%20to%20know%20more%20about%20your%20company."
+              href="https://wa.me/260964068483?text=Hi%20Nadine%20Cloud%2C%20I%27d%20like%20to%20know%20more%20about%20your%20company."
               target="_blank"
               rel="noopener"
             >

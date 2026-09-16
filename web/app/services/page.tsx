@@ -110,7 +110,7 @@ export default function Services() {
           <p>Get a fixed quote for your website within a day — no obligation.</p>
           <div className="actions">
             <a className="btn-primary" href="/contact">Request a quote</a>
-            <a className="btn-ghost" href="https://wa.me/260770346698?text=Hi%20Nadine%20Cloud%2C%20I%27d%20like%20a%20quote%20for%20a%20website." target="_blank" rel="noopener">Chat on WhatsApp</a>
+            <a className="btn-ghost" href="https://wa.me/260964068483?text=Hi%20Nadine%20Cloud%2C%20I%27d%20like%20a%20quote%20for%20a%20website." target="_blank" rel="noopener">Chat on WhatsApp</a>
           </div>
         </div>
       </section>

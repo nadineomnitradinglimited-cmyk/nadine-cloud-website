@@ -140,7 +140,7 @@ export default function Header({
           {!hideTalkToSales && (
             <a
               className="btn-sm ghost"
-              href="https://wa.me/260770346698?text=Hi%20Nadine%20Cloud%2C%20I%27d%20like%20to%20talk%20to%20sales."
+              href="https://wa.me/260964068483?text=Hi%20Nadine%20Cloud%2C%20I%27d%20like%20to%20talk%20to%20sales."
               target="_blank"
               rel="noopener"
             >

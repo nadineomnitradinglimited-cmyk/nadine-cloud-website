@@ -129,7 +129,7 @@ export default function Care() {
           <p>We&apos;ll reach out to onboard you within 24 hours of signing up.</p>
           <div className="actions">
             <a className="btn-primary" href="/contact">Choose a plan</a>
-            <a className="btn-ghost" href="https://wa.me/260770346698?text=Hi%20Nadine%20Cloud%2C%20I%27d%20like%20to%20ask%20about%20a%20Care%20Plan." target="_blank" rel="noopener">Chat on WhatsApp</a>
+            <a className="btn-ghost" href="https://wa.me/260964068483?text=Hi%20Nadine%20Cloud%2C%20I%27d%20like%20to%20ask%20about%20a%20Care%20Plan." target="_blank" rel="noopener">Chat on WhatsApp</a>
           </div>
         </div>
       </section>

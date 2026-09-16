@@ -78,7 +78,7 @@ export default function Marketing() {
           <p>We&apos;ll recommend which of these makes sense for your business and give you a fixed quote.</p>
           <div className="actions">
             <a className="btn-primary" href="/contact">Request a quote</a>
-            <a className="btn-ghost" href="https://wa.me/260770346698?text=Hi%20Nadine%20Cloud%2C%20I%27d%20like%20to%20ask%20about%20marketing%20services." target="_blank" rel="noopener">Chat on WhatsApp</a>
+            <a className="btn-ghost" href="https://wa.me/260964068483?text=Hi%20Nadine%20Cloud%2C%20I%27d%20like%20to%20ask%20about%20marketing%20services." target="_blank" rel="noopener">Chat on WhatsApp</a>
           </div>
         </div>
       </section>

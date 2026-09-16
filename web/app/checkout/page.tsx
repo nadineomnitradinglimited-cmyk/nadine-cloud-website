@@ -138,7 +138,7 @@ export default function Checkout() {
                 <p><strong>1.</strong> Enter your details and submit.</p>
                 <p><strong>2.</strong> Approve the payment prompt sent to your phone.</p>
                 <p><strong>3.</strong> We&apos;ll confirm here and set things up the same day.</p>
-                <p style={{ marginTop: 10 }}>Prefer to pay another way? <a href="/contact" style={{ color: "var(--copper-bright)" }}>Contact us</a> or <a href="https://wa.me/260770346698" target="_blank" rel="noopener" style={{ color: "var(--copper-bright)" }}>WhatsApp</a> instead.</p>
+                <p style={{ marginTop: 10 }}>Prefer to pay another way? <a href="/contact" style={{ color: "var(--copper-bright)" }}>Contact us</a> or <a href="https://wa.me/260964068483" target="_blank" rel="noopener" style={{ color: "var(--copper-bright)" }}>WhatsApp</a> instead.</p>
               </div>
             </div>
           </div>
