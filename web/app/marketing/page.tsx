@@ -48,22 +48,22 @@ export default function Marketing() {
           </div>
           <div className="services-grid">
             <div className="svc" id="seo">
-              <div className="ic"><svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke="#FBA30E" strokeWidth={2}><circle cx={11} cy={11} r={7} /><path d="m21 21-4.3-4.3" /></svg></div>
+              <div className="ic"><svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke="#1769FF" strokeWidth={2}><circle cx={11} cy={11} r={7} /><path d="m21 21-4.3-4.3" /></svg></div>
               <h3>SEO setup &amp; optimization</h3>
               <p>On-page SEO, meta tags, sitemaps and search console setup so your site actually shows up in search results.</p>
             </div>
             <div className="svc" id="social">
-              <div className="ic"><svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke="#FBA30E" strokeWidth={2}><rect x={3} y={3} width={18} height={18} rx={3} /><path d="M8 12h.01M12 12h.01M16 12h.01" /></svg></div>
+              <div className="ic"><svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke="#1769FF" strokeWidth={2}><rect x={3} y={3} width={18} height={18} rx={3} /><path d="M8 12h.01M12 12h.01M16 12h.01" /></svg></div>
               <h3>Social media management</h3>
               <p>We plan and post content on Facebook, Instagram and other platforms to keep your business active and visible.</p>
             </div>
             <div className="svc" id="email-marketing">
-              <div className="ic"><svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke="#FBA30E" strokeWidth={2}><rect x={3} y={5} width={18} height={14} rx={2} /><path d="m3 7 9 6 9-6" /></svg></div>
+              <div className="ic"><svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke="#1769FF" strokeWidth={2}><rect x={3} y={5} width={18} height={14} rx={2} /><path d="m3 7 9 6 9-6" /></svg></div>
               <h3>Email marketing campaigns</h3>
               <p>Newsletters and promotional emails to your customer list, using the business email we already host for you.</p>
             </div>
             <div className="svc" id="ads">
-              <div className="ic"><svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke="#FBA30E" strokeWidth={2}><path d="M3 12h18M12 3v18" /><path d="m17 8 4 4-4 4M7 8l-4 4 4 4" /></svg></div>
+              <div className="ic"><svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke="#1769FF" strokeWidth={2}><path d="M3 12h18M12 3v18" /><path d="m17 8 4 4-4 4M7 8l-4 4 4 4" /></svg></div>
               <h3>Paid ads management</h3>
               <p>Google and Facebook ad campaigns set up, targeted and managed to bring in the customers you&apos;re after.</p>
             </div>

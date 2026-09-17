@@ -48,7 +48,7 @@ export default function Header({
           >
             <path
               d="M22.5 12.2a7.5 7.5 0 0 0-14.6-1.6A6 6 0 0 0 8.5 22.5h13a5.2 5.2 0 0 0 1-10.3Z"
-              stroke="#FBA30E"
+              stroke="#1769FF"
               strokeWidth={2}
               strokeLinecap="round"
               strokeLinejoin="round"
