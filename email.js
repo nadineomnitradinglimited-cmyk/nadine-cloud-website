@@ -45,7 +45,12 @@ async function sendEmail({ subject, text, html, to, attachments, replyTo }) {
 // most modern CSS, so this deliberately uses old-school inline styles and
 // table-free but simple block markup that Gmail/Outlook/Apple Mail all
 // render consistently, rather than the site's real stylesheet.
-function renderEmail({ heading, bodyHtml, ctaText, ctaUrl }) {
+function renderEmail({ heading, bodyHtml, ctaText, ctaUrl, imageUrl, imageAlt }) {
+  const image = imageUrl
+    ? `<div style="text-align:center;margin:24px 0 0">
+        <img src="${imageUrl}" width="456" alt="${imageAlt || ''}" style="width:100%;max-width:456px;height:auto;border:0;border-radius:12px;display:block;margin:0 auto">
+      </div>`
+    : '';
   const cta = ctaText && ctaUrl
     ? `<div style="text-align:center;margin:32px 0 8px">
         <a href="${ctaUrl}" style="display:inline-block;background:#1769FF;color:#ffffff;text-decoration:none;font-family:Arial,Helvetica,sans-serif;font-weight:bold;font-size:15px;padding:14px 32px;border-radius:8px">${ctaText}</a>
@@ -61,6 +66,7 @@ function renderEmail({ heading, bodyHtml, ctaText, ctaUrl }) {
       </div>
       <h1 style="font-family:Arial,Helvetica,sans-serif;font-size:22px;font-weight:800;color:#0B1220;margin:0 0 16px;">${heading}</h1>
       <div style="font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#45566B;">${bodyHtml}</div>
+      ${image}
       ${cta}
     </div>
     <p style="text-align:center;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#78899C;margin-top:24px;">
