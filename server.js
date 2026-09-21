@@ -5,8 +5,8 @@ const { handleChat } = require('./chat');
 const { handleCheckoutInitiate, handleCheckoutStatus, handleLencoWebhook, handleReceiptDownload, handleValidatePromo, handleAdminPromoCodes } = require('./payments');
 const { handleContact } = require('./contact');
 const { handleSignup, handleLogin, handleLogout, handleMe } = require('./auth');
-const { handleDomainCheck } = require('./namecheap');
-const { startReminderScheduler } = require('./reminders');
+const { handleDomainCheck } = require('./registrar');
+const { startReminderScheduler, handleSendReminders } = require('./reminders');
 const { handleGenerate, handleRefine, handlePreview, handleExport } = require('./ai-builder');
 
 const ROOT = __dirname;
@@ -184,6 +184,11 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  if (req.method === 'POST' && urlPath === '/api/admin/send-reminders') {
+    handleSendReminders(req, res);
+    return;
+  }
+
   if (req.method === 'POST' && urlPath === '/api/ai-builder/generate') {
     handleGenerate(req, res);
     return;
@@ -302,6 +307,10 @@ server.listen(PORT, () => {
   console.log(`USE_RUST_API: ${USE_RUST_API} (domain-check, contact, chat -> ${RUST_API_HOST}:${RUST_API_PORT})`);
   console.log(`USE_RUST_AUTH: ${USE_RUST_AUTH} (signup, login, logout, me -> ${RUST_API_HOST}:${RUST_API_PORT})`);
   console.log(`USE_RUST_SHADOW: ${USE_RUST_SHADOW} (checkout, lenco-webhook mirrored, fire-and-forget, to ${RUST_API_HOST}:${RUST_API_PORT})`);
-  startReminderScheduler();
-  console.log('Renewal reminder scheduler started (daily check, first run in 1 minute).');
+  if (process.env.DISABLE_REMINDER_SCHEDULER === 'true') {
+    console.log('Renewal reminder scheduler: off (DISABLE_REMINDER_SCHEDULER=true) -- expecting a cron job to call POST /api/admin/send-reminders.');
+  } else {
+    startReminderScheduler();
+    console.log('Renewal reminder scheduler started (daily check, first run in 1 minute).');
+  }
 });

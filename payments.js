@@ -8,7 +8,7 @@ const SSL_PRODUCTS = new Set(['ssl-standard', 'ssl-wildcard', 'ssl-ev']);
 const CARE_PRODUCTS = new Set(['care-essential', 'care-growth', 'care-premium']);
 const { generateReceiptPdf } = require('./receipt');
 const { isConfigured: dbConfigured, getPool, ensureSchema } = require('./db');
-const { checkAvailability, registerDomain } = require('./namecheap');
+const { checkAvailability, registerDomain, registrarName } = require('./registrar');
 const { loadDraft } = require('./ai-builder');
 const { deployDraftHtml } = require('./ftp-deploy');
 
@@ -189,7 +189,7 @@ function toNamecheapPhone(phoneDigits) {
 // can report success or a clear reason for manual follow-up.
 async function attemptDomainRegistration(order) {
   if (!order.registrant) return { ok: false, reason: 'No registrant contact details on file for this order.' };
-  if (process.env.NAMECHEAP_SANDBOX === 'true') {
+  if (registrarName === 'namecheap' && process.env.NAMECHEAP_SANDBOX === 'true') {
     // Sandbox only ever talks to Namecheap's fake test environment — never
     // let it report a false "registered" success for a real paying customer.
     return { ok: false, reason: 'Namecheap is still in sandbox mode (not yet moved to a funded production account) — register this domain manually on the real Namecheap site and confirm the price with the customer.' };

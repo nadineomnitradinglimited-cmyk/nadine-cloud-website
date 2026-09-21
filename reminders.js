@@ -70,7 +70,8 @@ function buildReminderEmail(order, daysLeft) {
 }
 
 async function sendDueReminders() {
-  if (!dbConfigured()) return;
+  const summary = { due: 0, sent: 0, failed: 0 };
+  if (!dbConfigured()) return summary;
   await ensureSchema();
 
   let rows;
@@ -85,12 +86,14 @@ async function sendDueReminders() {
     rows = result.rows;
   } catch (err) {
     console.error('sendDueReminders query failed:', err);
-    return;
+    summary.failed += 1;
+    return summary;
   }
 
   for (const order of rows) {
     try {
       if (await alreadyRenewed(order)) continue;
+      summary.due += 1;
 
       const daysLeft = daysBetween(new Date(order.expires_at), new Date());
       const { subject, html, text } = buildReminderEmail(order, daysLeft);
@@ -101,12 +104,44 @@ async function sendDueReminders() {
           'UPDATE orders SET reminder_sent_at = now(), reminder_count = reminder_count + 1 WHERE reference = $1',
           [order.reference]
         );
+        summary.sent += 1;
       } else {
+        summary.failed += 1;
         console.error(`Renewal reminder not delivered for ${order.reference}:`, result.reason);
       }
     } catch (err) {
+      summary.failed += 1;
       console.error(`Renewal reminder failed for ${order.reference}:`, err);
     }
+  }
+  return summary;
+}
+
+// For hosts where the app may sleep between visits (cPanel/Passenger): a
+// scheduled job (cron) calls this instead of relying on the in-process timer.
+// Same shared-secret header as the promo-code admin route.
+function isAdminAuthorized(req) {
+  const secret = process.env.ADMIN_SECRET;
+  const given = req.headers['x-admin-secret'];
+  if (!secret || typeof given !== 'string') return false;
+  const a = Buffer.from(given);
+  const b = Buffer.from(secret);
+  return a.length === b.length && require('crypto').timingSafeEqual(a, b);
+}
+
+async function handleSendReminders(req, res) {
+  const send = (status, obj) => {
+    res.writeHead(status, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify(obj));
+  };
+  if (!isAdminAuthorized(req)) return send(401, { error: 'Unauthorized.' });
+  if (!dbConfigured()) return send(503, { error: 'Database not configured.' });
+  try {
+    const summary = await sendDueReminders();
+    send(200, { ok: true, ...summary });
+  } catch (err) {
+    console.error('send-reminders route failed:', err);
+    send(500, { error: 'Could not send reminders.' });
   }
 }
 
@@ -119,4 +154,4 @@ function startReminderScheduler() {
   }, FIRST_RUN_DELAY_MS);
 }
 
-module.exports = { startReminderScheduler, sendDueReminders };
+module.exports = { startReminderScheduler, sendDueReminders, handleSendReminders };
