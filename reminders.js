@@ -54,7 +54,7 @@ function buildReminderEmail(order, daysLeft) {
 
   const html = renderEmail({
     heading,
-    bodyHtml: `<p style="margin:0 0 14px">Hi ${order.name || 'there'},</p><p style="margin:0 0 14px">${dueLine}</p><p style="margin:0">Visit the page below to see current pricing and complete your renewal payment by mobile money.</p>`,
+    bodyHtml: `<p style="margin:0 0 14px">Hi ${order.name || 'there'},</p><p style="margin:0 0 14px">${dueLine}</p><p style="margin:0">Visit the page below to see current pricing and complete your renewal payment by mobile money or card.</p>`,
     ctaText: 'Renew now',
     ctaUrl: renewUrl,
   });

@@ -2,7 +2,7 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const { handleChat } = require('./chat');
-const { handleLipilaWebhook, handleCheckoutInitiate, handleCheckoutStatus, handleLencoWebhook, handleReceiptDownload, handleValidatePromo, handleAdminPromoCodes } = require('./payments');
+const { handleAdminClients, handleLipilaWebhook, handleCheckoutInitiate, handleCheckoutStatus, handleLencoWebhook, handleReceiptDownload, handleValidatePromo, handleAdminPromoCodes } = require('./payments');
 const { handleContact } = require('./contact');
 const { handleSignup, handleLogin, handleLogout, handleMe } = require('./auth');
 const { handleDomainCheck } = require('./registrar');
@@ -181,6 +181,14 @@ const server = http.createServer((req, res) => {
 
   if (urlPath === '/api/admin/promo-codes' && (req.method === 'GET' || req.method === 'POST' || req.method === 'DELETE')) {
     handleAdminPromoCodes(req, res);
+    return;
+  }
+
+  if (urlPath === '/api/admin/clients' && (req.method === 'GET' || req.method === 'POST')) {
+    handleAdminClients(req, res).catch((err) => {
+      console.error('admin clients failed:', err);
+      if (!res.headersSent) { res.writeHead(500, { 'Content-Type': 'application/json' }); res.end('{"error":"Something went wrong."}'); }
+    });
     return;
   }
 

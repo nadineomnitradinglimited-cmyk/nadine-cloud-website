@@ -329,6 +329,23 @@ async function deployAiDraftIfAny(order, acct) {
   return `\n\n--- ACTION NEEDED: AI-generated site deployment FAILED ---\nDraft: ${order.draftId}\nReason: ${deployResult.reason}\nDownload it from /api/ai-builder/export/${order.draftId}?email=${encodeURIComponent(order.email)} and upload it into public_html manually via cPanel File Manager or FTP, then let the customer know.`;
 }
 
+// A payment for a hosting-type product on a domain that already has an earlier PAID order is a
+// renewal: the account already exists, so we must not try to create a second one.
+async function isRenewalOrder(reference, order) {
+  if (!order || !order.domain || !dbConfigured() || !['hosting', 'wordpress', 'builder'].includes(order.type)) return false;
+  try {
+    await ensureSchema();
+    const r = await getPool().query(
+      `SELECT 1 FROM orders WHERE domain = $1 AND type = $2 AND status = 'paid' AND reference <> $3 LIMIT 1`,
+      [order.domain, order.type, reference]
+    );
+    return r.rowCount > 0;
+  } catch (err) {
+    console.error('isRenewalOrder check failed (treating as a new order):', err);
+    return false;
+  }
+}
+
 async function notifyOrder(reference, outcome, reason) {
   if (notified.has(reference)) return;
   notified.add(reference);
@@ -342,9 +359,16 @@ async function notifyOrder(reference, outcome, reason) {
     ? `Plan: ${order.plan}\nAmount: ZMW ${order.amount}\nCustomer: ${order.name} <${order.email}>\nPhone: ${order.phone}\nDomain requested: ${order.domain || '-'}${domainOptionLine}\nReference: ${reference}\nStatus: ${outcome}${reasonLine}`
     : `Reference: ${reference}\nStatus: ${outcome}${reasonLine}\n(No local order details — server likely restarted since checkout started; check the Lenco dashboard for this reference.)`;
 
+  const renewal = outcome === 'paid' && await isRenewalOrder(reference, order);
+
   // On a successful hosting payment for a domain the customer already owns,
   // provision the real cPanel account automatically.
-  if (outcome === 'paid' && order && order.type === 'hosting' && order.pkg && order.domain && order.domainOption !== 'new') {
+  if (renewal) {
+    message += `
+
+--- RENEWAL: ${order.domain} already has an account, nothing was created ---
+The customer paid to keep ${order.plan} running. Their end date was extended by this payment.`;
+  } else if (outcome === 'paid' && order && order.type === 'hosting' && order.pkg && order.domain && order.domainOption !== 'new') {
     const acct = await createAccount({ domain: order.domain, pkgSlug: order.pkg, contactemail: order.email });
     if (acct.ok) {
       const emailResult = await emailAccountDetailsToCustomer(order, acct);
@@ -853,6 +877,58 @@ async function handleAdminPromoCodes(req, res) {
   }
 }
 
+// Admin only: add a client that Nadine Cloud set up by hand (no checkout), so they get the same
+// renewal reminders as everyone else. GET lists every order with an end date.
+async function handleAdminClients(req, res) {
+  if (!isAdminAuthorized(req)) return sendJson(res, 401, { error: 'Unauthorized.' });
+  if (!dbConfigured()) return sendJson(res, 503, { error: 'Database not configured.' });
+  await ensureSchema();
+
+  if (req.method === 'GET') {
+    const result = await getPool().query(
+      `SELECT reference, plan, amount, type, pkg, domain, email, status, created_at, expires_at, reminder_count
+       FROM orders WHERE expires_at IS NOT NULL ORDER BY expires_at ASC LIMIT 200`
+    );
+    return sendJson(res, 200, { orders: result.rows });
+  }
+
+  let parsed;
+  try {
+    parsed = JSON.parse(await readBody(req, 2000));
+  } catch {
+    return sendJson(res, 400, { error: 'Invalid request.' });
+  }
+  const email = typeof parsed.email === 'string' ? parsed.email.trim().toLowerCase().slice(0, 200) : '';
+  const plan = typeof parsed.plan === 'string' ? parsed.plan.trim().slice(0, 120) : '';
+  const type = typeof parsed.type === 'string' ? parsed.type.trim().slice(0, 30) : 'hosting';
+  const pkg = typeof parsed.pkg === 'string' ? parsed.pkg.trim().toLowerCase().slice(0, 40) : null;
+  const domain = typeof parsed.domain === 'string' ? parsed.domain.trim().toLowerCase().replace(/^https?:\/\//, '').replace(/\/.*$/, '').slice(0, 255) : null;
+  const amount = Number(parsed.amount);
+  const months = parsed.months == null ? 1 : Number(parsed.months);
+  const start = parsed.startDate ? new Date(parsed.startDate) : new Date();
+
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return sendJson(res, 400, { error: 'A valid customer email is required.' });
+  if (!plan) return sendJson(res, 400, { error: 'A plan name is required.' });
+  if (!Number.isFinite(amount) || amount <= 0) return sendJson(res, 400, { error: 'A positive amount is required.' });
+  if (!Number.isInteger(months) || months < 1 || months > 36) return sendJson(res, 400, { error: 'months must be a whole number from 1 to 36.' });
+  if (Number.isNaN(start.getTime())) return sendJson(res, 400, { error: 'startDate is not a valid date.' });
+
+  const expires = new Date(start);
+  expires.setMonth(expires.getMonth() + months);
+  const reference = 'MAN-' + Date.now() + '-' + crypto.randomBytes(3).toString('hex');
+  try {
+    await getPool().query(
+      `INSERT INTO orders (reference, plan, amount, type, pkg, domain, email, status, created_at, paid_at, period, expires_at)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, 'paid', $8, $8, $9, $10)`,
+      [reference, plan, amount, type, pkg, domain, email, start, months === 1 ? 'mo' : null, expires]
+    );
+    sendJson(res, 200, { ok: true, reference, expires_at: expires.toISOString() });
+  } catch (err) {
+    console.error('Add client failed:', err);
+    sendJson(res, 500, { error: 'Could not save that client.' });
+  }
+}
+
 async function handleLencoWebhook(req, res) {
   let raw;
   try {
@@ -924,4 +1000,4 @@ async function handleLipilaWebhook(req, res) {
   sendJson(res, 200, { received: true });
 }
 
-module.exports = { handleLipilaWebhook, handleCheckoutInitiate, handleCheckoutStatus, handleLencoWebhook, handleReceiptDownload, handleValidatePromo, handleAdminPromoCodes };
+module.exports = { handleAdminClients, handleLipilaWebhook, handleCheckoutInitiate, handleCheckoutStatus, handleLencoWebhook, handleReceiptDownload, handleValidatePromo, handleAdminPromoCodes };
