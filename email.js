@@ -41,32 +41,40 @@ async function sendEmail({ subject, text, html, to, attachments, replyTo }) {
   }
 }
 
+// The blue button on its own, for emails that want it higher up than the bottom
+// (put it inside bodyHtml and leave ctaText/ctaUrl empty).
+function renderButton(text, url) {
+  return `<div style="text-align:center;margin:26px 0 22px">
+        <a href="${url}" style="display:inline-block;background:#1769FF;color:#ffffff;text-decoration:none;font-family:Arial,Helvetica,sans-serif;font-weight:bold;font-size:15px;padding:14px 32px;border-radius:8px">${text}</a>
+      </div>`;
+}
+
 // Shared branded template for customer-facing emails. Email clients strip
 // most modern CSS, so this deliberately uses old-school inline styles and
 // table-free but simple block markup that Gmail/Outlook/Apple Mail all
 // render consistently, rather than the site's real stylesheet.
-function renderEmail({ heading, bodyHtml, ctaText, ctaUrl, imageUrl, imageAlt }) {
+// imageUrl adds a picture; imageFirst puts it at the very top instead of under the message
+// (the picture then replaces the small logo, so the logo is not shown twice).
+// headingSerif uses an elegant serif for the heading (Georgia is installed on every phone/computer;
+// web fonts are stripped by Gmail/Outlook, so an email-safe font is the reliable choice).
+function renderEmail({ heading, bodyHtml, ctaText, ctaUrl, imageUrl, imageAlt, imageFirst, headingSerif }) {
   const image = imageUrl
-    ? `<div style="text-align:center;margin:24px 0 0">
+    ? `<div style="text-align:center;margin:${imageFirst ? '0 0 22px' : '24px 0 0'}">
         <img src="${imageUrl}" width="456" alt="${imageAlt || ''}" style="width:100%;max-width:456px;height:auto;border:0;border-radius:12px;display:block;margin:0 auto">
       </div>`
     : '';
-  const cta = ctaText && ctaUrl
-    ? `<div style="text-align:center;margin:32px 0 8px">
-        <a href="${ctaUrl}" style="display:inline-block;background:#1769FF;color:#ffffff;text-decoration:none;font-family:Arial,Helvetica,sans-serif;font-weight:bold;font-size:15px;padding:14px 32px;border-radius:8px">${ctaText}</a>
-      </div>`
-    : '';
+  const cta = ctaText && ctaUrl ? renderButton(ctaText, ctaUrl) : '';
   return `<!doctype html>
 <html>
 <body style="margin:0;padding:0;background:#F0F3F8;font-family:Arial,Helvetica,sans-serif;">
   <div style="max-width:520px;margin:0 auto;padding:32px 16px;">
     <div style="background:#ffffff;border-radius:16px;padding:32px;box-shadow:0 1px 2px rgba(11,18,32,.05);">
-      <div style="text-align:center;margin:0 0 20px;">
+      ${imageUrl && imageFirst ? image : `<div style="text-align:center;margin:0 0 20px;">
         <img src="https://www.nadinecloud.com/assets/email-logo.png" width="200" alt="Nadine Cloud" style="width:200px;max-width:100%;height:auto;border:0;outline:none;text-decoration:none;font-family:Arial,Helvetica,sans-serif;font-weight:800;font-size:20px;color:#0B1220;">
-      </div>
-      <h1 style="font-family:Arial,Helvetica,sans-serif;font-size:22px;font-weight:800;color:#0B1220;margin:0 0 16px;">${heading}</h1>
+      </div>`}
+      <h1 style="${headingSerif ? "font-family:Georgia,'Times New Roman',Times,serif;font-size:28px;font-weight:bold;line-height:1.25;letter-spacing:-0.2px;text-align:center;" : "font-family:Arial,Helvetica,sans-serif;font-size:22px;font-weight:800;"}color:#0B1220;margin:0 0 16px;">${heading}</h1>
       <div style="font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#45566B;">${bodyHtml}</div>
-      ${image}
+      ${imageFirst ? '' : image}
       ${cta}
     </div>
     <p style="text-align:center;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#78899C;margin-top:24px;">
@@ -78,4 +86,4 @@ function renderEmail({ heading, bodyHtml, ctaText, ctaUrl, imageUrl, imageAlt })
 </html>`;
 }
 
-module.exports = { sendEmail, renderEmail };
+module.exports = { sendEmail, renderEmail, renderButton };

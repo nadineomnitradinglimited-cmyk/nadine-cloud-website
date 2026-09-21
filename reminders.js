@@ -41,7 +41,10 @@ async function alreadyRenewed(order) {
 
 function buildReminderEmail(order, daysLeft) {
   const page = RENEWAL_PAGE[order.type] || '/contact';
-  const renewUrl = `${SITE_URL}${page}`;
+  // Clients we host by hand pay through a personal link that already knows their plan and amount.
+  const renewUrl = order.type === 'managed'
+    ? `${SITE_URL}/checkout/?type=managed&client=${encodeURIComponent(order.reference)}&plan=${encodeURIComponent(order.plan)}&amount=${encodeURIComponent(Number(order.amount))}&period=mo`
+    : `${SITE_URL}${page}`;
   const overdue = daysLeft < 0;
   const heading = overdue
     ? `${order.plan} is overdue for renewal`

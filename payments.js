@@ -22,13 +22,14 @@ async function persistOrder(reference, order) {
   if (!dbConfigured()) return;
   try {
     await ensureSchema();
-    const userResult = await getPool().query('SELECT id FROM users WHERE email = $1', [order.email]);
+    const ownerEmail = order.recordEmail || order.email; // managed clients: the email their record is kept under
+    const userResult = await getPool().query('SELECT id FROM users WHERE email = $1', [ownerEmail]);
     const userId = userResult.rows[0] ? userResult.rows[0].id : null;
     await getPool().query(
       `INSERT INTO orders (reference, user_id, plan, amount, type, pkg, domain, domain_option, email, status, period, expires_at, promo_code, discount_amount, draft_id)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 'pending', $10, $11, $12, $13, $14)
        ON CONFLICT (reference) DO NOTHING`,
-      [reference, userId, order.plan, order.amount, order.type, order.pkg, order.domain, order.domainOption, order.email,
+      [reference, userId, order.plan, order.amount, order.type, order.pkg, order.domain, order.domainOption, ownerEmail,
        order.period || null, order.expiresAt || null, order.promoCode || null, order.discountAmount || 0, order.draftId || null]
     );
   } catch (err) {
@@ -329,6 +330,28 @@ async function deployAiDraftIfAny(order, acct) {
   return `\n\n--- ACTION NEEDED: AI-generated site deployment FAILED ---\nDraft: ${order.draftId}\nReason: ${deployResult.reason}\nDownload it from /api/ai-builder/export/${order.draftId}?email=${encodeURIComponent(order.email)} and upload it into public_html manually via cPanel File Manager or FTP, then let the customer know.`;
 }
 
+// Clients Nadine Cloud hosts by hand pay a fixed monthly amount through a personal link
+// (/checkout/?type=managed&client=<reference>). The amount, plan and next due date always come from
+// their record in the database, never from the browser.
+async function lookupManagedClient(ref) {
+  if (!/^[A-Za-z0-9._-]{1,80}$/.test(ref || '') || !dbConfigured()) return null;
+  try {
+    await ensureSchema();
+    const r = await getPool().query(
+      `SELECT plan, amount, email, expires_at FROM orders WHERE reference = $1 AND type = 'managed' AND status = 'paid'`,
+      [ref]
+    );
+    const row = r.rows[0];
+    if (!row) return null;
+    const next = new Date(row.expires_at || Date.now());
+    next.setMonth(next.getMonth() + 1); // keep the same day of the month every month
+    return { plan: row.plan, amount: Number(row.amount), email: row.email, nextExpiry: next };
+  } catch (err) {
+    console.error('lookupManagedClient failed:', err);
+    return null;
+  }
+}
+
 // A payment for a hosting-type product on a domain that already has an earlier PAID order is a
 // renewal: the account already exists, so we must not try to create a second one.
 async function isRenewalOrder(reference, order) {
@@ -454,6 +477,13 @@ The customer paid to keep ${order.plan} running. Their end date was extended by 
     }
   }
 
+  if (outcome === 'paid' && order && order.type === 'managed') {
+    message += `
+
+--- Managed client payment received ---
+Nothing to set up: this client's hosting is looked after by hand. Their next payment date moved forward by one month.`;
+  }
+
   if (order && outcome === 'paid') {
     order.paidAt = Date.now();
     if (order.promoCode) await redeemPromoCode(order.promoCode);
@@ -539,7 +569,8 @@ async function handleCheckoutInitiate(req, res) {
     return;
   }
 
-  const plan = typeof parsed.plan === 'string' ? parsed.plan.trim().slice(0, 120) : '';
+  let plan = typeof parsed.plan === 'string' ? parsed.plan.trim().slice(0, 120) : '';
+  const clientRef = typeof parsed.clientRef === 'string' ? parsed.clientRef.trim().slice(0, 80) : '';
   const amount = Number(parsed.amount);
   const name = typeof parsed.name === 'string' ? parsed.name.trim().slice(0, 120) : '';
   const email = typeof parsed.email === 'string' ? parsed.email.trim().slice(0, 200) : '';
@@ -618,15 +649,23 @@ async function handleCheckoutInitiate(req, res) {
 
   // Never trust the amount sent by the browser: check it against the real list price
   // (a domain is priced from the registrar's live price) before any payment is started.
-  const priceCheck = await checkPrice({ type, pkg, period, plan, domain, amount });
-  if (!priceCheck.ok) {
-    console.warn(`Checkout price rejected: type=${type} pkg=${pkg} period=${period} amount=${amount} expected=${priceCheck.expected ?? 'n/a'}`);
-    return sendJson(res, 400, { error: priceCheck.error });
+  let managed = null;
+  if (type === 'managed') {
+    managed = await lookupManagedClient(clientRef);
+    if (!managed) return sendJson(res, 400, { error: 'This payment link is not valid. Please use the link in your latest email from us, or message us on WhatsApp.' });
+    if (Math.abs(amount - managed.amount) > 0.009) return sendJson(res, 400, { error: 'That amount does not match your agreed monthly payment.' });
+    plan = managed.plan;
+  } else {
+    const priceCheck = await checkPrice({ type, pkg, period, plan, domain, amount });
+    if (!priceCheck.ok) {
+      console.warn(`Checkout price rejected: type=${type} pkg=${pkg} period=${period} amount=${amount} expected=${priceCheck.expected ?? 'n/a'}`);
+      return sendJson(res, 400, { error: priceCheck.error });
+    }
   }
 
   let discountAmount = 0;
   let promoCode = null;
-  if (promoCodeInput) {
+  if (promoCodeInput && !managed) {
     const promo = await validatePromoCode(promoCodeInput, amount);
     if (!promo.ok) return sendJson(res, 400, { error: promo.reason });
     discountAmount = promo.discountAmount;
@@ -642,8 +681,9 @@ async function handleCheckoutInitiate(req, res) {
     domainOption: type === 'hosting' ? domainOption : null,
     registrant: needsRegistrant ? { address1, city, stateProvince, postalCode, country } : null,
     createdAt: Date.now(),
-    period: period || null,
-    expiresAt: computeExpiryDate(type, period),
+    period: managed ? 'mo' : (period || null),
+    expiresAt: managed ? managed.nextExpiry : computeExpiryDate(type, period),
+    recordEmail: managed ? managed.email : null,
     promoCode,
     discountAmount,
     draftId,
@@ -906,15 +946,18 @@ async function handleAdminClients(req, res) {
   const amount = Number(parsed.amount);
   const months = parsed.months == null ? 1 : Number(parsed.months);
   const start = parsed.startDate ? new Date(parsed.startDate) : new Date();
+  const explicitExpiry = parsed.expiresAt ? new Date(parsed.expiresAt) : null;
 
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return sendJson(res, 400, { error: 'A valid customer email is required.' });
   if (!plan) return sendJson(res, 400, { error: 'A plan name is required.' });
   if (!Number.isFinite(amount) || amount <= 0) return sendJson(res, 400, { error: 'A positive amount is required.' });
   if (!Number.isInteger(months) || months < 1 || months > 36) return sendJson(res, 400, { error: 'months must be a whole number from 1 to 36.' });
   if (Number.isNaN(start.getTime())) return sendJson(res, 400, { error: 'startDate is not a valid date.' });
+  if (explicitExpiry && Number.isNaN(explicitExpiry.getTime())) return sendJson(res, 400, { error: 'expiresAt is not a valid date.' });
 
-  const expires = new Date(start);
-  expires.setMonth(expires.getMonth() + months);
+  // expiresAt sets the due date directly (e.g. "the 19th"); otherwise it is startDate plus `months`.
+  const expires = explicitExpiry || new Date(start);
+  if (!explicitExpiry) expires.setMonth(expires.getMonth() + months);
   const reference = 'MAN-' + Date.now() + '-' + crypto.randomBytes(3).toString('hex');
   try {
     await getPool().query(

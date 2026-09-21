@@ -8,6 +8,7 @@
   const type = params.get('type') || '';
   const pkg = params.get('pkg') || '';
   const draftId = params.get('draftId') || '';
+  const clientRef = params.get('client') || ''; // personal payment link of a client we host by hand
   const PERIOD_LABEL = { mo: '/month', '6mo': '/6 months', yr: '/year', '2yr': '/2 years', '3yr': '/3 years' };
   const PERIOD_BILLED = {
     mo: 'Billed monthly. ',
@@ -310,6 +311,7 @@
       pkg,
       period,
       draftId,
+      clientRef,
       promoCode: appliedPromo ? appliedPromo.code : '',
       domain: fd.get('domain') || '',
       domainOption: type === 'hosting' ? (fd.get('domainOption') || 'existing') : '',
