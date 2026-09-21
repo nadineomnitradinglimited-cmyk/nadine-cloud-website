@@ -22,8 +22,7 @@ export default function Footer({ productsExtra = [], supportLinks = DEFAULT_SUPP
             <h4>Nadine Cloud</h4>
             <p>
               Web design, cloud hosting, domains and business email for
-              businesses worldwide. A service of Nadine Omni Trading
-              Limited.
+              businesses worldwide.
             </p>
             <p style={{ marginTop: 14 }}>
               <a

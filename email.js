@@ -78,7 +78,7 @@ function renderEmail({ heading, bodyHtml, ctaText, ctaUrl, imageUrl, imageAlt, i
       ${cta}
     </div>
     <p style="text-align:center;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#78899C;margin-top:24px;">
-      Nadine Cloud — a service of Nadine Omni Trading Limited<br>
+      Nadine Cloud<br>
       Questions? <a href="https://wa.me/260964068483" style="color:#1769FF;">Message us on WhatsApp</a>
     </p>
   </div>

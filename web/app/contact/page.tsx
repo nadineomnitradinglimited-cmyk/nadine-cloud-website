@@ -73,7 +73,7 @@ export default function Contact() {
             <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
               <div className="contact-card">
                 <h3>Visit or call</h3>
-                <p><strong>Nadine Cloud</strong><br />A service of Nadine Omni Trading Limited<br />Serving clients worldwide</p>
+                <p><strong>Nadine Cloud</strong><br />Serving clients worldwide</p>
                 <a className="mono" href="mailto:info@nadinecloud.com">info@nadinecloud.com</a><br />
                 <a className="mono" href="tel:+260964068483">+260 964 068 483</a>
                 <br />

@@ -35,7 +35,7 @@ export default function About() {
         <div className="wrap page-hero-inner">
           <span className="eyebrow">About us</span>
           <h1>One team, everything your business needs online.</h1>
-          <p>Nadine Cloud is a service of Nadine Omni Trading Limited — we design, host and support websites for businesses worldwide, so you never have to juggle separate providers for your site, your domain, your email and your hosting.</p>
+          <p>Nadine Cloud designs, hosts and supports websites for businesses worldwide, so you never have to juggle separate providers for your site, your domain, your email and your hosting.</p>
         </div>
       </section>
 
