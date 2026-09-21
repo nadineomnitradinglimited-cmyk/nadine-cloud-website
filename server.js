@@ -2,7 +2,7 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const { handleChat } = require('./chat');
-const { handleCheckoutInitiate, handleCheckoutStatus, handleLencoWebhook, handleReceiptDownload, handleValidatePromo, handleAdminPromoCodes } = require('./payments');
+const { handleLipilaWebhook, handleCheckoutInitiate, handleCheckoutStatus, handleLencoWebhook, handleReceiptDownload, handleValidatePromo, handleAdminPromoCodes } = require('./payments');
 const { handleContact } = require('./contact');
 const { handleSignup, handleLogin, handleLogout, handleMe } = require('./auth');
 const { handleDomainCheck } = require('./registrar');
@@ -208,6 +208,11 @@ const server = http.createServer((req, res) => {
   if (req.method === 'GET' && urlPath.startsWith('/api/ai-builder/export/')) {
     const draftId = decodeURIComponent(urlPath.slice('/api/ai-builder/export/'.length));
     handleExport(req, res, draftId, new URLSearchParams(req.url.split('?')[1] || ''));
+    return;
+  }
+
+  if (req.method === 'POST' && urlPath === '/api/lipila-webhook') {
+    handleLipilaWebhook(req, res);
     return;
   }
 

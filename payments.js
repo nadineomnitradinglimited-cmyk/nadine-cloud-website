@@ -10,6 +10,7 @@ const { generateReceiptPdf } = require('./receipt');
 const { isConfigured: dbConfigured, getPool, ensureSchema } = require('./db');
 const { checkAvailability, registerDomain, registrarName } = require('./registrar');
 const { checkPrice } = require('./pricing');
+const lipila = require('./lipila');
 const { loadDraft } = require('./ai-builder');
 const { deployDraftHtml } = require('./ftp-deploy');
 
@@ -520,6 +521,7 @@ async function handleCheckoutInitiate(req, res) {
   const email = typeof parsed.email === 'string' ? parsed.email.trim().slice(0, 200) : '';
   const phoneDigits = typeof parsed.phone === 'string' ? parsed.phone.replace(/[^\d+]/g, '').slice(0, 20) : '';
   const operator = typeof parsed.operator === 'string' ? parsed.operator.toLowerCase().trim() : '';
+  const isCard = parsed.method === 'card';
   const domain = typeof parsed.domain === 'string' ? parsed.domain.trim().toLowerCase().replace(/^https?:\/\//, '').replace(/\/.*$/, '').slice(0, 255) : '';
   const type = typeof parsed.type === 'string' ? parsed.type.trim().slice(0, 30) : '';
   const pkg = typeof parsed.pkg === 'string' ? parsed.pkg.trim().toLowerCase() : '';
@@ -537,8 +539,13 @@ async function handleCheckoutInitiate(req, res) {
   if (!Number.isFinite(amount) || amount <= 0 || amount > 20000) return sendJson(res, 400, { error: 'Invalid amount.' });
   if (!name) return sendJson(res, 400, { error: 'Name is required.' });
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return sendJson(res, 400, { error: 'A valid email is required.' });
-  if (phoneDigits.length < 9) return sendJson(res, 400, { error: 'A valid mobile money phone number is required.' });
-  if (!OPERATORS.has(operator)) return sendJson(res, 400, { error: 'Select MTN, Airtel or Zamtel.' });
+  if (phoneDigits.length < 9) return sendJson(res, 400, { error: isCard ? 'A valid phone number is required.' : 'A valid mobile money phone number is required.' });
+  if (isCard) {
+    if (!lipila.isConfigured()) return sendJson(res, 503, { error: 'Card payment isn’t switched on yet — please use mobile money, WhatsApp or the contact form.' });
+    if (!address1 || !city || !postalCode || !country || country === 'OTHER') {
+      return sendJson(res, 400, { error: 'Please fill in your billing address (street, city, postal code and country) for card payment.' });
+    }
+  } else if (!OPERATORS.has(operator)) return sendJson(res, 400, { error: 'Select MTN, Airtel or Zamtel.' });
   if (type === 'hosting') {
     if (!pkg || !HOSTING_PACKAGES[pkg]) return sendJson(res, 400, { error: 'Missing or invalid hosting package.' });
     if (!domain || !/^[a-z0-9.-]+\.[a-z]{2,}$/.test(domain)) return sendJson(res, 400, { error: 'A valid domain is required to set up hosting.' });
@@ -603,7 +610,50 @@ async function handleCheckoutInitiate(req, res) {
   }
   const chargeAmount = Math.round((amount - discountAmount) * 100) / 100;
 
-  const reference = genReference();
+  const reference = isCard ? genReference().replace(/^NC-/, 'NCC-') : genReference();
+
+  const newOrderRecord = () => ({
+    plan, amount: chargeAmount, name, email, phone: phoneDigits,
+    domain: domain || null, type: type || null, pkg: pkg || null,
+    domainOption: type === 'hosting' ? domainOption : null,
+    registrant: needsRegistrant ? { address1, city, stateProvince, postalCode, country } : null,
+    createdAt: Date.now(),
+    period: period || null,
+    expiresAt: computeExpiryDate(type, period),
+    promoCode,
+    discountAmount,
+    draftId,
+    method: isCard ? 'card' : 'mobile-money',
+  });
+
+  // Card: send the customer to Lipila's hosted card page. Nothing is provisioned here -
+  // that only happens when Lipila itself confirms the payment (status check or webhook).
+  if (isCard) {
+    const site = (process.env.PUBLIC_SITE_URL || 'https://www.nadinecloud.com').replace(/\/+$/, '');
+    const [firstName, ...rest] = name.split(/\s+/);
+    const orderRecord = newOrderRecord();
+    pendingOrders.set(reference, orderRecord);
+    const card = await lipila.createCardPayment({
+      reference,
+      amount: chargeAmount,
+      currency: 'ZMW',
+      narration: `Nadine Cloud - ${plan}`.slice(0, 100),
+      customer: {
+        firstName, lastName: rest.join(' ') || '-', phoneNumber: phoneDigits, email,
+        city, country, address: address1, zip: postalCode,
+      },
+      backUrl: `${site}/checkout/?ref=${encodeURIComponent(reference)}`,
+      callbackUrl: `${site}/api/lipila-webhook`,
+    });
+    if (!card.ok) {
+      pendingOrders.delete(reference);
+      sendJson(res, 502, { error: 'Could not start the card payment — please try again, use mobile money, or message us on WhatsApp.' });
+      return;
+    }
+    persistOrder(reference, orderRecord);
+    sendJson(res, 200, { reference, redirectUrl: card.redirectUrl });
+    return;
+  }
 
   let lenco;
   try {
@@ -635,28 +685,49 @@ async function handleCheckoutInitiate(req, res) {
     return;
   }
 
-  const orderRecord = {
-    plan, amount: chargeAmount, name, email, phone: phoneDigits,
-    domain: domain || null, type: type || null, pkg: pkg || null,
-    domainOption: type === 'hosting' ? domainOption : null,
-    registrant: needsRegistrant ? { address1, city, stateProvince, postalCode, country } : null,
-    createdAt: Date.now(),
-    period: period || null,
-    expiresAt: computeExpiryDate(type, period),
-    promoCode,
-    discountAmount,
-    draftId,
-  };
+  const orderRecord = newOrderRecord();
   pendingOrders.set(reference, orderRecord);
   persistOrder(reference, orderRecord);
 
   sendJson(res, 200, { reference, status: lenco.body.data.status });
 }
 
+// Asks Lipila for the real state of a card payment and, when it is really paid, runs the normal
+// order fulfilment once (notifyOrder is idempotent). Used by the status poll and the webhook.
+async function resolveCardPayment(reference) {
+  const order = pendingOrders.get(reference);
+  const r = await lipila.checkStatus(reference);
+  if (r.error) return { error: r.error };
+  if (r.status === 'successful') {
+    const wrongRef = r.referenceId && r.referenceId !== reference;
+    const wrongAmount = order && typeof r.amount === 'number' && r.amount + 0.01 < order.amount;
+    const wrongCurrency = r.currency && r.currency.toUpperCase() !== 'ZMW';
+    if (wrongRef || wrongAmount || wrongCurrency) {
+      console.error(`Card payment ${reference} does not match the order (ref ${r.referenceId}, amount ${r.amount} ${r.currency}) - not provisioning`);
+      notifyOrder(reference, 'needs-review', `Lipila reports ${r.amount} ${r.currency || ''} for reference ${r.referenceId || reference}, which does not match the order. Nothing was set up - check it in the Lipila dashboard.`).catch(() => {});
+      return { status: 'pending' };
+    }
+    notifyOrder(reference, 'paid').catch(() => {});
+    return { status: 'successful' };
+  }
+  if (r.status === 'failed') {
+    console.error(`Card checkout ${reference} failed:`, r.message || '(no reason given)');
+    return { status: 'failed', reason: r.message };
+  }
+  return { status: 'pending' };
+}
+
 async function handleCheckoutStatus(req, res, reference) {
   if (!/^[A-Za-z0-9._-]{1,80}$/.test(reference || '')) {
     sendJson(res, 400, { error: 'Invalid reference.' });
     return;
+  }
+
+  // Card payments (references start NCC-) are confirmed with Lipila, never by what the browser says.
+  if (reference.startsWith('NCC-')) {
+    const result = await resolveCardPayment(reference);
+    if (result.error) return sendJson(res, 502, { error: 'Could not check payment status.' });
+    return sendJson(res, 200, { status: result.status, reason: result.reason || null });
   }
 
   let lenco;
@@ -831,4 +902,26 @@ async function handleLencoWebhook(req, res) {
   sendJson(res, 200, { received: true });
 }
 
-module.exports = { handleCheckoutInitiate, handleCheckoutStatus, handleLencoWebhook, handleReceiptDownload, handleValidatePromo, handleAdminPromoCodes };
+// Lipila calls this when a card payment finishes (even if the customer closes the page). The body is
+// NOT trusted: it is only used to learn which reference to check, and the real result comes from
+// asking Lipila directly with our API key.
+async function handleLipilaWebhook(req, res) {
+  let raw;
+  try {
+    raw = await readBody(req, 20000);
+  } catch {
+    res.writeHead(413);
+    res.end();
+    return;
+  }
+  let event = null;
+  try { event = JSON.parse(raw); } catch { /* ignore */ }
+  const src = event && (event.data && typeof event.data === 'object' ? event.data : event);
+  const reference = src && typeof src.referenceId === 'string' ? src.referenceId : '';
+  if (/^NCC-[A-Za-z0-9-]{1,70}$/.test(reference) && pendingOrders.has(reference)) {
+    await resolveCardPayment(reference).catch((err) => console.error('Lipila webhook check failed:', err));
+  }
+  sendJson(res, 200, { received: true });
+}
+
+module.exports = { handleLipilaWebhook, handleCheckoutInitiate, handleCheckoutStatus, handleLencoWebhook, handleReceiptDownload, handleValidatePromo, handleAdminPromoCodes };

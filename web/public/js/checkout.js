@@ -24,7 +24,7 @@
   document.getElementById('ckAmountLabel').textContent = Number.isFinite(amount) ? ('ZMW ' + amount.toLocaleString()) : 'now';
   const billingNote = document.getElementById('ckBillingNote');
   if (billingNote) {
-    billingNote.textContent = PERIOD_BILLED[period] + "Card payments aren't available yet — mobile money only for now.";
+    billingNote.textContent = PERIOD_BILLED[period] + 'Pay by mobile money or by card (Visa / Mastercard).';
   }
 
   // Promo codes: the amount actually charged is always re-derived
@@ -96,10 +96,46 @@
   const domainNewNote = document.getElementById('domainNewNote');
   const registrantFields = document.getElementById('registrantFields');
 
-  function setRegistrantRequired(required){
-    registrantFields.hidden = !required;
-    registrantFields.querySelectorAll('input').forEach((el) => { el.required = required; });
+  // The address block is needed for a new domain registration and also for a card payment
+  // (the card page asks for a billing address).
+  let domainNeedsRegistrant = false;
+  let payMethod = 'mobile-money';
+
+  function refreshRegistrant(){
+    const card = payMethod === 'card';
+    const need = domainNeedsRegistrant || card;
+    registrantFields.hidden = !need;
+    registrantFields.querySelectorAll('input').forEach((el) => {
+      el.required = need && (domainNeedsRegistrant || el.name !== 'stateProvince');
+    });
   }
+
+  function setRegistrantRequired(required){
+    domainNeedsRegistrant = required;
+    refreshRegistrant();
+  }
+
+  const operatorField = document.getElementById('operatorField');
+  const operatorSelect = operatorField ? operatorField.querySelector('select') : null;
+  const phoneLabelText = document.getElementById('phoneLabelText');
+  const cardNote = document.getElementById('cardNote');
+  function applyMethod(){
+    payMethod = (document.querySelector('input[name="payMethod"]:checked') || {}).value || 'mobile-money';
+    const card = payMethod === 'card';
+    if (operatorField) operatorField.hidden = card;
+    if (operatorSelect) operatorSelect.required = !card;
+    if (phoneLabelText) phoneLabelText.textContent = card ? 'Phone number' : 'Mobile money phone number';
+    if (cardNote) cardNote.hidden = !card;
+    submitBtnLabel();
+    refreshRegistrant();
+  }
+  function submitBtnLabel(){
+    const el = document.getElementById('ckSubmit');
+    if (el) el.firstChild.textContent = payMethod === 'card' ? 'Pay by card ' : 'Pay ';
+  }
+  const payMethodGroup = document.getElementById('payMethodGroup');
+  if (payMethodGroup) payMethodGroup.addEventListener('change', applyMethod);
+  applyMethod();
 
   // Any hosting plan includes a free .com domain when billed annually or
   // longer. Monthly signups -- including Avara's ZMW 50 first-month intro
@@ -165,16 +201,56 @@
     return !domainConfirmField.hidden ? a && a === b : true;
   }
 
+  const statusEl = document.getElementById('ckStatus');
+  const submitBtn = document.getElementById('ckSubmit');
+  let polling = null;
+
+  // Coming back from the card page: the address is ?ref=<reference>. Ask the server (which asks Lipila)
+  // whether the payment went through.
+  const returnRef = params.get('ref');
+  if (returnRef && /^NCC-[A-Za-z0-9-]{1,70}$/.test(returnRef)) {
+    Array.from(form.children).forEach((c) => { if (c.id !== 'ckStatus') c.hidden = true; });
+    document.getElementById('ckPlanTitle').textContent = 'Confirming your card payment';
+    document.getElementById('ckPlanSub').textContent = 'One moment while we check with the payment provider.';
+    document.getElementById('ckSummaryPlan').textContent = 'Card payment';
+    document.getElementById('ckSummaryAmount').textContent = 'Checking…';
+    statusEl.textContent = 'Checking your payment…';
+    statusEl.className = 'form-status';
+    let tries = 0;
+    const check = () => {
+      tries++;
+      fetch('/api/checkout/status/' + encodeURIComponent(returnRef))
+        .then((r) => r.json())
+        .then((data) => {
+          if (data.status === 'successful') {
+            clearInterval(polling);
+            statusEl.className = 'form-status ok';
+            statusEl.innerHTML = "Payment received! We'll set things up and confirm by email shortly. " +
+              '<a href="/api/checkout/receipt/' + encodeURIComponent(returnRef) + '" style="color:var(--copper);font-weight:600">Download your receipt (PDF)</a>';
+            document.getElementById('ckSummaryAmount').textContent = 'Paid';
+          } else if (data.status === 'failed') {
+            clearInterval(polling);
+            statusEl.className = 'form-status err';
+            statusEl.innerHTML = 'The card payment did not go through' + (data.reason ? ' (' + data.reason.replace(/[<>&]/g, '') + ')' : '') + '. You were not charged. <a href="/hosting/" style="color:var(--copper);font-weight:600">Start again</a> or message us on WhatsApp.';
+            document.getElementById('ckSummaryAmount').textContent = 'Not paid';
+          } else if (tries >= 40) {
+            clearInterval(polling);
+            statusEl.textContent = "We haven't received confirmation yet. If your card was charged, don't worry — we'll email you as soon as it clears.";
+          }
+        })
+        .catch(() => {});
+    };
+    polling = setInterval(check, 3000);
+    check();
+    return;
+  }
+
   if (!Number.isFinite(amount) || amount <= 0) {
     document.getElementById('ckSubmit').disabled = true;
     document.getElementById('ckStatus').textContent = 'Missing order details — please go back and pick a plan again.';
     document.getElementById('ckStatus').classList.add('err');
     return;
   }
-
-  const statusEl = document.getElementById('ckStatus');
-  const submitBtn = document.getElementById('ckSubmit');
-  let polling = null;
 
   function setStatus(text, cls){
     statusEl.textContent = text;
@@ -240,7 +316,8 @@
       name: fd.get('name'),
       email: fd.get('email'),
       phone: fd.get('phone'),
-      operator: fd.get('operator'),
+      method: payMethod,
+      operator: payMethod === 'card' ? '' : fd.get('operator'),
       address1: fd.get('address1') || '',
       city: fd.get('city') || '',
       stateProvince: fd.get('stateProvince') || '',
@@ -258,6 +335,11 @@
         if (!ok) {
           setStatus(data.error || 'Something went wrong starting the payment.', 'err');
           submitBtn.disabled = false;
+          return;
+        }
+        if (data.redirectUrl) {
+          setStatus('Taking you to the secure card page…', '');
+          window.location.href = data.redirectUrl;
           return;
         }
         setStatus('Check your phone for a payment prompt and approve it…', '');

@@ -5,7 +5,7 @@ import Footer from "../components/Footer";
 
 export const metadata: Metadata = {
   title: "Checkout — Nadine Cloud",
-  description: "Pay for your Nadine Cloud hosting, domain or email plan by mobile money.",
+  description: "Pay for your Nadine Cloud hosting, domain or email plan by mobile money or card.",
   robots: { index: false },
   alternates: { canonical: "https://www.nadinecloud.com/checkout" },
 };
@@ -19,7 +19,7 @@ export default function Checkout() {
         <div className="wrap page-hero-inner">
           <span className="eyebrow">Checkout</span>
           <h1 id="ckPlanTitle">Complete your order</h1>
-          <p id="ckPlanSub">Pay by mobile money — MTN, Airtel or Zamtel.</p>
+          <p id="ckPlanSub">Pay by mobile money (MTN, Airtel, Zamtel) or by card (Visa / Mastercard).</p>
         </div>
       </section>
 
@@ -35,10 +35,10 @@ export default function Checkout() {
             </div>
             <div>
               <span className="eyebrow">Simple &amp; secure</span>
-              <h2>Pay in a minute, from your phone.</h2>
+              <h2>Pay in a minute — mobile money or card.</h2>
               <p style={{ color: "var(--text-soft)" }}>
-                Enter your details below, approve the prompt sent to your phone, and you&apos;re done — no card
-                needed, no account to create first.
+                Enter your details below, then either approve the prompt sent to your phone or pay on the secure
+                card page — no account to create first.
               </p>
             </div>
           </div>
@@ -49,8 +49,13 @@ export default function Checkout() {
         <div className="wrap">
           <div className="contact-grid">
             <div className="contact-card">
-              <h3>Pay with mobile money</h3>
+              <h3>Your details</h3>
               <form id="checkoutForm" className="contact-form">
+                <div id="payMethodGroup" className="radio-group">
+                  <span className="radio-group-label">How would you like to pay?</span>
+                  <label className="radio-inline"><input type="radio" name="payMethod" value="mobile-money" defaultChecked /> Mobile money (MTN, Airtel, Zamtel)</label>
+                  <label className="radio-inline"><input type="radio" name="payMethod" value="card" /> Card (Visa / Mastercard)</label>
+                </div>
                 <label>Full name
                   <input type="text" name="name" required maxLength={120} />
                 </label>
@@ -104,7 +109,7 @@ export default function Checkout() {
                     </select>
                   </label>
                 </div>
-                <label>Mobile money network
+                <label id="operatorField">Mobile money network
                   <select name="operator" required defaultValue="">
                     <option value="">Select network</option>
                     <option value="mtn">MTN Mobile Money</option>
@@ -112,7 +117,7 @@ export default function Checkout() {
                     <option value="zamtel">Zamtel Kwacha</option>
                   </select>
                 </label>
-                <label>Mobile money phone number
+                <label><span id="phoneLabelText">Mobile money phone number</span>
                   <input type="tel" name="phone" required placeholder="09XXXXXXXX" maxLength={20} />
                 </label>
                 <label>Promo code (optional)
@@ -122,6 +127,7 @@ export default function Checkout() {
                   </div>
                 </label>
                 <p id="promoStatus" className="form-status" role="status" aria-live="polite"></p>
+                <p id="cardNote" className="form-status" hidden style={{ margin: "0 0 4px", color: "var(--text-mute)" }}>You&apos;ll be taken to a secure card page to enter your card details — we never see or store your card number.</p>
                 <button type="submit" className="btn-primary" id="ckSubmit">Pay <span id="ckAmountLabel">now</span></button>
                 <p id="ckStatus" className="form-status" role="status" aria-live="polite"></p>
               </form>
@@ -131,12 +137,12 @@ export default function Checkout() {
                 <h3>Order summary</h3>
                 <p><strong id="ckSummaryPlan">—</strong></p>
                 <p id="ckSummaryAmount" style={{ fontFamily: "var(--mono)", fontSize: 22, color: "var(--cloud)" }}>—</p>
-                <p style={{ fontSize: 13.5, color: "var(--text-mute)" }} id="ckBillingNote">Card payments aren&apos;t available yet — mobile money only for now.</p>
+                <p style={{ fontSize: 13.5, color: "var(--text-mute)" }} id="ckBillingNote">Pay by mobile money or by card (Visa / Mastercard).</p>
               </div>
               <div className="contact-card">
                 <h3>How it works</h3>
                 <p><strong>1.</strong> Enter your details and submit.</p>
-                <p><strong>2.</strong> Approve the payment prompt sent to your phone.</p>
+                <p><strong>2.</strong> Approve the prompt on your phone, or enter your card on the secure card page.</p>
                 <p><strong>3.</strong> We&apos;ll confirm here and set things up the same day.</p>
                 <p style={{ marginTop: 10 }}>Prefer to pay another way? <a href="/contact" style={{ color: "var(--copper-bright)" }}>Contact us</a> or <a href="https://wa.me/260964068483" target="_blank" rel="noopener" style={{ color: "var(--copper-bright)" }}>WhatsApp</a> instead.</p>
               </div>
