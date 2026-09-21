@@ -83,9 +83,9 @@ deploy_site() {
   NAME=nadinecloud; REPO_PATH=nadineomnitradinglimited-cmyk/nadine-cloud-website; BRANCH=deploy; PRIVATE=0
   APP_DIR=$HOME_DIR/nodeapp; NPM_DIR=$APP_DIR; LOCK_FILE=package-lock.json
   NODE=$HOME_DIR/nodevenv/nodeapp/24/bin/node; VENV=$HOME_DIR/nodevenv/nodeapp/24/bin/activate
-  SYNC_FILES="server.js auth.js ai-builder.js chat.js contact.js db.js email.js ftp-deploy.js namecheap.js namecom.js payments.js pricing.js receipt.js registrar.js reminders.js whm.js package.json package-lock.json"
+  SYNC_FILES="server.js auth.js ai-builder.js chat.js contact.js db.js email.js ftp-deploy.js namecheap.js namecom.js lipila.js payments.js pricing.js receipt.js registrar.js reminders.js whm.js package.json package-lock.json"
   SYNC_DIRS_REPLACE=""; SYNC_MAP="site:$HOME_DIR/public_html"
-  CHECK_JS="server.js auth.js payments.js pricing.js registrar.js namecom.js reminders.js"
+  CHECK_JS="server.js auth.js lipila.js payments.js pricing.js registrar.js namecom.js reminders.js"
   REQUIRED="server.js payments.js pricing.js package.json package-lock.json site/index.html"
   BACKUP_PATHS="$SYNC_FILES"; RESTART_FILE=$APP_DIR/tmp/restart.txt
   deploy_site

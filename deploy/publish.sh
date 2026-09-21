@@ -12,7 +12,7 @@ set -e
 
 ROOT=$(git rev-parse --show-toplevel)
 cd "$ROOT"
-FILES="server.js auth.js ai-builder.js chat.js contact.js db.js email.js ftp-deploy.js namecheap.js namecom.js payments.js pricing.js receipt.js registrar.js reminders.js whm.js package.json package-lock.json"
+FILES="server.js auth.js ai-builder.js chat.js contact.js db.js email.js ftp-deploy.js namecheap.js namecom.js lipila.js payments.js pricing.js receipt.js registrar.js reminders.js whm.js package.json package-lock.json"
 
 echo "[deploy] checking the backend files..."
 for f in $FILES; do
