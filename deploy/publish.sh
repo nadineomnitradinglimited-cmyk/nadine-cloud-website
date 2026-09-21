@@ -18,6 +18,8 @@ echo "[deploy] checking the backend files..."
 for f in $FILES; do
   case "$f" in *.js) node --check "$f" ;; esac
 done
+bash -n deploy/nc-autodeploy.sh
+for c in deploy/sites.d/*.conf; do bash -n "$c"; done
 
 echo "[deploy] building the website pages..."
 ( cd web && BUILD_TARGET=static npx next build > /tmp/nc-next-build.log 2>&1 ) || { echo "[deploy] the website build FAILED - see /tmp/nc-next-build.log. Nothing was published."; exit 1; }
@@ -26,6 +28,15 @@ test -f web/out/index.html
 TMP=$(mktemp -d)
 for f in $FILES; do cp "$f" "$TMP/"; done
 cp -R web/out "$TMP/site"
+
+# The auto-deploy script itself and the other sites' settings travel with this branch.
+# tr -d '\015' removes Windows carriage returns so the files run on the Linux server.
+tr -d '\015' < deploy/nc-autodeploy.sh > "$TMP/nc-autodeploy.sh"
+mkdir "$TMP/sites.d"
+for c in deploy/sites.d/*.conf; do
+  tr -d '\015' < "$c" > "$TMP/sites.d/$(basename "$c")"
+done
+
 SHA=$(git rev-parse HEAD)
 echo "Built from $SHA at $(date -u +%FT%TZ)" > "$TMP/VERSION"
 
