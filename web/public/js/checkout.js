@@ -169,6 +169,11 @@
     domainConfirmField.hidden = false;
     domainConfirmField.querySelector('input').required = true;
     setRegistrantRequired(true);
+    const wantedDomain = (params.get('domain') || '').trim().toLowerCase();
+    if (/^[a-z0-9-]+(\.[a-z0-9-]+)+$/.test(wantedDomain)) {
+      domainField.querySelector('input').value = wantedDomain;
+      domainConfirmField.querySelector('input').value = wantedDomain;
+    }
     document.getElementById('ckPlanSub').textContent = "Tell us the domain you want — we'll confirm the exact price if it differs.";
   } else if (type === 'hosting') {
     domainChoice.hidden = false;

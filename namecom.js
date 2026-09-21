@@ -147,6 +147,12 @@ async function handleDomainCheck(req, res, urlParams) {
 
   try {
     const results = await checkAvailability(TLDS.map((tld) => `${name}.${tld}`));
+    // ZMW quote = registrar price x today's rate, rounded up: the same figure pricing.js checks at checkout.
+    // (required lazily: pricing.js itself requires the registrar)
+    const rate = await require('./pricing').usdToZmw();
+    for (const r of results) {
+      if (r.available && !r.isPremium && typeof r.price === 'number') r.priceZmw = Math.ceil(r.price * rate);
+    }
     sendJson(res, 200, { results });
   } catch (err) {
     console.error('Name.com domain check error:', err);

@@ -150,7 +150,7 @@ export default function Hosting() {
               <div className="other-billing"></div>
             </div>
           </div>
-          <p className="pricing-note">* Prices shown are the total for the selected billing period, charged once at checkout. Pay by mobile money, or bank transfer on request — card payments coming soon.</p>
+          <p className="pricing-note">* Prices shown are the total for the selected billing period, charged once at checkout. Pay by mobile money or card (Visa / Mastercard), or ask us for a bank transfer.</p>
         </div>
       </section>
 
@@ -254,7 +254,7 @@ export default function Hosting() {
             </details>
             <details className="faq-item">
               <summary>What payment methods do you accept?</summary>
-              <p>Mobile money (MTN, Airtel, Zamtel) at checkout, or bank transfer on request — card payments are coming soon. Hosting can be billed monthly, or every 6 months, 1, 2 or 3 years for a bigger discount — pick your billing period above the plans.</p>
+              <p>Pay at checkout by mobile money (MTN, Airtel, Zamtel) or card (Visa / Mastercard), or ask us for a bank transfer. Hosting can be billed monthly, or every 6 months, 1, 2 or 3 years for a bigger discount — pick your billing period above the plans.</p>
             </details>
             <details className="faq-item">
               <summary>What happens if my site goes down?</summary>

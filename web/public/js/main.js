@@ -54,8 +54,12 @@ function lookupDomain(){
               priceText += ' <span style="color:var(--text-mute)">(renews at ' + usd(r.renewalPrice + DOMAIN_MARKUP_USD) + '/yr)</span>';
             }
           }
-          return '<span class="ok">✓</span> <strong>' + r.domain + '</strong> is available' + priceText +
-            ' &nbsp;<a href="https://wa.me/260964068483?text=' + waText + '" target="_blank" rel="noopener" style="color:#7047FF">Register it</a>';
+          // Normal domains go straight to checkout with the server's ZMW quote. Premium or unquoted ones still go to WhatsApp.
+          const action = typeof r.priceZmw === 'number'
+            ? '<a href="/checkout?type=domain&plan=' + encodeURIComponent(r.domain + ' registration') + '&amount=' + r.priceZmw +
+              '&domain=' + encodeURIComponent(r.domain) + '" style="color:#7047FF;font-weight:600">Register it</a>'
+            : '<a href="https://wa.me/260964068483?text=' + waText + '" target="_blank" rel="noopener" style="color:#7047FF">Ask us to register it</a>';
+          return '<span class="ok">✓</span> <strong>' + r.domain + '</strong> is available' + priceText + ' &nbsp;' + action;
         }
         return '<span style="color:var(--text-mute)">✗ ' + r.domain + ' is already taken</span>';
       });

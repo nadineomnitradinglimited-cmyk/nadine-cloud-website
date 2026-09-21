@@ -111,4 +111,4 @@ async function checkPrice({ type, pkg, period, plan, domain, amount }) {
   }
 }
 
-module.exports = { checkPrice, hostingExpected, PERIODS, HOSTING };
+module.exports = { checkPrice, hostingExpected, usdToZmw, PERIODS, HOSTING };

@@ -502,8 +502,8 @@ export default function Home() {
             <span className="tech-badge payment-badge" style={{ borderColor: "rgba(255,204,0,.4)" }}><img src="/assets/mtn-momo.png" alt="" width={20} height={20} style={{ borderRadius: 5 }} />MTN Mobile Money</span>
             <span className="tech-badge payment-badge" style={{ borderColor: "rgba(237,28,36,.4)" }}><img src="/assets/airtel-money.png" alt="" width={20} height={20} style={{ borderRadius: 5 }} />Airtel Money</span>
             <span className="tech-badge payment-badge" style={{ borderColor: "rgba(0,166,81,.4)" }}><img src="/assets/zamtel-money.png" alt="" width={20} height={20} style={{ borderRadius: "50%" }} />Zamtel Kwacha</span>
-            <span className="tech-badge payment-badge" style={{ opacity: 0.6 }}><svg viewBox="0 0 24 24"><circle cx="9" cy="12" r="7" fill="#EB001B" /><circle cx="15" cy="12" r="7" fill="#F79E1B" fillOpacity="0.85" /></svg>Mastercard — coming soon</span>
-            <span className="tech-badge payment-badge" style={{ opacity: 0.6 }}><span style={{ fontFamily: "Georgia, serif", fontStyle: "italic", fontWeight: 800, color: "#1A1F71", fontSize: 15, letterSpacing: "-0.02em" }}>VISA</span> — coming soon</span>
+            <span className="tech-badge payment-badge"><svg viewBox="0 0 24 24"><circle cx="9" cy="12" r="7" fill="#EB001B" /><circle cx="15" cy="12" r="7" fill="#F79E1B" fillOpacity="0.85" /></svg>Mastercard</span>
+            <span className="tech-badge payment-badge"><span style={{ fontFamily: "Georgia, serif", fontStyle: "italic", fontWeight: 800, color: "#1A1F71", fontSize: 15, letterSpacing: "-0.02em" }}>VISA</span></span>
           </div>
         </div>
       </section>

@@ -120,7 +120,7 @@ export default function WordPress() {
             </details>
             <details className="faq-item">
               <summary>What payment methods do you accept?</summary>
-              <p>Mobile money (MTN, Airtel, Zamtel) at checkout, or bank transfer on request — card payments are coming soon. WordPress hosting is billed monthly.</p>
+              <p>Pay at checkout by mobile money (MTN, Airtel, Zamtel) or card (Visa / Mastercard), or ask us for a bank transfer. WordPress hosting is billed monthly.</p>
             </details>
           </div>
         </div>

@@ -134,7 +134,7 @@ DOMAIN REGISTRATION (annual, ZMW, "from" prices — exact price depends on the s
 Nadine Cloud can also transfer in domains registered elsewhere.
 
 PAYMENT
-Mobile money (MTN, Airtel, Zamtel) at checkout, or bank transfer on request. Card payments are coming soon, not available yet. Hosting billing period (Monthly/6 Months/1 Year/2 Years/3 Years) is chosen with a selector above the plans on the hosting page — longer periods get a bigger discount (10/15/20/25%), charged as one upfront total, not per month. Domains and standalone email are billed annually. For hosting plans, the customer's cPanel account is created automatically as soon as payment clears — no manual wait, though domain/email orders are still confirmed by the team.
+Mobile money (MTN, Airtel, Zamtel) or card (Visa / Mastercard) at checkout, or bank transfer on request. Hosting billing period (Monthly/6 Months/1 Year/2 Years/3 Years) is chosen with a selector above the plans on the hosting page — longer periods get a bigger discount (10/15/20/25%), charged as one upfront total, not per month. Domains and standalone email are billed annually. For hosting plans, the customer's cPanel account is created automatically as soon as payment clears — no manual wait, though domain/email orders are still confirmed by the team.
 
 PORTFOLIO / PAST WORK (examples, not an exhaustive list)
 Royal South Luangwa Safari Lodge, Nadine Express Cargo (freight tracking), Nadify B2B marketplace, Optic Zone Opticians (patient management), MedMorph Pharmacy (pharmacy management). Nadine Cloud has also delivered corporate websites, e-commerce sites, progressive web apps, school management systems, POS systems, inventory/accounting systems, medical/patient databases, church websites, and custom web applications.

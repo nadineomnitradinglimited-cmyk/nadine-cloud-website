@@ -46,7 +46,7 @@ export default function Domains() {
           <div className="section-head">
             <span className="eyebrow">Check availability</span>
             <h2>Find your domain name</h2>
-            <p>Search a name below, then contact us to register it — we&apos;ll set up the DNS, email and hosting together.</p>
+            <p>Search a name below and register it online — we&apos;ll set up the DNS, email and hosting with you.</p>
           </div>
           <InlineDomainSearch />
         </div>
@@ -57,7 +57,7 @@ export default function Domains() {
           <div className="section-head">
             <span className="eyebrow">Domain pricing</span>
             <h2>Pick your extension</h2>
-            <p>Prices shown in your local currency where available. Final price depends on the exact domain — message us to confirm.</p>
+            <p>Prices shown in your local currency where available. The exact price for your name is shown when you search.</p>
           </div>
           <div className="tld-cards">
             <div className="tld-card">
@@ -65,19 +65,19 @@ export default function Domains() {
               <span className="ext">.com</span>
               <span className="tagline">The classic choice — instantly recognized, trusted by customers everywhere.</span>
               <div className="price"><span className="from">From</span> <span className="amt amt-live" data-zmw="330">ZMW 330</span> <span className="per">/yr</span><small className="price-note" hidden></small></div>
-              <a className="cta" href="/checkout?type=domain&plan=.com+domain+registration&amount=330">Register</a>
+              <a className="cta" href="#domains">Search a name</a>
             </div>
             <div className="tld-card">
               <span className="ext">.org</span>
               <span className="tagline">The domain for causes, communities and non-profits.</span>
               <div className="price"><span className="from">From</span> <span className="amt amt-live" data-zmw="315">ZMW 315</span> <span className="per">/yr</span><small className="price-note" hidden></small></div>
-              <a className="cta" href="/checkout?type=domain&plan=.org+domain+registration&amount=315">Register</a>
+              <a className="cta" href="#domains">Search a name</a>
             </div>
             <div className="tld-card">
               <span className="ext">.net</span>
               <span className="tagline">A trusted alternative when the .com you want is taken.</span>
               <div className="price"><span className="from">From</span> <span className="amt amt-live" data-zmw="315">ZMW 315</span> <span className="per">/yr</span><small className="price-note" hidden></small></div>
-              <a className="cta" href="/checkout?type=domain&plan=.net+domain+registration&amount=315">Register</a>
+              <a className="cta" href="#domains">Search a name</a>
             </div>
           </div>
         </div>
