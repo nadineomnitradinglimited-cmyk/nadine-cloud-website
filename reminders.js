@@ -43,7 +43,7 @@ function buildReminderEmail(order, daysLeft) {
   const page = RENEWAL_PAGE[order.type] || '/contact';
   // Clients we host by hand pay through a personal link that already knows their plan and amount.
   const renewUrl = order.type === 'managed'
-    ? `${SITE_URL}/checkout/?type=managed&client=${encodeURIComponent(order.reference)}&plan=${encodeURIComponent(order.plan)}&amount=${encodeURIComponent(Number(order.amount))}&period=mo`
+    ? `${SITE_URL}/checkout/?type=managed&client=${encodeURIComponent(order.reference)}&plan=${encodeURIComponent(order.plan)}&amount=${encodeURIComponent(Number(order.amount))}&period=${order.period === 'yr' ? 'yr' : 'mo'}`
     : `${SITE_URL}${page}`;
   const overdue = daysLeft < 0;
   const heading = overdue
@@ -98,7 +98,7 @@ async function lookupDomainExpiry(domain) {
 async function buildWelcomeEmail(o) {
   const per = o.period === 'mo' ? ' per month' : o.period === 'yr' ? ' per year' : '';
   const again = o.period === 'mo' ? ', then the same day every month' : o.period === 'yr' ? ', then the same day every year' : '';
-  const payUrl = `${SITE_URL}/checkout/?type=managed&client=${encodeURIComponent(o.reference)}&plan=${encodeURIComponent(o.plan)}&amount=${encodeURIComponent(Number(o.amount))}&period=mo`;
+  const payUrl = `${SITE_URL}/checkout/?type=managed&client=${encodeURIComponent(o.reference)}&plan=${encodeURIComponent(o.plan)}&amount=${encodeURIComponent(Number(o.amount))}&period=${o.period === 'yr' ? 'yr' : 'mo'}`;
   const domainExpiry = await lookupDomainExpiry(o.domain);
   const rows = [
     o.domain ? ['Website', o.domain] : null,
@@ -261,4 +261,4 @@ function startReminderScheduler() {
   }, FIRST_RUN_DELAY_MS);
 }
 
-module.exports = { startReminderScheduler, sendDueReminders, handleSendReminders };
+module.exports = { startReminderScheduler, sendDueReminders, handleSendReminders, buildWelcomeEmail };

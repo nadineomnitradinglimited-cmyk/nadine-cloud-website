@@ -338,14 +338,15 @@ async function lookupManagedClient(ref) {
   try {
     await ensureSchema();
     const r = await getPool().query(
-      `SELECT plan, amount, email, expires_at FROM orders WHERE reference = $1 AND type = 'managed' AND status = 'paid'`,
+      `SELECT plan, amount, email, expires_at, period FROM orders WHERE reference = $1 AND type = 'managed' AND status = 'paid'`,
       [ref]
     );
     const row = r.rows[0];
     if (!row) return null;
+    const period = row.period === 'yr' ? 'yr' : 'mo';
     const next = new Date(row.expires_at || Date.now());
-    next.setMonth(next.getMonth() + 1); // keep the same day of the month every month
-    return { plan: row.plan, amount: Number(row.amount), email: row.email, nextExpiry: next };
+    next.setMonth(next.getMonth() + (period === 'yr' ? 12 : 1)); // keep the same day every month / every year
+    return { plan: row.plan, amount: Number(row.amount), email: row.email, nextExpiry: next, period };
   } catch (err) {
     console.error('lookupManagedClient failed:', err);
     return null;
@@ -681,7 +682,7 @@ async function handleCheckoutInitiate(req, res) {
     domainOption: type === 'hosting' ? domainOption : null,
     registrant: needsRegistrant ? { address1, city, stateProvince, postalCode, country } : null,
     createdAt: Date.now(),
-    period: managed ? 'mo' : (period || null),
+    period: managed ? managed.period : (period || null),
     expiresAt: managed ? managed.nextExpiry : computeExpiryDate(type, period),
     recordEmail: managed ? managed.email : null,
     promoCode,
@@ -963,7 +964,7 @@ async function handleAdminClients(req, res) {
     await getPool().query(
       `INSERT INTO orders (reference, plan, amount, type, pkg, domain, email, status, created_at, paid_at, period, expires_at)
        VALUES ($1, $2, $3, $4, $5, $6, $7, 'paid', $8, $8, $9, $10)`,
-      [reference, plan, amount, type, pkg, domain, email, start, months === 1 ? 'mo' : null, expires]
+      [reference, plan, amount, type, pkg, domain, email, start, months === 1 ? 'mo' : months === 12 ? 'yr' : null, expires]
     );
     sendJson(res, 200, { ok: true, reference, expires_at: expires.toISOString() });
   } catch (err) {
