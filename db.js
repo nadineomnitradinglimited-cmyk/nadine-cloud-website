@@ -97,6 +97,9 @@ async function ensureSchema() {
       ALTER TABLE orders ADD COLUMN IF NOT EXISTS reminder_count INTEGER NOT NULL DEFAULT 0;
       ALTER TABLE orders ADD COLUMN IF NOT EXISTS draft_id TEXT;
     `);
+    // Kept separate: if this one ever fails, it must not take the rest of the site down with it.
+    await getPool().query('ALTER TABLE orders ADD COLUMN IF NOT EXISTS welcome_sent_at TIMESTAMPTZ')
+      .catch((err) => console.error('Could not add orders.welcome_sent_at (welcome emails will wait):', err.message));
     return true;
   });
   return schemaReady;

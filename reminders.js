@@ -1,4 +1,4 @@
-const { sendEmail, renderEmail } = require('./email');
+const { sendEmail, renderEmail, renderButton } = require('./email');
 const { isConfigured: dbConfigured, getPool, ensureSchema } = require('./db');
 
 // Which page shows the current, correct renewal price for each product --
@@ -57,8 +57,8 @@ function buildReminderEmail(order, daysLeft) {
 
   const html = renderEmail({
     heading,
-    bodyHtml: `<p style="margin:0 0 14px">Hi ${order.name || 'there'},</p><p style="margin:0 0 14px">${dueLine}</p><p style="margin:0">Visit the page below to see current pricing and complete your renewal payment by mobile money or card.</p>`,
-    ctaText: 'Renew now',
+    bodyHtml: `<p style="margin:0 0 14px">Hi ${order.name || 'there'},</p><p style="margin:0 0 14px">${dueLine}</p><p style="margin:0">${order.type === 'managed' ? 'Use your personal payment link below to pay by mobile money or card.' : 'Visit the page below to see current pricing and complete your renewal payment by mobile money or card.'}</p>`,
+    ctaText: order.type === 'managed' ? 'Make my payment' : 'Renew now',
     ctaUrl: renewUrl,
   });
   const text = `Hi ${order.name || 'there'},\n\n${dueLine.replace(/<[^>]+>/g, '')}\n\nRenew here: ${renewUrl}\n\n— Nadine Cloud`;
@@ -70,6 +70,109 @@ function buildReminderEmail(order, daysLeft) {
     html,
     text,
   };
+}
+
+// ---- "Welcome on board" email for clients we host by hand ----
+// Sent once, automatically, to every hand-added client (reference MAN-...) that has not had it yet.
+function fmtDate(d) {
+  return new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
+}
+
+// When the domain itself expires (public RDAP record). Best effort: returns null if it cannot be found.
+async function lookupDomainExpiry(domain) {
+  if (!domain || !/^[a-z0-9.-]+\.[a-z]{2,}$/.test(domain)) return null;
+  try {
+    const tld = domain.split('.').pop();
+    const RDAP = { com: 'https://rdap.verisign.com/com/v1/domain/', net: 'https://rdap.verisign.com/net/v1/domain/', org: 'https://rdap.publicinterestregistry.org/rdap/domain/' };
+    if (!RDAP[tld]) return null; // other endings (e.g. .zm) have no public record we can read
+    const res = await fetch(RDAP[tld] + encodeURIComponent(domain), { signal: AbortSignal.timeout(7000), headers: { Accept: 'application/rdap+json' } });
+    if (!res.ok) return null;
+    const data = await res.json();
+    const ev = (data.events || []).find((e) => e.eventAction === 'expiration');
+    return ev && ev.eventDate ? ev.eventDate : null;
+  } catch {
+    return null;
+  }
+}
+
+async function buildWelcomeEmail(o) {
+  const per = o.period === 'mo' ? ' per month' : o.period === 'yr' ? ' per year' : '';
+  const again = o.period === 'mo' ? ', then the same day every month' : o.period === 'yr' ? ', then the same day every year' : '';
+  const payUrl = `${SITE_URL}/checkout/?type=managed&client=${encodeURIComponent(o.reference)}&plan=${encodeURIComponent(o.plan)}&amount=${encodeURIComponent(Number(o.amount))}&period=mo`;
+  const domainExpiry = await lookupDomainExpiry(o.domain);
+  const rows = [
+    o.domain ? ['Website', o.domain] : null,
+    ['Plan', o.plan],
+    ['Payment', `ZMW ${Number(o.amount).toLocaleString('en-US')}${per}`],
+    ['Next payment due', `${fmtDate(o.expires_at)}${again}`],
+    domainExpiry ? ['Domain renews', `${fmtDate(domainExpiry)} &mdash; we will remind you before then`] : null,
+  ].filter(Boolean);
+  const table = rows.map(([a, b]) => `<tr><td style="padding:9px 0;color:#0B1220;font-weight:bold;width:40%;vertical-align:top">${a}</td><td style="padding:9px 0">${b}</td></tr>`).join('');
+  const siteLine = o.domain
+    ? `<a href="https://${o.domain}" style="color:#1769FF;font-weight:bold">${o.domain}</a> is now hosted with us, and we look after it for you every day.`
+    : 'Your hosting is now looked after by us every day.';
+  const html = renderEmail({
+    heading: 'Welcome on board to Nadine Cloud',
+    imageUrl: `${SITE_URL}/assets/email-stay-informed.jpg`,
+    imageAlt: 'Nadine Cloud: your hosting reminders will be sent to you',
+    imageFirst: true,
+    headingSerif: true,
+    bodyHtml: `
+    <p style="margin:0 0 14px">Hello,</p>
+    <p style="margin:0 0 14px">Thank you for choosing Nadine Cloud. ${siteLine}</p>
+    ${renderButton('Make my payment', payUrl)}
+    <p style="margin:18px 0 6px;color:#0B1220;font-weight:bold">Your plan</p>
+    <table style="width:100%;border-collapse:collapse;border-top:1px solid #E3E9F1;border-bottom:1px solid #E3E9F1;font-size:15px">${table}</table>
+    <p style="margin:18px 0 14px">A week before each due date we'll send you a reminder with your personal payment link. You can pay by <strong>mobile money or card (Visa / Mastercard)</strong>. Card details are entered on the payment provider's secure page &mdash; we never see or keep them.</p>
+    <p style="margin:0">Need anything? Just reply to this email or message us on WhatsApp.</p>
+    <p style="margin:18px 0 0">Welcome aboard,<br><strong style="color:#0B1220">The Nadine Cloud team</strong></p>`,
+  });
+  const text = `Hello,
+
+Thank you for choosing Nadine Cloud. ${o.domain ? o.domain + ' is now hosted with us' : 'Your hosting is now looked after by us'}.
+
+${rows.map(([a, b]) => `${a}: ${b.replace(/&mdash;/g, '-').replace(/<[^>]+>/g, '')}`).join(String.fromCharCode(10))}
+
+Make your payment (mobile money or card): ${payUrl}
+
+A week before each due date we will send you a reminder with your personal payment link. Card details are entered on the payment provider's secure page - we never see or keep them.
+
+Need anything? Reply to this email or message us on WhatsApp: https://wa.me/260964068483
+
+Welcome aboard,
+The Nadine Cloud team`;
+  return { subject: 'Welcome on board to Nadine Cloud', html, text };
+}
+
+async function sendPendingWelcomes(summary) {
+  summary.welcomes = 0;
+  let rows;
+  try {
+    const r = await getPool().query(
+      `SELECT reference, plan, amount, period, domain, email, expires_at FROM orders
+       WHERE type = 'managed' AND status = 'paid' AND reference LIKE 'MAN-%'
+         AND welcome_sent_at IS NULL AND email IS NOT NULL`
+    );
+    rows = r.rows;
+  } catch (err) {
+    console.error('sendPendingWelcomes query failed:', err);
+    return;
+  }
+  for (const o of rows) {
+    // Claim first, so two overlapping runs can never both send the same welcome.
+    const claim = await getPool().query('UPDATE orders SET welcome_sent_at = now() WHERE reference = $1 AND welcome_sent_at IS NULL RETURNING reference', [o.reference]);
+    if (!claim.rowCount) continue;
+    try {
+      const { subject, html, text } = await buildWelcomeEmail(o);
+      const sent = await sendEmail({ to: o.email, subject, html, text });
+      if (!sent.ok) throw new Error(sent.reason);
+      await sendEmail({ subject: `Copy: welcome email sent to ${o.email}`, html, text }); // a copy for Nadine Cloud
+      summary.welcomes += 1;
+    } catch (err) {
+      await getPool().query('UPDATE orders SET welcome_sent_at = NULL WHERE reference = $1', [o.reference]); // try again next run
+      console.error(`Welcome email failed for ${o.reference}:`, err);
+    }
+  }
 }
 
 async function sendDueReminders() {
@@ -117,6 +220,7 @@ async function sendDueReminders() {
       console.error(`Renewal reminder failed for ${order.reference}:`, err);
     }
   }
+  await sendPendingWelcomes(summary);
   return summary;
 }
 
