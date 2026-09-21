@@ -18,6 +18,8 @@ const RENEWAL_PAGE = {
 };
 
 const SITE_URL = 'https://www.nadinecloud.com';
+// Nadine Cloud gets a copy of every welcome email and reminder it sends to a client (set COPY_EMAILS_TO to change).
+const COPY_TO = process.env.COPY_EMAILS_TO || 'nadineomnitradinglimited@gmail.com';
 const CHECK_INTERVAL_MS = 24 * 60 * 60 * 1000; // once a day
 const FIRST_RUN_DELAY_MS = 60 * 1000; // 1 minute after startup, not a full day
 
@@ -166,7 +168,7 @@ async function sendPendingWelcomes(summary) {
       const { subject, html, text } = await buildWelcomeEmail(o);
       const sent = await sendEmail({ to: o.email, subject, html, text });
       if (!sent.ok) throw new Error(sent.reason);
-      await sendEmail({ subject: `Copy: welcome email sent to ${o.email}`, html, text }); // a copy for Nadine Cloud
+      await sendEmail({ to: COPY_TO, subject: `Copy: welcome email sent to ${o.email}`, html, text }); // a copy for Nadine Cloud
       summary.welcomes += 1;
     } catch (err) {
       await getPool().query('UPDATE orders SET welcome_sent_at = NULL WHERE reference = $1', [o.reference]); // try again next run
@@ -206,6 +208,7 @@ async function sendDueReminders() {
       const result = await sendEmail({ to: order.email, subject, html, text });
 
       if (result.ok) {
+        sendEmail({ to: COPY_TO, subject: `Copy: reminder sent to ${order.email} (${subject})`, html, text }).catch(() => {});
         await getPool().query(
           'UPDATE orders SET reminder_sent_at = now(), reminder_count = reminder_count + 1 WHERE reference = $1',
           [order.reference]
