@@ -21,6 +21,7 @@ const SITE_URL = 'https://www.nadinecloud.com';
 // Nadine Cloud gets a copy of every welcome email and reminder it sends to a client (set COPY_EMAILS_TO to change).
 const COPY_TO = process.env.COPY_EMAILS_TO || 'nadineomnitradinglimited@gmail.com';
 const CHECK_INTERVAL_MS = 24 * 60 * 60 * 1000; // once a day
+const WELCOME_CHECK_MS = 5 * 60 * 1000; // look for clients still waiting for their welcome email
 const FIRST_RUN_DELAY_MS = 60 * 1000; // 1 minute after startup, not a full day
 
 function daysBetween(a, b) {
@@ -274,12 +275,22 @@ async function handleSendReminders(req, res) {
   }
 }
 
+// A newly added client should get their welcome email within minutes, not at the next daily run.
+async function checkWelcomesOnly() {
+  if (!dbConfigured()) return;
+  await ensureSchema();
+  await sendPendingWelcomes({});
+}
+
 function startReminderScheduler() {
   setTimeout(() => {
     sendDueReminders().catch((err) => console.error('sendDueReminders failed:', err));
     setInterval(() => {
       sendDueReminders().catch((err) => console.error('sendDueReminders failed:', err));
     }, CHECK_INTERVAL_MS);
+    setInterval(() => {
+      checkWelcomesOnly().catch((err) => console.error('checkWelcomesOnly failed:', err));
+    }, WELCOME_CHECK_MS);
   }, FIRST_RUN_DELAY_MS);
 }
 
