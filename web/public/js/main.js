@@ -15,9 +15,14 @@
   window.addEventListener('hashchange', openTargetDetails);
 })();
 
-/* ---------- domain name search (live availability check via Namecheap) ---------- */
-const DOMAIN_PRICE_ZMW = { com: 330, net: 315, org: 315 };
+/* ---------- domain name search (live availability + real price check via Name.com) ---------- */
+const DOMAIN_PRICE_ZMW = { com: 330, net: 315, org: 315 }; // fallback only, if the live price is missing
+// Your profit per domain per year, in USD, added on top of Name.com's real price.
+// 0 = show exactly what Name.com charges. Example: 3 shows $12.99 as $15.99.
+const DOMAIN_MARKUP_USD = 0;
 let domainLookupSeq = 0;
+
+function usd(n){ return '$' + Number(n).toFixed(2); }
 
 function lookupDomain(){
   const input = document.getElementById('domInput');
@@ -40,7 +45,16 @@ function lookupDomain(){
         const price = DOMAIN_PRICE_ZMW[tld];
         if (r.available) {
           const waText = encodeURIComponent('Hi Nadine Cloud, I\'d like to register ' + r.domain);
-          return '<span class="ok">✓</span> <strong>' + r.domain + '</strong> is available' + (price ? ' — from ZMW ' + price + '/yr' : '') +
+          // Real price in USD straight from the registrar (+ your optional markup); ZMW table only as a fallback.
+          let priceText = price ? ' — from ZMW ' + price + '/yr' : '';
+          if (typeof r.price === 'number') {
+            const first = r.price + DOMAIN_MARKUP_USD;
+            priceText = ' — <strong>' + usd(first) + ' USD</strong>/yr';
+            if (typeof r.renewalPrice === 'number' && r.renewalPrice + DOMAIN_MARKUP_USD > first + 0.005) {
+              priceText += ' <span style="color:var(--text-mute)">(renews at ' + usd(r.renewalPrice + DOMAIN_MARKUP_USD) + '/yr)</span>';
+            }
+          }
+          return '<span class="ok">✓</span> <strong>' + r.domain + '</strong> is available' + priceText +
             ' &nbsp;<a href="https://wa.me/260964068483?text=' + waText + '" target="_blank" rel="noopener" style="color:#7047FF">Register it</a>';
         }
         return '<span style="color:var(--text-mute)">✗ ' + r.domain + ' is already taken</span>';
@@ -50,7 +64,7 @@ function lookupDomain(){
     .catch(() => {
       if (seq !== domainLookupSeq) return;
       const waText = encodeURIComponent('Hi Nadine Cloud, is ' + raw + '.com available to register?');
-      out.innerHTML = 'We\'ll confirm if <strong>' + raw + '.com</strong> is available, from ZMW 330/yr' +
+      out.innerHTML = 'We\'ll confirm if <strong>' + raw + '.com</strong> is available, from ' + usd(12.99 + DOMAIN_MARKUP_USD) + ' USD/yr' +
         ' &nbsp;·&nbsp; <a href="https://wa.me/260964068483?text=' + waText + '" target="_blank" rel="noopener" style="color:#7047FF">Ask on WhatsApp</a>' +
         ' &nbsp;·&nbsp; <a href="contact" style="color:#7047FF">Contact form</a>';
     });
