@@ -1,0 +1,57 @@
+# On every push to main: build the website pages and publish everything the server needs to the
+# `deploy` branch. The Nadine Cloud server checks that branch every minute and installs it
+# (see deploy/nc-autodeploy.sh). The `deploy` branch is rebuilt from scratch each time.
+name: Build and publish to deploy branch
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: deploy-branch
+  cancel-in-progress: true
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - name: Build the website pages (static export)
+        working-directory: web
+        run: |
+          npm ci
+          BUILD_TARGET=static npx next build
+
+      - name: Check the backend files parse
+        run: |
+          for f in server.js auth.js ai-builder.js chat.js contact.js db.js email.js ftp-deploy.js namecheap.js namecom.js payments.js pricing.js receipt.js registrar.js reminders.js whm.js; do
+            node --check "$f"
+          done
+
+      - name: Assemble and push the deploy branch
+        run: |
+          set -e
+          test -f web/out/index.html
+          mkdir /tmp/deploy
+          cp server.js auth.js ai-builder.js chat.js contact.js db.js email.js ftp-deploy.js namecheap.js namecom.js payments.js pricing.js receipt.js registrar.js reminders.js whm.js package.json package-lock.json /tmp/deploy/
+          cp -R web/out /tmp/deploy/site
+          echo "Built from ${GITHUB_SHA} at $(date -u +%FT%TZ)" > /tmp/deploy/VERSION
+          cd /tmp/deploy
+          git init -q -b deploy
+          git config user.name "nadine-cloud-deploy"
+          git config user.email "deploy@nadinecloud.com"
+          git add -A
+          git commit -q -m "Deploy ${GITHUB_SHA}"
+          git remote add origin "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git"
+          git push -f origin deploy
