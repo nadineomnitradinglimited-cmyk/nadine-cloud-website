@@ -9,6 +9,7 @@ const CARE_PRODUCTS = new Set(['care-essential', 'care-growth', 'care-premium'])
 const { generateReceiptPdf } = require('./receipt');
 const { isConfigured: dbConfigured, getPool, ensureSchema } = require('./db');
 const { checkAvailability, registerDomain, registrarName } = require('./registrar');
+const { checkPrice } = require('./pricing');
 const { loadDraft } = require('./ai-builder');
 const { deployDraftHtml } = require('./ftp-deploy');
 
@@ -582,6 +583,14 @@ async function handleCheckoutInitiate(req, res) {
     if (!address1 || !city || !postalCode || !country || country === 'OTHER') {
       return sendJson(res, 400, { error: 'A full contact address is required to register a domain — please fill in every field, or message us on WhatsApp if your country isn’t listed.' });
     }
+  }
+
+  // Never trust the amount sent by the browser: check it against the real list price
+  // (a domain is priced from the registrar's live price) before any payment is started.
+  const priceCheck = await checkPrice({ type, pkg, period, plan, domain, amount });
+  if (!priceCheck.ok) {
+    console.warn(`Checkout price rejected: type=${type} pkg=${pkg} period=${period} amount=${amount} expected=${priceCheck.expected ?? 'n/a'}`);
+    return sendJson(res, 400, { error: priceCheck.error });
   }
 
   let discountAmount = 0;
