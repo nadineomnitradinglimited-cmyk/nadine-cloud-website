@@ -97,7 +97,26 @@ async function lookupDomainExpiry(domain) {
   }
 }
 
+// Mail programs (Gmail, Outlook, webmail) hide pictures that live on a website until the reader clicks
+// "display images". A picture packed INSIDE the email (referenced as cid:...) shows straight away.
+// If the picture cannot be fetched, the email falls back to the normal website link.
+let embeddedPictures = null;
+async function loadEmbeddedPictures() {
+  if (embeddedPictures) return embeddedPictures;
+  try {
+    const res = await fetch(`${SITE_URL}/assets/email-stay-informed.jpg`, { signal: AbortSignal.timeout(8000), headers: { 'User-Agent': 'NadineCloud-Mailer/1.0' } });
+    if (!res.ok) throw new Error(`picture ${res.status}`);
+    const content = Buffer.from(await res.arrayBuffer()).toString('base64');
+    embeddedPictures = [{ filename: 'nadine-cloud-welcome.jpg', content, content_id: 'stay-informed', content_type: 'image/jpeg' }];
+    return embeddedPictures;
+  } catch (err) {
+    console.error('Could not embed the welcome picture (using the website link instead):', err.message);
+    return null;
+  }
+}
+
 async function buildWelcomeEmail(o) {
+  const attachments = await loadEmbeddedPictures();
   const per = o.period === 'mo' ? ' per month' : o.period === 'yr' ? ' per year' : '';
   const again = o.period === 'mo' ? ', then the same day every month' : o.period === 'yr' ? ', then the same day every year' : '';
   const payUrl = `${SITE_URL}/checkout/?type=managed&client=${encodeURIComponent(o.reference)}&plan=${encodeURIComponent(o.plan)}&amount=${encodeURIComponent(Number(o.amount))}&period=${o.period === 'yr' ? 'yr' : 'mo'}`;
@@ -115,7 +134,7 @@ async function buildWelcomeEmail(o) {
     : 'Your hosting is now looked after by us every day.';
   const html = renderEmail({
     heading: 'Welcome on board to Nadine Cloud',
-    imageUrl: `${SITE_URL}/assets/email-stay-informed.jpg`,
+    imageUrl: attachments ? 'cid:stay-informed' : `${SITE_URL}/assets/email-stay-informed.jpg`,
     imageAlt: 'Nadine Cloud: your hosting reminders will be sent to you',
     imageFirst: true,
     headingSerif: true,
@@ -143,7 +162,7 @@ Need anything? Reply to this email or message us on WhatsApp: https://wa.me/2609
 
 Welcome aboard,
 The Nadine Cloud team`;
-  return { subject: 'Welcome on board to Nadine Cloud', html, text };
+  return { subject: 'Welcome on board to Nadine Cloud', html, text, attachments: attachments || undefined };
 }
 
 async function sendPendingWelcomes(summary) {
@@ -165,10 +184,10 @@ async function sendPendingWelcomes(summary) {
     const claim = await getPool().query('UPDATE orders SET welcome_sent_at = now() WHERE reference = $1 AND welcome_sent_at IS NULL RETURNING reference', [o.reference]);
     if (!claim.rowCount) continue;
     try {
-      const { subject, html, text } = await buildWelcomeEmail(o);
-      const sent = await sendEmail({ to: o.email, subject, html, text });
+      const { subject, html, text, attachments } = await buildWelcomeEmail(o);
+      const sent = await sendEmail({ to: o.email, subject, html, text, attachments });
       if (!sent.ok) throw new Error(sent.reason);
-      await sendEmail({ to: COPY_TO, subject: `Copy: welcome email sent to ${o.email}`, html, text }); // a copy for Nadine Cloud
+      await sendEmail({ to: COPY_TO, subject: `Copy: welcome email sent to ${o.email}`, html, text, attachments }); // a copy for Nadine Cloud
       summary.welcomes += 1;
     } catch (err) {
       await getPool().query('UPDATE orders SET welcome_sent_at = NULL WHERE reference = $1', [o.reference]); // try again next run
