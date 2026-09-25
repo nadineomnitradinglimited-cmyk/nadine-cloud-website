@@ -53,7 +53,7 @@
           '<input type="radio" name="' + radioName + '" value="' + key + '"' + (key === 'mo' ? ' checked' : '') + '>' +
           '<span class="ob-name">' + cfg.name + '</span>' +
           '<span class="ob-price-wrap">' +
-            '<span class="ob-price">ZMW ' + total.toLocaleString() + '</span>' +
+            '<span class="ob-price" data-zmw="' + total + '">ZMW ' + total.toLocaleString() + '</span>' +
             (cfg.discount > 0 ? '<span class="ob-save">Save ' + Math.round(cfg.discount * 100) + '%</span>' : '') +
           '</span>' +
           '</label>';
@@ -97,7 +97,7 @@
             equivEl.hidden = true;
           } else {
             equivEl.hidden = false;
-            equivEl.textContent = 'Equivalent to ZMW ' + perMonth.toLocaleString() + '/month';
+            equivEl.innerHTML = 'Equivalent to <span data-zmw="' + perMonth + '">ZMW ' + perMonth.toLocaleString() + '</span>/month';
           }
         }
 
@@ -131,4 +131,7 @@
       setPeriod(btn.dataset.period);
     });
   });
+
+  // The billing options above were written in ZMW; show them in the chosen currency.
+  if (window.ncRefreshPrices) window.ncRefreshPrices();
 })();

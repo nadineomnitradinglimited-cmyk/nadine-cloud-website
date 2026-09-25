@@ -107,7 +107,7 @@ export default function Builder() {
               <a className="cta" href="/checkout?type=bundle&pkg=builder&plan=Nadine+Cloud+%E2%80%94+Launch&amount=850&period=yr">Get Launch</a>
             </div>
           </div>
-          <p className="pricing-note">* Launch renews at ZMW 59/month for hosting after the first year, plus your domain&apos;s standard renewal price — we&apos;ll remind you before either is due.</p>
+          <p className="pricing-note">* Launch renews at <span className="amt-live" data-zmw="59">ZMW 59</span>/month for hosting after the first year, plus your domain&apos;s standard renewal price — we&apos;ll remind you before either is due.</p>
         </div>
       </section>
 

@@ -1,134 +1,167 @@
-/* ---------- live local-currency pricing ----------
-   Prices in the HTML are the source of truth, in ZMW (data-zmw="NNN").
-   On load we detect the visitor's country, map it to their currency,
-   fetch a live ZMW exchange rate, and swap the displayed price into
-   their local currency — keeping the original ZMW amount as a small
-   reference note. If geo lookup, the rate API, or an unsupported
-   currency fails at any point, we simply leave the static ZMW price
-   already in the markup. */
+/* ---------- display currency ----------
+   Prices in the HTML are the source of truth, in ZMW (data-zmw="NNN"), and
+   checkout always charges that ZMW amount. For display we show every price in
+   USD by default, converted at the day's rate. The visitor can pick another
+   currency with the small picker in the header (#curPicker); that choice is
+   remembered. Nothing changes automatically by location.
+   If the live rate can't be fetched we use a built-in fallback rate, so
+   prices are never left blank. */
 (function(){
-  const CACHE_KEY = 'nc_currency_v1';
-  const CACHE_MS = 12 * 60 * 60 * 1000;
-  let lastCurrency = null;
-  let lastRate = null;
+  const CHOICE_KEY = 'nc_currency_choice';
+  const RATES_KEY = 'nc_rates_v2';
+  const RATES_MS = 12 * 60 * 60 * 1000;
+  const DEFAULT_CURRENCY = 'USD';
+  // Used until the live rates arrive (and if they never do). 1 ZMW in each currency.
+  const FALLBACK_RATES = { ZMW: 1, USD: 1 / 19.66 };
 
-  window.ncRefreshPrices = function(){ applyRate(lastCurrency, lastRate); };
+  const CHOICES = [
+    { code: 'USD', label: 'United States (USD)' },
+    { code: 'ZMW', label: 'Zambia (ZMW)' },
+    { code: 'EUR', label: 'Europe (EUR)' },
+    { code: 'GBP', label: 'United Kingdom (GBP)' },
+    { code: 'ZAR', label: 'South Africa (ZAR)' },
+    { code: 'BWP', label: 'Botswana (BWP)' },
+    { code: 'NAD', label: 'Namibia (NAD)' },
+    { code: 'MWK', label: 'Malawi (MWK)' },
+    { code: 'TZS', label: 'Tanzania (TZS)' },
+    { code: 'KES', label: 'Kenya (KES)' },
+    { code: 'UGX', label: 'Uganda (UGX)' },
+    { code: 'NGN', label: 'Nigeria (NGN)' },
+    { code: 'GHS', label: 'Ghana (GHS)' },
+    { code: 'AED', label: 'UAE (AED)' },
+    { code: 'CAD', label: 'Canada (CAD)' },
+    { code: 'AUD', label: 'Australia (AUD)' },
+    { code: 'INR', label: 'India (INR)' },
+    { code: 'CNY', label: 'China (CNY)' }
+  ];
 
-  // ISO 3166-1 alpha-2 country -> ISO 4217 currency code.
-  const COUNTRY_CURRENCY = {
-    ZM:'ZMW',US:'USD',GB:'GBP',IE:'EUR',CA:'CAD',AU:'AUD',NZ:'NZD',
-    ZA:'ZAR',ZW:'ZWL',BW:'BWP',NA:'NAD',MW:'MWK',MZ:'MZN',TZ:'TZS',
-    KE:'KES',UG:'UGX',RW:'RWF',BI:'BIF',ET:'ETB',SS:'SSP',SD:'SDG',
-    SO:'SOS',ER:'ERN',DJ:'DJF',NG:'NGN',GH:'GHS',SL:'SLL',LR:'LRD',
-    GM:'GMD',GN:'GNF',SN:'XOF',ML:'XOF',BF:'XOF',NE:'XOF',CI:'XOF',
-    TG:'XOF',BJ:'XOF',GW:'XOF',CM:'XAF',CF:'XAF',TD:'XAF',CG:'XAF',
-    GA:'XAF',GQ:'XAF',CD:'CDF',AO:'AOA',ST:'STN',CV:'CVE',MR:'MRU',
-    EG:'EGP',LY:'LYD',TN:'TND',DZ:'DZD',MA:'MAD',
-    EU:'EUR',DE:'EUR',FR:'EUR',IT:'EUR',ES:'EUR',PT:'EUR',NL:'EUR',
-    BE:'EUR',AT:'EUR',FI:'EUR',GR:'EUR',LU:'EUR',MT:'EUR',CY:'EUR',
-    SK:'EUR',SI:'EUR',EE:'EUR',LV:'EUR',LT:'EUR',HR:'EUR',
-    CH:'CHF',NO:'NOK',SE:'SEK',DK:'DKK',IS:'ISK',PL:'PLN',CZ:'CZK',
-    HU:'HUF',RO:'RON',BG:'BGN',RS:'RSD',BA:'BAM',MK:'MKD',AL:'ALL',
-    ME:'EUR',MD:'MDL',UA:'UAH',BY:'BYN',RU:'RUB',TR:'TRY',
-    CN:'CNY',HK:'HKD',MO:'MOP',TW:'TWD',JP:'JPY',KR:'KRW',KP:'KPW',
-    IN:'INR',PK:'PKR',BD:'BDT',LK:'LKR',NP:'NPR',BT:'BTN',MV:'MVR',
-    AF:'AFN',IR:'IRR',IQ:'IQD',SY:'SYP',LB:'LBP',JO:'JOD',IL:'ILS',
-    PS:'ILS',SA:'SAR',YE:'YER',OM:'OMR',AE:'AED',QA:'QAR',BH:'BHD',
-    KW:'KWD',GE:'GEL',AM:'AMD',AZ:'AZN',KZ:'KZT',UZ:'UZS',TM:'TMT',
-    TJ:'TJS',KG:'KGS',MN:'MNT',
-    TH:'THB',VN:'VND',LA:'LAK',KH:'KHR',MM:'MMK',MY:'MYR',SG:'SGD',
-    ID:'IDR',PH:'PHP',BN:'BND',TL:'USD',
-    FJ:'FJD',PG:'PGK',SB:'SBD',VU:'VUV',WS:'WST',TO:'TOP',
-    KI:'AUD',TV:'AUD',NR:'AUD',FM:'USD',MH:'USD',PW:'USD',
-    MX:'MXN',GT:'GTQ',BZ:'BZD',HN:'HNL',SV:'USD',NI:'NIO',CR:'CRC',
-    PA:'USD',CU:'CUP',DO:'DOP',HT:'HTG',JM:'JMD',TT:'TTD',BB:'BBD',
-    BS:'BSD',BM:'BMD',
-    CO:'COP',VE:'VES',GY:'GYD',SR:'SRD',EC:'USD',PE:'PEN',BR:'BRL',
-    BO:'BOB',PY:'PYG',UY:'UYU',AR:'ARS',CL:'CLP'
-  };
+  let rates = FALLBACK_RATES;
+  let currency = DEFAULT_CURRENCY;
 
-  function readCache(){
+  function store(key, value){ try{ localStorage.setItem(key, value); }catch(e){} }
+  function load(key){ try{ return localStorage.getItem(key); }catch(e){ return null; } }
+
+  const saved = load(CHOICE_KEY);
+  if (saved && CHOICES.some(function(c){ return c.code === saved; })) currency = saved;
+
+  try{
+    const cached = JSON.parse(load(RATES_KEY) || 'null');
+    if (cached && cached.rates && (Date.now() - cached.ts) < RATES_MS) rates = cached.rates;
+  }catch(e){}
+
+  function zmwText(zmw){ return 'ZMW ' + Number(zmw).toLocaleString(); }
+
+  // Format a ZMW amount in the chosen display currency.
+  function format(zmw){
+    zmw = Number(zmw);
+    if (!isFinite(zmw)) return '';
+    const rate = rates[currency];
+    if (currency === 'ZMW' || !rate) return zmwText(zmw);
+    const converted = zmw * rate;
     try{
-      const raw = localStorage.getItem(CACHE_KEY);
-      if(!raw) return null;
-      const data = JSON.parse(raw);
-      if(!data || (Date.now() - data.ts) > CACHE_MS) return null;
-      return data;
-    }catch(e){ return null; }
+      const whole = converted >= 100;
+      return new Intl.NumberFormat('en-US', {
+        style: 'currency', currency: currency,
+        minimumFractionDigits: whole ? 0 : 2,
+        maximumFractionDigits: whole ? 0 : 2
+      }).format(converted);
+    }catch(e){
+      return zmwText(zmw);
+    }
   }
 
-  function writeCache(data){
-    try{ localStorage.setItem(CACHE_KEY, JSON.stringify(Object.assign({ ts: Date.now() }, data))); }
-    catch(e){ /* localStorage unavailable — skip caching */ }
+  // "$5.04 (ZMW 99)" -- for places where the kwacha charge matters, like checkout.
+  function formatBoth(zmw){
+    const shown = format(zmw);
+    return (currency === 'ZMW' || shown === zmwText(zmw)) ? shown : shown + ' (' + zmwText(zmw) + ')';
   }
 
-  function applyRate(currency, rate){
-    lastCurrency = currency;
-    lastRate = rate;
+  function applyAll(){
     document.querySelectorAll('[data-zmw]').forEach(function(el){
       const zmw = parseFloat(el.getAttribute('data-zmw'));
-      if(!isFinite(zmw)) return;
+      if (!isFinite(zmw)) return;
+      el.textContent = format(zmw);
       const scope = el.closest('.price, .offer-price');
       const note = scope && scope.querySelector('.price-note');
-
-      if(!currency || currency === 'ZMW' || !rate){
-        el.textContent = 'ZMW ' + zmw.toLocaleString();
-        if(note) note.hidden = true;
-        return;
-      }
-
-      let formatted;
-      try{
-        const converted = zmw * rate;
-        formatted = new Intl.NumberFormat(undefined, {
-          style: 'currency',
-          currency: currency,
-          maximumFractionDigits: converted >= 100 ? 0 : 2
-        }).format(converted);
-      }catch(e){
-        el.textContent = 'ZMW ' + zmw.toLocaleString();
-        if(note) note.hidden = true;
-        return;
-      }
-
-      el.textContent = formatted;
-      if(note){
-        note.hidden = false;
-        note.textContent = '≈ ZMW ' + zmw.toLocaleString();
+      if (note) {
+        const showNote = currency !== 'ZMW' && el.textContent !== zmwText(zmw);
+        note.hidden = !showNote;
+        if (showNote) note.textContent = '≈ ' + zmwText(zmw);
       }
     });
-  }
-
-  const hit = readCache();
-  if(hit){
-    applyRate(hit.currency, hit.rate);
-    return;
-  }
-
-  fetch('https://ipwho.is/')
-    .then(function(r){ return r.json(); })
-    .then(function(geo){
-      if(!geo || !geo.success || !geo.country_code) throw new Error('no country from geo lookup');
-      const currency = COUNTRY_CURRENCY[geo.country_code];
-      if(!currency) throw new Error('no currency mapping for ' + geo.country_code);
-
-      if(currency === 'ZMW'){
-        writeCache({ currency: 'ZMW', rate: 1 });
-        applyRate('ZMW', 1);
-        return;
-      }
-
-      return fetch('https://open.er-api.com/v6/latest/ZMW')
-        .then(function(r){ return r.json(); })
-        .then(function(fx){
-          if(!fx || fx.result !== 'success' || !fx.rates || !fx.rates[currency]){
-            throw new Error('no live rate for ' + currency);
-          }
-          writeCache({ currency: currency, rate: fx.rates[currency] });
-          applyRate(currency, fx.rates[currency]);
-        });
-    })
-    .catch(function(){
-      /* geo/rate lookup failed, or currency unsupported — static ZMW prices already in the page stand as-is */
+    const btnLabel = document.querySelector('#curPicker .cur-code');
+    if (btnLabel) btnLabel.textContent = currency;
+    document.querySelectorAll('#curPicker [data-cur]').forEach(function(opt){
+      opt.setAttribute('aria-selected', opt.getAttribute('data-cur') === currency ? 'true' : 'false');
     });
+    document.dispatchEvent(new CustomEvent('nc:currency', { detail: { currency: currency } }));
+  }
+
+  window.ncRefreshPrices = applyAll;
+  window.ncFormatZmw = format;
+  window.ncFormatBoth = formatBoth;
+  window.ncCurrency = function(){ return currency; };
+
+  function setCurrency(code){
+    currency = code;
+    store(CHOICE_KEY, code);
+    applyAll();
+  }
+
+  function buildPicker(){
+    const host = document.getElementById('curPicker');
+    if (!host || host.dataset.ready) return;
+    host.dataset.ready = '1';
+    host.innerHTML =
+      '<button type="button" class="cur-btn" aria-haspopup="listbox" aria-expanded="false" aria-label="Change currency">' +
+        '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">' +
+          '<circle cx="12" cy="12" r="9.5"/><path d="M2.5 12h19M12 2.5c2.6 2.8 3.9 6 3.9 9.5s-1.3 6.7-3.9 9.5c-2.6-2.8-3.9-6-3.9-9.5s1.3-6.7 3.9-9.5z"/>' +
+        '</svg>' +
+        '<span class="cur-code">' + currency + '</span>' +
+        '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>' +
+      '</button>' +
+      '<div class="cur-menu" role="listbox" hidden>' +
+        '<div class="cur-menu-title">Show prices in</div>' +
+        CHOICES.map(function(c){
+          return '<button type="button" role="option" data-cur="' + c.code + '">' + c.label + '</button>';
+        }).join('') +
+        '<div class="cur-menu-note">Payments are charged in ZMW at the day\'s rate.</div>' +
+      '</div>';
+
+    const btn = host.querySelector('.cur-btn');
+    const menu = host.querySelector('.cur-menu');
+    function close(){ menu.hidden = true; btn.setAttribute('aria-expanded', 'false'); }
+    btn.addEventListener('click', function(e){
+      e.stopPropagation();
+      const open = menu.hidden;
+      menu.hidden = !open;
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+    menu.addEventListener('click', function(e){
+      const opt = e.target.closest('[data-cur]');
+      if (!opt) return;
+      setCurrency(opt.getAttribute('data-cur'));
+      close();
+    });
+    document.addEventListener('click', function(e){ if (!host.contains(e.target)) close(); });
+    document.addEventListener('keydown', function(e){ if (e.key === 'Escape') close(); });
+  }
+
+  buildPicker();
+  applyAll();
+
+  const cachedFresh = rates !== FALLBACK_RATES;
+  if (!cachedFresh) {
+    fetch('https://open.er-api.com/v6/latest/ZMW')
+      .then(function(r){ return r.json(); })
+      .then(function(fx){
+        if (!fx || fx.result !== 'success' || !fx.rates || !fx.rates.USD) throw new Error('no live rates');
+        const keep = { ZMW: 1 };
+        CHOICES.forEach(function(c){ if (fx.rates[c.code]) keep[c.code] = fx.rates[c.code]; });
+        rates = keep;
+        store(RATES_KEY, JSON.stringify({ ts: Date.now(), rates: keep }));
+        applyAll();
+      })
+      .catch(function(){ /* keep the fallback rate */ });
+  }
 })();

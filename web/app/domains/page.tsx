@@ -5,7 +5,7 @@ import InlineDomainSearch from "../components/InlineDomainSearch";
 
 const TITLE = "Domain Registration — Nadine Cloud";
 const DESCRIPTION =
-  "Register or transfer .com, .org, .net and more, starting from ZMW 315/year. We handle the DNS so your domain, email and website just work.";
+  "Register or transfer .com, .org, .net and more, starting from about $16 a year. We handle the DNS so your domain, email and website just work.";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -37,7 +37,7 @@ export default function Domains() {
         <div className="wrap page-hero-inner">
           <span className="eyebrow">Domains</span>
           <h1>Your name, your address on the internet.</h1>
-          <p>Register or transfer .com, .org, .net and more, starting from ZMW 315/year. We handle the DNS so your domain, email and website just work.</p>
+          <p>Register or transfer .com, .org, .net and more, starting from <span className="amt-live" data-zmw="315">ZMW 315</span>/year. We handle the DNS so your domain, email and website just work.</p>
         </div>
       </section>
 

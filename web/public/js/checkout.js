@@ -38,6 +38,12 @@
     return appliedPromo ? appliedPromo.finalAmount : amount;
   }
 
+  // The charge is always in ZMW; the summary also shows the visitor's display
+  // currency (currency.js), e.g. "$5.04 (ZMW 99)".
+  function money(zmw){
+    return window.ncFormatBoth ? window.ncFormatBoth(zmw) : 'ZMW ' + Number(zmw).toLocaleString();
+  }
+
   function renderSummaryAmount(){
     if (!Number.isFinite(amount)) {
       document.getElementById('ckSummaryAmount').textContent = 'Amount to be confirmed';
@@ -47,14 +53,15 @@
     document.getElementById('ckAmountLabel').textContent = 'ZMW ' + total.toLocaleString();
     if (appliedPromo) {
       document.getElementById('ckSummaryAmount').innerHTML =
-        '<span style="text-decoration:line-through;color:var(--text-mute);font-size:16px">ZMW ' + amount.toLocaleString() + '</span> ' +
-        'ZMW ' + total.toLocaleString() + ' ' + PERIOD_LABEL[period] +
+        '<span style="text-decoration:line-through;color:var(--text-mute);font-size:16px">' + money(amount) + '</span> ' +
+        money(total) + ' ' + PERIOD_LABEL[period] +
         ' <span style="color:var(--ok);font-size:13px;font-weight:600">(' + appliedPromo.code + ' applied)</span>';
     } else {
-      document.getElementById('ckSummaryAmount').textContent = 'ZMW ' + amount.toLocaleString() + ' ' + PERIOD_LABEL[period];
+      document.getElementById('ckSummaryAmount').textContent = money(amount) + ' ' + PERIOD_LABEL[period];
     }
   }
   renderSummaryAmount();
+  document.addEventListener('nc:currency', renderSummaryAmount);
 
   const promoInput = document.getElementById('promoCode');
   const promoApplyBtn = document.getElementById('promoApply');

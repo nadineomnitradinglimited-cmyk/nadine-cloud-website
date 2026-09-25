@@ -122,6 +122,8 @@ export default function Header({
           </ul>
         </nav>
         <div className="nav-actions">
+          {/* Currency picker; filled in by /js/currency.js */}
+          <div className="cur-picker" id="curPicker" suppressHydrationWarning />
           {!hideTalkToSales && (
             <a
               className="btn-sm ghost"

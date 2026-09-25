@@ -46,7 +46,7 @@ function lookupDomain(){
         if (r.available) {
           const waText = encodeURIComponent('Hi Nadine Cloud, I\'d like to register ' + r.domain);
           // Real price in USD straight from the registrar (+ your optional markup); ZMW table only as a fallback.
-          let priceText = price ? ' — from ZMW ' + price + '/yr' : '';
+          let priceText = price ? ' — from ' + (window.ncFormatZmw ? window.ncFormatZmw(price) : 'ZMW ' + price) + '/yr' : '';
           if (typeof r.price === 'number') {
             const first = r.price + DOMAIN_MARKUP_USD;
             priceText = ' — <strong>' + usd(first) + ' USD</strong>/yr';

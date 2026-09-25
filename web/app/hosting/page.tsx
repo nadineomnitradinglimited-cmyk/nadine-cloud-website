@@ -54,7 +54,7 @@ export default function Hosting() {
             <button type="button" className="billing-opt" data-period="2yr">2 Years<span className="save-tag">Save 20%</span></button>
             <button type="button" className="billing-opt" data-period="3yr">3 Years<span className="save-tag">Save 25%</span></button>
           </div>
-          <p style={{ fontFamily: "var(--mono)", fontSize: 12.5, color: "var(--ok)", marginBottom: 24 }}>✓ Choose 1 Year, 2 Years or 3 Years billing on any plan and get a free .com domain for the first year — excludes Avara&apos;s ZMW 50 first-month rate.</p>
+          <p style={{ fontFamily: "var(--mono)", fontSize: 12.5, color: "var(--ok)", marginBottom: 24 }}>✓ Choose 1 Year, 2 Years or 3 Years billing on any plan and get a free .com domain for the first year — excludes Avara&apos;s <span className="amt-live" data-zmw="50">ZMW 50</span> first-month rate.</p>
           <div className="plans">
             <div className="plan">
               <div className="plan-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><circle cx={12} cy={12} r={9} /><path d="M3 12h18M12 3c3 3.5 3 14 0 18-3-4-3-14.5 0-18Z" /></svg></div>
