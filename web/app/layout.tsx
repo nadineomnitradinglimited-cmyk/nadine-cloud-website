@@ -37,6 +37,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <Script src="/js/main.js" strategy="afterInteractive" />
         <Script src="/js/currency.js" strategy="afterInteractive" />
         <Script src="/js/billing-toggle.js" strategy="afterInteractive" />
+        <Script src="/js/promo-banner.js" strategy="afterInteractive" />
         <Script src="/js/chat-widget.js" strategy="afterInteractive" />
       </body>
     </html>
