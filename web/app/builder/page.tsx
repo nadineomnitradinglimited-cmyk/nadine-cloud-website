@@ -92,7 +92,7 @@ export default function Builder() {
               <div className="plan-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><path d="m12 2 2.9 6.3 6.9.6-5.2 4.6 1.6 6.8L12 16.9l-6.2 3.4 1.6-6.8-5.2-4.6 6.9-.6Z" /></svg></div>
               <h3>Nadine Cloud — Launch</h3>
               <div className="for">No domain yet? This is the one-payment starter bundle</div>
-              <div className="price"><span className="amt amt-live" data-zmw="850">ZMW 850</span> <span className="per">/first year</span><small className="price-note" hidden></small></div>
+              <div className="price"><span className="amt amt-live" data-zmw="850" data-launch-price="">ZMW 850</span> <span className="per">/first year</span><small className="price-note" hidden></small></div>
               <div className="plan-stats">
                 <div><span className="n">1</span><span className="l">Free .com domain</span></div>
                 <div><span className="n">1</span><span className="l">Year hosting</span></div>

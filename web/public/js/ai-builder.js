@@ -26,7 +26,8 @@
     previewFrame.src = '/api/ai-builder/preview/' + encodeURIComponent(id);
     previewWrap.hidden = false;
     getBuilderLink.href = '/checkout?type=builder&pkg=builder&plan=Nadine+Cloud+%E2%80%94+Builder&amount=59&period=mo&draftId=' + encodeURIComponent(id);
-    getLaunchLink.href = '/checkout?type=bundle&pkg=builder&plan=Nadine+Cloud+%E2%80%94+Launch&amount=850&period=yr&draftId=' + encodeURIComponent(id);
+    const launchAmount = window.ncLaunchPrice ? window.ncLaunchPrice() : 850; // promo-banner.js
+    getLaunchLink.href = '/checkout?type=bundle&pkg=builder&plan=Nadine+Cloud+%E2%80%94+Launch&amount=' + launchAmount + '&period=yr&draftId=' + encodeURIComponent(id);
   }
 
   function updateGenerationsLeft(remaining){

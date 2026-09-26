@@ -69,7 +69,7 @@ export default function AiBuilderGenerate() {
                 <p style={{ color: "var(--text-soft)", marginBottom: 14 }}>Pay for hosting and we deploy this exact site to your new domain the same day.</p>
                 <div className="actions" style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
                   <a className="btn-primary" id="aiGetBuilder" href="#">Get Builder — <span className="amt-live" data-zmw="59">ZMW 59</span>/mo</a>
-                  <a className="btn-ghost" id="aiGetLaunch" href="#">Get Launch — <span className="amt-live" data-zmw="850">ZMW 850</span></a>
+                  <a className="btn-ghost" id="aiGetLaunch" href="#">Get Launch — <span className="amt-live" data-zmw="850" data-launch-price="">ZMW 850</span></a>
                 </div>
               </div>
             </div>

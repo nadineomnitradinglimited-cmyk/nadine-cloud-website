@@ -67,6 +67,8 @@ button{font-family:inherit;cursor:pointer}
 .promo-bar-cta:hover{background:#eaf3ff}
 .promo-bar-close{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:#fff;font-size:22px;line-height:1;opacity:.8;padding:4px}
 .promo-bar-close:hover{opacity:1}
+.promo-bar s{opacity:.75;font-weight:500}
+.was-price{opacity:.55;font-size:.7em;font-weight:500;text-decoration:line-through;margin-right:2px}
 @media(max-width:640px){.promo-bar{font-size:12.5px}.promo-bar-inner{padding:8px 40px 8px 14px;gap:6px 10px}}
 
 /* ---------- header ---------- */

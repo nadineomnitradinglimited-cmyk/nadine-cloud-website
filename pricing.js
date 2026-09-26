@@ -34,6 +34,13 @@ const CARE = { 'care-essential': 199, 'care-growth': 349, 'care-premium': 599 };
 const SSL = { 'ssl-standard': 350, 'ssl-wildcard': 1200, 'ssl-ev': 2500 };
 const BUILDER_MONTHLY = 59;
 const BUNDLE_LAUNCH = 850;
+// Launch offer: ZMW 659 until the end of the site banner's countdown
+// (keep in sync with LAUNCH_OFFER in web/public/js/promo-banner.js), then back to 850.
+const BUNDLE_LAUNCH_OFFER = 659;
+const LAUNCH_OFFER_END = Date.parse('2026-10-26T23:59:59+02:00');
+function launchPrice() {
+  return Date.now() < LAUNCH_OFFER_END ? BUNDLE_LAUNCH_OFFER : BUNDLE_LAUNCH;
+}
 const EMAIL_BY_PLAN = { 'basic email': 300, 'business email': 600, 'enterprise email': 1200 };
 
 // Never accept less than 0.5% under the expected price (covers rounding only).
@@ -83,7 +90,7 @@ async function checkPrice({ type, pkg, period, plan, domain, amount }) {
     case 'care': return CARE[pkg] ? accept(CARE[pkg]) : fail(null);
     case 'ssl': return SSL[pkg] ? accept(SSL[pkg]) : fail(null);
     case 'builder': return accept(BUILDER_MONTHLY);
-    case 'bundle': return accept(BUNDLE_LAUNCH);
+    case 'bundle': return accept(launchPrice());
     case 'email': {
       const expected = EMAIL_BY_PLAN[String(plan || '').trim().toLowerCase()];
       return expected ? accept(expected) : fail(null);
