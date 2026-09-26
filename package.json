@@ -1,0 +1,16 @@
+{
+  "name": "nadine-cloud",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Nadine Cloud marketing site — static multi-page HTML/CSS/JS",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.70.0",
+    "basic-ftp": "^5.3.1",
+    "fast-xml-parser": "^5.11.1",
+    "pdfkit": "^0.20.2",
+    "pg": "^8.23.0"
+  }
+}
