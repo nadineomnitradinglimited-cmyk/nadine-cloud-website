@@ -28,16 +28,6 @@
     billingNote.textContent = PERIOD_BILLED[period] + 'Pay by mobile money or by card (Visa / Mastercard).';
   }
 
-  // Promo codes: the amount actually charged is always re-derived
-  // server-side (see /api/checkout/validate-promo and /api/checkout
-  // itself) -- this just mirrors that result so the customer sees the
-  // real total before paying.
-  let appliedPromo = null; // { code, discountAmount, finalAmount }
-
-  function currentTotal(){
-    return appliedPromo ? appliedPromo.finalAmount : amount;
-  }
-
   // The charge is always in ZMW; the summary also shows the visitor's display
   // currency (currency.js), e.g. "$5.04 (ZMW 99)".
   function money(zmw){
@@ -49,53 +39,11 @@
       document.getElementById('ckSummaryAmount').textContent = 'Amount to be confirmed';
       return;
     }
-    const total = currentTotal();
-    document.getElementById('ckAmountLabel').textContent = 'ZMW ' + total.toLocaleString();
-    if (appliedPromo) {
-      document.getElementById('ckSummaryAmount').innerHTML =
-        '<span style="text-decoration:line-through;color:var(--text-mute);font-size:16px">' + money(amount) + '</span> ' +
-        money(total) + ' ' + PERIOD_LABEL[period] +
-        ' <span style="color:var(--ok);font-size:13px;font-weight:600">(' + appliedPromo.code + ' applied)</span>';
-    } else {
-      document.getElementById('ckSummaryAmount').textContent = money(amount) + ' ' + PERIOD_LABEL[period];
-    }
+    document.getElementById('ckAmountLabel').textContent = 'ZMW ' + amount.toLocaleString();
+    document.getElementById('ckSummaryAmount').textContent = money(amount) + ' ' + PERIOD_LABEL[period];
   }
   renderSummaryAmount();
   document.addEventListener('nc:currency', renderSummaryAmount);
-
-  const promoInput = document.getElementById('promoCode');
-  const promoApplyBtn = document.getElementById('promoApply');
-  const promoStatus = document.getElementById('promoStatus');
-  if (promoInput && promoApplyBtn) {
-    promoApplyBtn.addEventListener('click', function(){
-      const code = (promoInput.value || '').trim();
-      promoStatus.className = 'form-status';
-      if (!code) { promoStatus.textContent = ''; return; }
-      promoApplyBtn.disabled = true;
-      promoStatus.textContent = 'Checking…';
-      fetch('/api/checkout/validate-promo?code=' + encodeURIComponent(code) + '&amount=' + encodeURIComponent(amount))
-        .then((r) => r.json().then((data) => ({ ok: r.ok, data })))
-        .then(({ ok, data }) => {
-          promoApplyBtn.disabled = false;
-          if (!ok) {
-            appliedPromo = null;
-            promoStatus.textContent = data.error || 'That code didn’t work.';
-            promoStatus.classList.add('err');
-            renderSummaryAmount();
-            return;
-          }
-          appliedPromo = data;
-          promoStatus.textContent = 'Applied — you saved ZMW ' + data.discountAmount.toLocaleString() + '.';
-          promoStatus.classList.add('ok');
-          renderSummaryAmount();
-        })
-        .catch(() => {
-          promoApplyBtn.disabled = false;
-          promoStatus.textContent = 'Could not check that code — please try again.';
-          promoStatus.classList.add('err');
-        });
-    });
-  }
 
   const domainField = document.getElementById('domainField');
   const domainConfirmField = document.getElementById('domainConfirmField');
@@ -324,7 +272,6 @@
       period,
       draftId,
       clientRef,
-      promoCode: appliedPromo ? appliedPromo.code : '',
       domain: fd.get('domain') || '',
       domainOption: type === 'hosting' ? (fd.get('domainOption') || 'existing') : '',
       name: fd.get('name'),

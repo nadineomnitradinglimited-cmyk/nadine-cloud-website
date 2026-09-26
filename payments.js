@@ -55,7 +55,13 @@ function computeExpiryDate(type, period) {
 
 // Never trust a client-supplied discount — always re-derive it server-side
 // from the stored code so a tampered request can't change what's charged.
+// Promo codes are switched off (owner's decision, 2026-09-26): no discount can be
+// applied at checkout. Set to true to bring them back -- but first add a
+// product-type restriction, or a % code would also discount domains (sold at cost).
+const PROMO_CODES_ENABLED = false;
+
 async function validatePromoCode(rawCode, subtotal) {
+  if (!PROMO_CODES_ENABLED) return { ok: false, reason: 'Promo codes aren’t available right now.' };
   const code = typeof rawCode === 'string' ? rawCode.trim().toUpperCase().slice(0, 40) : '';
   if (!code) return { ok: false, reason: 'No promo code given.' };
   if (!dbConfigured()) return { ok: false, reason: 'Promo codes aren’t available right now.' };
