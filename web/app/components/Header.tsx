@@ -74,6 +74,9 @@ export default function Header({
                 </a>
                 <a href="/hosting#security">Security</a>
                 <a href="/hosting#migrate">Free Migration</a>
+                <a href="/deploy">
+                  Deploy from GitHub <span className="badge-new">New</span>
+                </a>
                 <a href="/hosting#faq">Help Center</a>
               </div>
             </li>

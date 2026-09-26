@@ -172,7 +172,7 @@ export default function Hosting() {
             <div>99.9% Uptime Guarantee</div>
             <div>Worldwide Support</div>
             <div>Fast NVMe SSD Cloud Servers</div>
-            <div>Git Version Control — deploy from GitHub</div>
+            <div><a href="/deploy" style={{ color: "inherit" }}>Git Version Control — deploy from GitHub</a></div>
             <div>Node.js App Hosting</div>
             <div>Sitejet Website Builder</div>
             <div>WordPress Manager</div>

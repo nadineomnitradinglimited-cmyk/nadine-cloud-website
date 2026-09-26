@@ -319,6 +319,25 @@ header .wrap{max-width:1560px}
 .tech-badge svg{width:16px;height:16px;color:var(--copper);flex:none}
 
 /* ---------- FAQ ---------- */
+/* ---------- deploy guides (/deploy) ---------- */
+.guide-picker{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
+.guide-picker a{display:flex;flex-direction:column;gap:4px;text-decoration:none;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px 22px;transition:border-color .2s,transform .2s}
+.guide-picker a:hover{border-color:var(--copper);transform:translateY(-2px)}
+.guide-picker b{font-family:var(--display);font-size:17px;color:var(--cloud)}
+.guide-picker span{font-size:13.5px;color:var(--text-mute)}
+.guide .section-head{margin-bottom:24px}
+.guide-steps{max-width:820px;padding-left:24px;display:flex;flex-direction:column;gap:14px;color:var(--text-soft)}
+.guide-steps li{padding-left:6px}
+.guide-steps li::marker{font-family:var(--mono);font-weight:700;color:var(--copper)}
+.guide-steps b,.guide p b{color:var(--cloud)}
+.guide-steps ul{margin:8px 0 0 18px;display:flex;flex-direction:column;gap:5px}
+.guide code,#troubleshooting code{font-family:var(--mono);font-size:.88em;background:var(--surface-2);border:1px solid var(--line);border-radius:6px;padding:1px 6px;color:var(--cloud);word-break:break-word}
+.guide-code{font-family:var(--mono);font-size:13px;line-height:1.55;background:#0B1220;color:#E6EDF7;border-radius:10px;padding:14px 16px;margin:10px 0;overflow-x:auto;white-space:pre}
+.guide-sub{font-size:17px;margin:26px 0 6px;color:var(--cloud)}
+.guide p{max-width:820px;color:var(--text-soft)}
+.guide-note{margin-top:18px;font-size:14.5px}
+.guide-note a{color:var(--copper)}
+
 .faq{border:1px solid var(--line);border-radius:14px;background:var(--surface);overflow:hidden}
 .faq-item{border-bottom:1px solid var(--line)}
 .faq-item:last-child{border-bottom:none}
