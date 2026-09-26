@@ -44,14 +44,15 @@ export default function Home() {
           <div style={{ marginBottom: 18 }}>
             <span className="hero-badge">One cloud. Endless possibilities.</span>
           </div>
-          <span className="eyebrow">Web design · Hosting · Domains — Worldwide</span>
+          <span className="eyebrow">Domains · Hosting · Developer tools — Worldwide</span>
           <h1>
-            Your business, <em>online</em> and under one roof.
+            Domains and hosting <em>built for developers</em>.
           </h1>
           <p className="lead">
-            Nadine Cloud designs your website, hosts it on fast NVMe servers,
-            and manages your domain and business email — so you deal with one
-            team, one invoice, zero headaches.
+            Grab your domain at honest prices, then ship to fast NVMe servers
+            with free SSL, Git deploys, Node.js &amp; PHP apps and MySQL or
+            PostgreSQL databases — plus business email. One cloud, and you pay
+            your way: mobile money or card.
           </p>
         </div>
 
@@ -60,9 +61,10 @@ export default function Home() {
 
       <div className="strip">
         <div className="wrap">
+          <span>Deploy from GitHub</span>
+          <span>Node.js &amp; PHP</span>
           <span>Free SSL on every site</span>
           <span>Daily backups</span>
-          <span>Worldwide support</span>
           <span>WhatsApp support</span>
         </div>
       </div>

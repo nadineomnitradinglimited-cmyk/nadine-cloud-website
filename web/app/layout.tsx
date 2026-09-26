@@ -3,9 +3,9 @@ import Script from "next/script";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Nadine Cloud — Web Design, Hosting & Domains Worldwide",
+  title: "Nadine Cloud — Domains & Hosting for Developers",
   description:
-    "Nadine Cloud builds, hosts and manages websites for businesses worldwide. Web design, cPanel hosting, domains and business email — all under one roof.",
+    "Domains at honest prices, fast NVMe hosting with free SSL, Git deploys, Node.js & PHP apps, MySQL and PostgreSQL databases, and business email. Pay by mobile money or card.",
   icons: {
     icon: "/favicon.svg",
   },
