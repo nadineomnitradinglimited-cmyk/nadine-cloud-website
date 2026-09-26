@@ -196,7 +196,7 @@ export default function Home() {
         <div className="wrap">
           <span className="eyebrow">All-in-one starter</span>
           <h2>Nadine Cloud — Launch</h2>
-          <p>Everything to get your business online in one payment: a free domain, a year of hosting, and our drag-and-drop website builder — all for <b className="amt-live" data-zmw="850" data-launch-price="">ZMW 850</b>.</p>
+          <p>Everything to get your business online in one payment: a free domain, a year of hosting, and a starter website designed and built for you by Nadine Cloud — all for <b className="amt-live" data-zmw="850" data-launch-price="">ZMW 850</b>.</p>
           <div className="actions">
             <a className="btn-primary" href="/checkout?type=bundle&pkg=builder&plan=Nadine+Cloud+%E2%80%94+Launch&amount=850&period=yr">Get Launch</a>
             <a className="btn-ghost" href="/builder">See what&apos;s included</a>

@@ -99,7 +99,7 @@ export default function Builder() {
               </div>
               <ul>
                 <li>Free .com domain (1st year)</li>
-                <li>Drag-and-Drop Website Builder</li>
+                <li>Starter website designed &amp; built for you by Nadine Cloud</li>
                 <li>Free SSL Certificate</li>
                 <li>1 Email Account</li>
                 <li>Standard Support</li>

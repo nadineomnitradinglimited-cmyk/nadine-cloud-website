@@ -1,6 +1,6 @@
 /* ---------- Launch offer: price + countdown banner ----------
    Until OFFER_END the Launch bundle (free .com domain + 1 year hosting +
-   website builder) costs OFFER_ZMW instead of NORMAL_ZMW:
+   a starter website built for the client by Nadine Cloud) costs OFFER_ZMW instead of NORMAL_ZMW:
      - every element marked data-launch-price shows the offer price with the
        normal price crossed out,
      - every Launch checkout link (type=bundle) carries the offer amount,
@@ -50,7 +50,7 @@
     bar.innerHTML =
       '<div class="promo-bar-inner">' +
         '<span class="promo-bar-tag">Launch offer</span>' +
-        '<span class="promo-bar-text"><b>Free .com domain + 1 year hosting + website builder</b> for just ' +
+        '<span class="promo-bar-text"><b>Free .com domain + 1 year hosting + a website built for you by Nadine Cloud</b> for just ' +
           '<s class="amt-live" data-zmw="' + NORMAL_ZMW + '">ZMW ' + NORMAL_ZMW + '</s> ' +
           '<b class="amt-live" data-zmw="' + OFFER_ZMW + '">ZMW ' + OFFER_ZMW + '</b></span>' +
         '<span class="promo-bar-timer" aria-live="off">Ends in ' +
