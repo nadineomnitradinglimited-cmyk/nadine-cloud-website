@@ -63,6 +63,7 @@ export default function Home() {
         <div className="wrap">
           <span>Deploy from GitHub</span>
           <span>Node.js &amp; PHP</span>
+          <span>Sitejet Builder &amp; WordPress Manager</span>
           <span>Free SSL on every site</span>
           <span>Daily backups</span>
           <span>WhatsApp support</span>
@@ -372,7 +373,7 @@ export default function Home() {
                 <div><span className="n">20 GB</span><span className="l">Storage</span></div>
               </div>
               <ul>
-                <li>Website Builder</li>
+                <li>Sitejet Website Builder</li>
                 <li>Automatic Backups</li>
                 <li>Priority Support</li>
               </ul>
@@ -399,7 +400,7 @@ export default function Home() {
                 <div><span className="n">40 GB</span><span className="l">Storage</span></div>
               </div>
               <ul>
-                <li>Website Builder</li>
+                <li>Sitejet Website Builder</li>
                 <li>Automatic Backups</li>
                 <li>Premium Support</li>
               </ul>

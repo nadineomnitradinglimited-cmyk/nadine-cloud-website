@@ -118,7 +118,7 @@ export default function Hosting() {
               </div>
               <ul>
                 <li>10 Databases</li>
-                <li>Website Builder</li>
+                <li>Sitejet Website Builder</li>
                 <li>Free SSL Certificate</li>
                 <li>Automatic Backups</li>
                 <li>Priority Support</li>
@@ -141,7 +141,7 @@ export default function Hosting() {
               </div>
               <ul>
                 <li>20 Databases</li>
-                <li>Website Builder</li>
+                <li>Sitejet Website Builder</li>
                 <li>Free SSL Certificate</li>
                 <li>Automatic Backups</li>
                 <li>Premium Support</li>
@@ -172,7 +172,10 @@ export default function Hosting() {
             <div>99.9% Uptime Guarantee</div>
             <div>Worldwide Support</div>
             <div>Fast NVMe SSD Cloud Servers</div>
-            <div>Git Version Control</div>
+            <div>Git Version Control — deploy from GitHub</div>
+            <div>Node.js App Hosting</div>
+            <div>Sitejet Website Builder</div>
+            <div>WordPress Manager</div>
           </div>
         </div>
       </section>
