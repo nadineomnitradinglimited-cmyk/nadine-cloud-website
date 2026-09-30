@@ -28,9 +28,9 @@ export default function Checkout() {
           <div className="contact-grid">
             <div>
               <img
-                src="/assets/checkout-payment.jpg"
-                alt=""
-                style={{ borderRadius: 16, width: "100%", display: "block", boxShadow: "0 1px 2px rgba(11,18,32,.05), 0 12px 30px rgba(11,18,32,.08)" }}
+                src="/assets/checkout-team.jpg"
+                alt="Nadine Cloud team member at the office"
+                style={{ borderRadius: 16, width: "100%", height: "auto", display: "block", boxShadow: "0 1px 2px rgba(11,18,32,.05), 0 12px 30px rgba(11,18,32,.08)" }}
               />
             </div>
             <div>

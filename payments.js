@@ -111,13 +111,58 @@ const RATE_LIMIT_WINDOW_MS = 60 * 1000;
 const RATE_LIMIT_MAX = 6;
 const hits = new Map();
 
-// in-memory only — order context (which plan/domain) is lost on restart,
-// but the payment itself still completes on Lenco's side either way.
-// Kept (not deleted) after payment so the receipt can still be downloaded;
-// pruned after a day instead.
-const pendingOrders = new Map();
-const notified = new Set();
+// Orders in progress, saved to a small JSON file in the home folder (outside the app folder the
+// deploy replaces) so a restart no longer forgets them: on 2026-09-30 a customer paid while the app
+// was restarting and got no receipt, and nobody was notified.
+// Kept (not deleted) after payment so the receipt can still be downloaded; pruned after a day instead.
+const fs = require('fs');
+const os = require('os');
+const path = require('path');
+const ORDERS_FILE = process.env.PENDING_ORDERS_FILE || path.join(os.homedir(), '.nc-pending-orders.json');
 const ORDER_TTL_MS = 24 * 60 * 60 * 1000;
+
+let saveTimer = null;
+function savePendingOrders() {
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    try {
+      const data = { orders: [...pendingOrders], notified: [...notified] };
+      fs.writeFileSync(ORDERS_FILE + '.tmp', JSON.stringify(data), { mode: 0o600 });
+      fs.renameSync(ORDERS_FILE + '.tmp', ORDERS_FILE);
+    } catch (err) {
+      console.error('Saving pending orders failed (non-fatal):', err.message);
+    }
+  }, 200);
+}
+
+class SavedMap extends Map {
+  set(key, value) { super.set(key, value); savePendingOrders(); return this; }
+  delete(key) { const had = super.delete(key); if (had) savePendingOrders(); return had; }
+}
+class SavedSet extends Set {
+  add(value) { super.add(value); savePendingOrders(); return this; }
+}
+
+const pendingOrders = new SavedMap();
+const notified = new SavedSet();
+
+(function loadPendingOrders() {
+  try {
+    const data = JSON.parse(fs.readFileSync(ORDERS_FILE, 'utf8'));
+    const now = Date.now();
+    for (const [ref, order] of data.orders || []) {
+      if (!order || now - order.createdAt > ORDER_TTL_MS) continue;
+      if (order.expiresAt) order.expiresAt = new Date(order.expiresAt);
+      Map.prototype.set.call(pendingOrders, ref, order);
+    }
+    for (const ref of data.notified || []) {
+      if (pendingOrders.has(ref)) Set.prototype.add.call(notified, ref);
+    }
+    console.log(`Pending orders restored from disk: ${pendingOrders.size}`);
+  } catch (err) {
+    if (err.code !== 'ENOENT') console.error('Loading pending orders failed (non-fatal):', err.message);
+  }
+})();
 
 function pruneOldOrders() {
   const now = Date.now();
@@ -493,6 +538,7 @@ Nothing to set up: this client's hosting is looked after by hand. Their next pay
 
   if (order && outcome === 'paid') {
     order.paidAt = Date.now();
+    savePendingOrders();
     if (order.promoCode) await redeemPromoCode(order.promoCode);
   }
   updateOrderStatus(reference, outcome, order && order.paidAt ? new Date(order.paidAt) : null);
@@ -1049,5 +1095,33 @@ async function handleLipilaWebhook(req, res) {
   }
   sendJson(res, 200, { received: true });
 }
+
+// Safety net: a customer may close the page before it confirms, and the provider's webhook may not
+// arrive. Every few minutes, ask the provider about each unfinished order from the last day, so the
+// receipt and our notification always go out.
+const SWEEP_EVERY_MS = 3 * 60 * 1000;
+async function sweepPendingPayments() {
+  const now = Date.now();
+  for (const [reference, order] of pendingOrders) {
+    if (notified.has(reference) || order.paidAt) continue;
+    if (now - order.createdAt < 60 * 1000 || now - order.createdAt > ORDER_TTL_MS) continue;
+    try {
+      if (reference.startsWith('NCC-')) {
+        await resolveCardPayment(reference);
+        continue;
+      }
+      const lenco = await lencoRequest(`/collections/status/${encodeURIComponent(reference)}`, { method: 'GET' });
+      const data = lenco.body && lenco.body.data;
+      if (data && data.status === 'successful') {
+        await notifyOrder(reference, 'paid');
+      } else if (data && data.status === 'failed') {
+        await notifyOrder(reference, 'failed', data.reasonForFailure);
+      }
+    } catch (err) {
+      console.error(`Payment sweep for ${reference} failed (will retry):`, err.message || err);
+    }
+  }
+}
+setInterval(() => { sweepPendingPayments().catch(() => {}); }, SWEEP_EVERY_MS).unref();
 
 module.exports = { handleAdminClients, handleLipilaWebhook, handleCheckoutInitiate, handleCheckoutStatus, handleLencoWebhook, handleReceiptDownload, handleValidatePromo, handleAdminPromoCodes };

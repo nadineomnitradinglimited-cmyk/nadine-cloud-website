@@ -71,6 +71,11 @@ export default function Contact() {
               </form>
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+              <img
+                src="/assets/contact-team.jpg"
+                alt="Nadine Cloud team member ready to help"
+                style={{ borderRadius: 16, width: "100%", height: "auto", display: "block", boxShadow: "0 1px 2px rgba(11,18,32,.05), 0 12px 30px rgba(11,18,32,.08)" }}
+              />
               <div className="contact-card">
                 <h3>Visit or call</h3>
                 <p><strong>Nadine Cloud</strong><br />Serving clients worldwide</p>
