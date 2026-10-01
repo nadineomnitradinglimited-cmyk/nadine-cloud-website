@@ -10,6 +10,21 @@ const TEXT_MUTE = '#8296A8';
 const LINE = '#E4E9F0';
 const OK = '#1E9E63';
 
+// Package contents printed on the receipt, by order type. Keep in sync with the plan cards on the website.
+const INCLUDED = {
+  bundle: {
+    items: [
+      'Free .com domain (1st year)',
+      '1 year of website hosting',
+      'Starter website designed & built for you by Nadine Cloud',
+      'Free SSL certificate (https and the padlock)',
+      '1 business email account',
+      'Standard support from our team in Lusaka',
+    ],
+    note: 'After the first year, hosting renews at ZMW 59/month plus your domain\'s standard renewal price. We\'ll remind you before either is due.',
+  },
+};
+
 function money(amount, currency) {
   return `${currency} ${Number(amount).toLocaleString()}`;
 }
@@ -90,13 +105,30 @@ function generateReceiptPdf(order, meta) {
     y += order.domain ? 54 : 46;
     doc.moveTo(marginX, y).lineTo(pageW - marginX, y).strokeColor(LINE).lineWidth(1).stroke();
 
-    // total box
+    // total box (right), with the package contents on the left when we know them
     y += 18;
     const boxW = 250;
     const boxX = pageW - marginX - boxW;
     doc.roundedRect(boxX, y, boxW, 52, 8).fillAndStroke(BLUE_SOFT, BLUE_LINE);
     doc.fillColor(TEXT_SOFT).font('Helvetica-Bold').fontSize(10).text('TOTAL PAID', boxX + 16, y + 20);
     doc.fillColor(BLUE).font('Helvetica-Bold').fontSize(18).text(money(order.amount, currency), boxX, y + 16, { align: 'right', width: boxW - 16 });
+
+    const included = INCLUDED[order.type];
+    if (included) {
+      const listW = boxX - marginX - 24;
+      doc.fillColor(BLUE).font('Helvetica-Bold').fontSize(9).text("WHAT'S INCLUDED", marginX + 16, y + 2);
+      let ly = y + 20;
+      for (const item of included.items) {
+        // small drawn tick (Helvetica has no check-mark glyph)
+        doc.save().lineWidth(1.6).strokeColor(OK)
+          .moveTo(marginX + 17, ly + 5).lineTo(marginX + 20, ly + 8.5).lineTo(marginX + 26, ly + 1.5).stroke().restore();
+        doc.fillColor(INK).font('Helvetica').fontSize(10).text(item, marginX + 34, ly, { width: listW - 18 });
+        ly = doc.y + 5;
+      }
+      if (included.note) {
+        doc.fillColor(TEXT_MUTE).font('Helvetica').fontSize(8.5).text(included.note, marginX + 16, ly + 4, { width: listW });
+      }
+    }
 
     // footer: thank-you line and a navy contact band
     const bandH = 84;
