@@ -141,7 +141,116 @@ async function createAccount({ domain, pkgSlug, contactemail }) {
   }
 }
 
+// ===================== Pausing sites for unpaid renewals =====================
+// Pausing and un-pausing a client's website when a renewal isn't paid.
+//
+// Two kinds of client sites live on our InMotion server:
+//  1. Their OWN cPanel account (created by whm.js after checkout)  -> WHM suspendacct / unsuspendacct.
+//  2. An addon domain inside OUR account nadine14 (a client site we host by hand)
+//     -> we must NEVER suspend nadine14 (that would take every site and mailbox offline), so instead
+//        a small block is put at the top of that site's .htaccess that shows a "paused" page.
+// Our own sites can never be paused.
+const fs = require('fs');
+const os = require('os');
+const path = require('path');
+
+const OUR_ACCOUNT = 'nadine14';
+const PROTECTED_DOMAINS = new Set(['nadinecloud.com', 'www.nadinecloud.com', 'cpanel-test.nadinecloud.com']);
+const START = '# >>> NADINE-CLOUD-PAUSE (added automatically, unpaid renewal) >>>';
+const END = '# <<< NADINE-CLOUD-PAUSE <<<';
+const PAGE = 'nc-paused.html';
+
+const clean = (d) => String(d || '').trim().toLowerCase().replace(/^https?:\/\//, '').replace(/^www\./, '').replace(/\/.*$/, '');
+
+async function accountForDomain(domain) {
+  try {
+    const r = await whmRequest(`/json-api/domainuserdata?api.version=1&domain=${encodeURIComponent(domain)}`);
+    return r.body?.data?.userdata?.user || null;
+  } catch {
+    return null; // WHM not reachable / not configured: fall back to the .htaccess method
+  }
+}
+
+// Folder that serves an addon domain inside our own account (/home/nadine14/<domain>).
+function addonDocroot(domain) {
+  const dir = path.join(os.homedir(), domain);
+  return fs.existsSync(dir) && fs.statSync(dir).isDirectory() ? dir : null;
+}
+
+function pausedPage(domain) {
+  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex">
+<title>${domain} is temporarily paused</title>
+<style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0B1220;color:#E6EEF8;font-family:system-ui,Segoe UI,Arial,sans-serif;text-align:center;padding:24px}
+.c{max-width:520px}.b{display:inline-block;margin-top:22px;background:#1769FF;color:#fff;text-decoration:none;padding:13px 22px;border-radius:10px;font-weight:700}
+h1{font-size:26px;margin:18px 0 10px}p{color:#A9B8CC;line-height:1.6}</style></head>
+<body><div class="c"><img src="https://www.nadinecloud.com/logo.png" alt="Nadine Cloud" width="150" onerror="this.remove()">
+<h1>This website is temporarily paused</h1>
+<p>The hosting for <strong>${domain}</strong> is awaiting renewal. If you own this website, please renew to bring it back online straight away.</p>
+<a class="b" href="https://wa.me/260964068483">Contact Nadine Cloud</a></div></body></html>`;
+}
+
+function stripBlock(text) {
+  const s = text.indexOf(START), e = text.indexOf(END);
+  if (s === -1 || e === -1) return text;
+  return (text.slice(0, s) + text.slice(e + END.length)).replace(/^\s*\n/, '');
+}
+
+// Returns { ok, how, user?, reason? }
+async function pauseSite(rawDomain, why = 'Unpaid renewal') {
+  const domain = clean(rawDomain);
+  if (!domain || PROTECTED_DOMAINS.has(domain)) return { ok: false, reason: 'protected_or_missing_domain' };
+
+  const user = await accountForDomain(domain);
+  if (user && user !== OUR_ACCOUNT) {
+    const r = await whmRequest(`/json-api/suspendacct?api.version=1&user=${encodeURIComponent(user)}&reason=${encodeURIComponent(`${why} (${domain})`)}`);
+    const ok = r.body?.metadata?.result === 1;
+    return ok ? { ok, how: `whm:${user}`, user } : { ok: false, reason: r.body?.metadata?.reason || `whm_http_${r.httpStatus}` };
+  }
+
+  const dir = addonDocroot(domain);
+  if (!dir) return { ok: false, reason: 'site_folder_not_found' };
+  const ht = path.join(dir, '.htaccess');
+  const old = fs.existsSync(ht) ? fs.readFileSync(ht, 'utf8') : '';
+  fs.writeFileSync(path.join(dir, PAGE), pausedPage(domain));
+  const block = `${START}\nRewriteEngine On\nRewriteCond %{REQUEST_URI} !^/nc-paused\\.html$\nRewriteRule ^ /${PAGE} [R=302,L]\n${END}\n`;
+  fs.writeFileSync(ht, block + stripBlock(old));
+  return { ok: true, how: 'htaccess' };
+}
+
+async function unpauseSite(rawDomain, how) {
+  const domain = clean(rawDomain);
+  if (!domain) return { ok: false, reason: 'missing_domain' };
+  if (how && how.startsWith('whm:')) {
+    const user = how.slice(4);
+    const r = await whmRequest(`/json-api/unsuspendacct?api.version=1&user=${encodeURIComponent(user)}`);
+    return r.body?.metadata?.result === 1 ? { ok: true } : { ok: false, reason: r.body?.metadata?.reason || `whm_http_${r.httpStatus}` };
+  }
+  const dir = addonDocroot(domain);
+  if (!dir) return { ok: false, reason: 'site_folder_not_found' };
+  const ht = path.join(dir, '.htaccess');
+  if (fs.existsSync(ht)) fs.writeFileSync(ht, stripBlock(fs.readFileSync(ht, 'utf8')));
+  try { fs.unlinkSync(path.join(dir, PAGE)); } catch { /* already gone */ }
+  return { ok: true };
+}
+
+// Database side: un-pause every paused record for this domain (used when a payment arrives).
+async function resumePausedSite(rawDomain) {
+  const { getPool } = require('./db');
+  const domain = clean(rawDomain);
+  const r = await getPool().query(
+    `SELECT reference, suspended_how FROM orders WHERE lower(regexp_replace(domain, '^www\\.', '')) = $1 AND suspended_at IS NOT NULL`,
+    [domain]
+  );
+  if (!r.rowCount) return { ok: true, reason: 'not_paused' };
+  const how = r.rows.find((x) => x.suspended_how)?.suspended_how || 'htaccess';
+  const res = await unpauseSite(domain, how);
+  if (!res.ok) return res;
+  await getPool().query('UPDATE orders SET suspended_at = NULL, suspended_how = NULL WHERE reference = ANY($1)', [r.rows.map((x) => x.reference)]);
+  return { ok: true, resumed: true };
+}
+
 module.exports = {
+  pauseSite, unpauseSite, resumePausedSite, stripBlock,
   whmRequest, ensurePackagesExist, createAccount, PACKAGES, WHM_HOST,
   HOSTING_PACKAGES, DATABASE_PACKAGES, WORDPRESS_PACKAGES, BUILDER_PACKAGES,
 };
