@@ -98,4 +98,39 @@ async function checkStatus(reference) {
   };
 }
 
-module.exports = { isConfigured, createCardPayment, checkStatus, normaliseStatus };
+// Zambian numbers in the form Lipila wants: 260XXXXXXXXX (MTN 96/76, Airtel 97/77, Zamtel 95/75).
+function zmPhone(raw) {
+  let d = String(raw || '').replace(/\D/g, '');
+  if (d.startsWith('260')) d = d.slice(3);
+  if (d.startsWith('0')) d = d.slice(1);
+  return /^[79][5-7]\d{7}$/.test(d) ? `260${d}` : null;
+}
+
+// Mobile money (MTN, Airtel, Zamtel): Lipila sends the customer a PIN prompt on their phone.
+// Returns { ok:true, status } or { ok:false, error }. Payment is confirmed later with checkStatus().
+async function createMobileMoneyPayment({ reference, amount, phone, narration, callbackUrl }) {
+  if (!isConfigured()) return { ok: false, error: 'NOT_CONFIGURED' };
+  const accountNumber = zmPhone(phone);
+  if (!accountNumber) return { ok: false, error: 'BAD_PHONE' };
+  let r;
+  try {
+    r = await lipilaRequest('/api/v1/collections/mobile-money', {
+      method: 'POST',
+      headers: callbackUrl ? { callbackUrl } : undefined,
+      body: JSON.stringify({ referenceId: reference, amount, narration, accountNumber, currency: 'ZMW' }),
+    });
+  } catch (err) {
+    console.error('Lipila mobile money request failed:', err && err.message);
+    return { ok: false, error: 'NETWORK' };
+  }
+  const d = r.data;
+  if (r.httpStatus < 200 || r.httpStatus >= 300 || !d || typeof d !== 'object') {
+    console.error('Lipila mobile money rejected:', r.httpStatus, JSON.stringify(d).slice(0, 300));
+    return { ok: false, error: (d && (d.message || d.error)) || 'REJECTED' };
+  }
+  const status = normaliseStatus(d.status);
+  if (status === 'failed') return { ok: false, error: d.message || 'FAILED' };
+  return { ok: true, status };
+}
+
+module.exports = { isConfigured, createCardPayment, createMobileMoneyPayment, checkStatus, normaliseStatus, zmPhone };

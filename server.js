@@ -2,7 +2,7 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const { handleChat } = require('./chat');
-const { handleAdminClients, handleLipilaWebhook, handleCheckoutInitiate, handleCheckoutStatus, handleLencoWebhook, handleReceiptDownload, handleValidatePromo, handleAdminPromoCodes } = require('./payments');
+const { handleAdminClients, handleAdminRecordPayment, handleLipilaWebhook, handleCheckoutInitiate, handleCheckoutStatus, handleLencoWebhook, handleReceiptDownload, handleValidatePromo, handleAdminPromoCodes } = require('./payments');
 const { handleContact } = require('./contact');
 const { handleSignup, handleLogin, handleLogout, handleMe } = require('./auth');
 const { handleDomainCheck } = require('./registrar');
@@ -194,6 +194,15 @@ const server = http.createServer((req, res) => {
 
   if (req.method === 'POST' && urlPath === '/api/admin/send-reminders') {
     handleSendReminders(req, res);
+    return;
+  }
+
+  // Record a payment made outside the website (cash / MoMo / bank) for a hand-hosted client.
+  if (req.method === 'POST' && urlPath === '/api/admin/record-payment') {
+    handleAdminRecordPayment(req, res).catch((err) => {
+      console.error('record-payment failed:', err);
+      if (!res.headersSent) { res.writeHead(500, { 'Content-Type': 'application/json' }); res.end(JSON.stringify({ error: 'Could not record that payment.' })); }
+    });
     return;
   }
 

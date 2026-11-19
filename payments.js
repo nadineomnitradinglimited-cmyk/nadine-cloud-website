@@ -7,6 +7,7 @@ const { createAccount, HOSTING_PACKAGES, DATABASE_PACKAGES, WORDPRESS_PACKAGES, 
 const SSL_PRODUCTS = new Set(['ssl-standard', 'ssl-wildcard', 'ssl-ev']);
 const CARE_PRODUCTS = new Set(['care-essential', 'care-growth', 'care-premium']);
 const { generateReceiptPdf } = require('./receipt');
+const { resumePausedSite } = require('./whm');
 const { isConfigured: dbConfigured, getPool, ensureSchema } = require('./db');
 const { checkAvailability, registerDomain, registrarName } = require('./registrar');
 const { checkPrice } = require('./pricing');
@@ -388,8 +389,14 @@ async function lookupManagedClient(ref) {
   if (!/^[A-Za-z0-9._-]{1,80}$/.test(ref || '') || !dbConfigured()) return null;
   try {
     await ensureSchema();
+    // The next due date follows the LATEST paid period for this client (their payments create new
+    // orders), not the date on the original record -- otherwise every payment would land on the same month.
     const r = await getPool().query(
-      `SELECT plan, amount, email, expires_at, period FROM orders WHERE reference = $1 AND type = 'managed' AND status = 'paid'`,
+      `SELECT o.plan, o.amount, o.email, o.period,
+              GREATEST(o.expires_at, (SELECT max(x.expires_at) FROM orders x
+                 WHERE x.email = o.email AND x.type = 'managed' AND x.status = 'paid'
+                   AND x.domain IS NOT DISTINCT FROM o.domain)) AS expires_at
+       FROM orders o WHERE o.reference = $1 AND o.type = 'managed' AND o.status = 'paid'`,
       [ref]
     );
     const row = r.rows[0];
@@ -542,6 +549,13 @@ Nothing to set up: this client's hosting is looked after by hand. Their next pay
     if (order.promoCode) await redeemPromoCode(order.promoCode);
   }
   updateOrderStatus(reference, outcome, order && order.paidAt ? new Date(order.paidAt) : null);
+
+  // A renewal paid for a site we had paused for non-payment: switch it straight back on.
+  if (order && outcome === 'paid' && order.domain) {
+    const back = await resumePausedSite(order.domain).catch((err) => ({ ok: false, reason: String(err) }));
+    if (back && back.resumed) message += `\n\n--- Site switched back on ---\n${order.domain} had been paused for non-payment; it is live again.`;
+    else if (back && back.reason && back.reason !== 'not_paused') message += `\n\n--- ACTION NEEDED ---\n${order.domain} was paused but could not be switched back on automatically (${back.reason}). Remove the NADINE-CLOUD-PAUSE block from its .htaccess or unsuspend it in WHM.`;
+  }
 
   await sendEmail({
     subject: `Nadine Cloud checkout — payment ${outcome} (${reference})`,
@@ -726,7 +740,10 @@ async function handleCheckoutInitiate(req, res) {
   }
   const chargeAmount = Math.round((amount - discountAmount) * 100) / 100;
 
-  const reference = isCard ? genReference().replace(/^NC-/, 'NCC-') : genReference();
+  // Mobile money now goes through Lipila (shown to customers as Nadine Pay). Lenco is only used
+  // if the Lipila key is missing, so a missing setting can never stop payments altogether.
+  const viaLipilaMomo = !isCard && lipila.isConfigured();
+  let reference = isCard ? genReference().replace(/^NC-/, 'NCC-') : viaLipilaMomo ? genReference().replace(/^NC-/, 'NCM-') : genReference();
 
   const newOrderRecord = () => ({
     plan, amount: chargeAmount, name, email, phone: phoneDigits,
@@ -772,6 +789,36 @@ async function handleCheckoutInitiate(req, res) {
     return;
   }
 
+  if (viaLipilaMomo) {
+    const site = (process.env.PUBLIC_SITE_URL || 'https://www.nadinecloud.com').replace(/\/+$/, '');
+    const orderRecord = newOrderRecord();
+    pendingOrders.set(reference, orderRecord);
+    const momo = await lipila.createMobileMoneyPayment({
+      reference,
+      amount: chargeAmount,
+      phone: phoneDigits,
+      narration: `Nadine Cloud - ${plan}`.slice(0, 100),
+      callbackUrl: `${site}/api/lipila-webhook`,
+    });
+    if (momo.ok) {
+      persistOrder(reference, orderRecord);
+      sendJson(res, 200, { reference, status: 'pay-offline' }); // the customer approves the prompt on their phone
+      return;
+    }
+    pendingOrders.delete(reference);
+    if (momo.error === 'BAD_PHONE') {
+      sendJson(res, 400, { error: 'Please enter a Zambian mobile money number (MTN, Airtel or Zamtel), e.g. 0971234567.' });
+      return;
+    }
+    if (!process.env.LENCO_API_KEY) {
+      sendJson(res, 502, { error: 'Could not start the mobile money payment — please check the number and try again, or message us on WhatsApp.' });
+      return;
+    }
+    // Lipila refused or could not be reached: fall back to Lenco so the customer can still pay.
+    console.error(`Lipila mobile money failed for ${reference} (${momo.error}) - falling back to Lenco`);
+    reference = genReference();
+  }
+
   let lenco;
   try {
     lenco = await lencoRequest('/collections/mobile-money', {
@@ -809,7 +856,9 @@ async function handleCheckoutInitiate(req, res) {
   sendJson(res, 200, { reference, status: lenco.body.data.status });
 }
 
-// Asks Lipila for the real state of a card payment and, when it is really paid, runs the normal
+const isLipilaRef = (ref) => /^NC[CM]-/.test(ref || '');
+
+// Asks Lipila for the real state of a card or mobile money payment and, when it is really paid, runs the normal
 // order fulfilment once (notifyOrder is idempotent). Used by the status poll and the webhook.
 async function resolveCardPayment(reference) {
   const order = pendingOrders.get(reference);
@@ -840,9 +889,10 @@ async function handleCheckoutStatus(req, res, reference) {
     return;
   }
 
-  // Card payments (references start NCC-) are confirmed with Lipila, never by what the browser says.
-  if (reference.startsWith('NCC-')) {
+  // Lipila payments (card NCC-, mobile money NCM-) are confirmed with Lipila, never by what the browser says.
+  if (isLipilaRef(reference)) {
     const result = await resolveCardPayment(reference);
+    if (result.status === 'failed' && reference.startsWith('NCM-')) notifyOrder(reference, 'failed', result.reason).catch(() => {});
     if (result.error) return sendJson(res, 502, { error: 'Could not check payment status.' });
     return sendJson(res, 200, { status: result.status, reason: result.reason || null });
   }
@@ -1025,6 +1075,47 @@ async function handleAdminClients(req, res) {
   }
 }
 
+// Admin only: record a payment a managed client made OUTSIDE the website (cash, MoMo to our number,
+// bank). It creates the same kind of paid order an online payment would, moves their due date on,
+// stops the reminders and switches the site back on if it was paused.
+// Body: { client: "MAN-…" (or domain: "example.com"), months: 1, method: "cash"|"momo"|"bank", amount?: number, note?: "" }
+async function handleAdminRecordPayment(req, res) {
+  if (!isAdminAuthorized(req)) return sendJson(res, 401, { error: 'Unauthorized.' });
+  if (!dbConfigured()) return sendJson(res, 503, { error: 'Database not configured.' });
+  await ensureSchema();
+  let p;
+  try { p = JSON.parse(await readBody(req, 2000)); } catch { return sendJson(res, 400, { error: 'Invalid request.' }); }
+
+  const months = p.months == null ? 1 : Number(p.months);
+  if (!Number.isInteger(months) || months < 1 || months > 24) return sendJson(res, 400, { error: 'months must be 1 to 24.' });
+  const method = ['cash', 'momo', 'bank', 'other'].includes(p.method) ? p.method : 'other';
+
+  let ref = typeof p.client === 'string' ? p.client.trim() : '';
+  if (!ref && typeof p.domain === 'string') {
+    const d = p.domain.trim().toLowerCase().replace(/^https?:\/\//, '').replace(/^www\./, '').replace(/\/.*$/, '');
+    const f = await getPool().query(`SELECT reference FROM orders WHERE type = 'managed' AND status = 'paid' AND reference LIKE 'MAN-%' AND lower(regexp_replace(domain, '^www\\.', '')) = $1 ORDER BY created_at DESC LIMIT 1`, [d]);
+    ref = f.rows[0]?.reference || '';
+  }
+  const managed = await lookupManagedClient(ref);
+  if (!managed) return sendJson(res, 404, { error: 'No managed client found for that reference or domain.' });
+
+  const base = await getPool().query(`SELECT plan, amount, pkg, domain, email FROM orders WHERE reference = $1`, [ref]);
+  const b = base.rows[0];
+  // lookupManagedClient already gives "latest paid period + 1"; extra months add on from there.
+  const expires = new Date(managed.nextExpiry);
+  if (months > 1) expires.setMonth(expires.getMonth() + (managed.period === 'yr' ? 12 : 1) * (months - 1));
+  const amount = Number.isFinite(Number(p.amount)) && Number(p.amount) > 0 ? Number(p.amount) : Number(b.amount) * months;
+  const reference = 'MANPAY-' + Date.now() + '-' + crypto.randomBytes(3).toString('hex');
+  await getPool().query(
+    `INSERT INTO orders (reference, plan, amount, type, pkg, domain, email, status, created_at, paid_at, period, expires_at, promo_code)
+     VALUES ($1, $2, $3, 'managed', $4, $5, $6, 'paid', now(), now(), $7, $8, $9)`,
+    [reference, b.plan, amount, b.pkg, b.domain, b.email, managed.period, expires, `manual:${method}`]
+  );
+  const back = b.domain ? await resumePausedSite(b.domain).catch((err) => ({ ok: false, reason: String(err) })) : { reason: 'no_domain' };
+  sendEmail({ subject: `Manual payment recorded — ${b.domain || b.email}`, text: `Recorded ${method} payment of ZMW ${amount} for ${b.plan} (${b.domain || b.email}).\nPaid until: ${expires.toISOString().slice(0, 10)}\nReference: ${reference}\n${back.resumed ? 'Site switched back on.' : ''}${p.note ? `\nNote: ${String(p.note).slice(0, 300)}` : ''}` }).catch(() => {});
+  sendJson(res, 200, { ok: true, reference, paidUntil: expires.toISOString(), siteResumed: Boolean(back.resumed) });
+}
+
 async function handleLencoWebhook(req, res) {
   let raw;
   try {
@@ -1090,7 +1181,7 @@ async function handleLipilaWebhook(req, res) {
   try { event = JSON.parse(raw); } catch { /* ignore */ }
   const src = event && (event.data && typeof event.data === 'object' ? event.data : event);
   const reference = src && typeof src.referenceId === 'string' ? src.referenceId : '';
-  if (/^NCC-[A-Za-z0-9-]{1,70}$/.test(reference) && pendingOrders.has(reference)) {
+  if (/^NC[CM]-[A-Za-z0-9-]{1,70}$/.test(reference) && pendingOrders.has(reference)) {
     await resolveCardPayment(reference).catch((err) => console.error('Lipila webhook check failed:', err));
   }
   sendJson(res, 200, { received: true });
@@ -1106,8 +1197,9 @@ async function sweepPendingPayments() {
     if (notified.has(reference) || order.paidAt) continue;
     if (now - order.createdAt < 60 * 1000 || now - order.createdAt > ORDER_TTL_MS) continue;
     try {
-      if (reference.startsWith('NCC-')) {
-        await resolveCardPayment(reference);
+      if (isLipilaRef(reference)) {
+        const r = await resolveCardPayment(reference);
+        if (r.status === 'failed' && reference.startsWith('NCM-')) await notifyOrder(reference, 'failed', r.reason);
         continue;
       }
       const lenco = await lencoRequest(`/collections/status/${encodeURIComponent(reference)}`, { method: 'GET' });
@@ -1124,4 +1216,4 @@ async function sweepPendingPayments() {
 }
 setInterval(() => { sweepPendingPayments().catch(() => {}); }, SWEEP_EVERY_MS).unref();
 
-module.exports = { handleAdminClients, handleLipilaWebhook, handleCheckoutInitiate, handleCheckoutStatus, handleLencoWebhook, handleReceiptDownload, handleValidatePromo, handleAdminPromoCodes };
+module.exports = { handleAdminClients, handleAdminRecordPayment, lookupManagedClient, handleLipilaWebhook, handleCheckoutInitiate, handleCheckoutStatus, handleLencoWebhook, handleReceiptDownload, handleValidatePromo, handleAdminPromoCodes };

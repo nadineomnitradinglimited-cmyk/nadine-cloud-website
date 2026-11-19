@@ -100,6 +100,9 @@ async function ensureSchema() {
     // Kept separate: if this one ever fails, it must not take the rest of the site down with it.
     await getPool().query('ALTER TABLE orders ADD COLUMN IF NOT EXISTS welcome_sent_at TIMESTAMPTZ')
       .catch((err) => console.error('Could not add orders.welcome_sent_at (welcome emails will wait):', err.message));
+    // Unpaid renewals: when (and how) a client's site was paused, so paying can bring it back.
+    await getPool().query('ALTER TABLE orders ADD COLUMN IF NOT EXISTS suspended_at TIMESTAMPTZ; ALTER TABLE orders ADD COLUMN IF NOT EXISTS suspended_how TEXT;')
+      .catch((err) => console.error('Could not add orders.suspended_* (site pausing will wait):', err.message));
     return true;
   });
   return schemaReady;

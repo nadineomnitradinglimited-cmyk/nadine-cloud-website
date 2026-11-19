@@ -18,8 +18,10 @@ const RENEWAL_PAGE = {
 };
 
 const SITE_URL = 'https://www.nadinecloud.com';
-// Nadine Cloud gets a copy of every welcome email and reminder it sends to a client (set COPY_EMAILS_TO to change).
-const COPY_TO = process.env.COPY_EMAILS_TO || 'nadineomnitradinglimited@gmail.com';
+// Nadine Cloud gets a copy of every welcome email and reminder it sends to a client.
+// The address lives in the server's settings (COPY_EMAILS_TO), not in the code. If it is not set,
+// copies go to the site's normal notification address (sendEmail with no "to").
+const COPY_TO = process.env.COPY_EMAILS_TO || undefined;
 const CHECK_INTERVAL_MS = 24 * 60 * 60 * 1000; // once a day
 const WELCOME_CHECK_MS = 5 * 60 * 1000; // look for clients still waiting for their welcome email
 const FIRST_RUN_DELAY_MS = 60 * 1000; // 1 minute after startup, not a full day
@@ -56,7 +58,9 @@ function buildReminderEmail(order, daysLeft) {
       : `${order.plan} renews in ${daysLeft} day${daysLeft === 1 ? '' : 's'}`;
   const dueLine = overdue
     ? `Your <strong>${order.plan}</strong>${order.domain ? ` (${order.domain})` : ''} was due for renewal ${Math.abs(daysLeft)} day${Math.abs(daysLeft) === 1 ? '' : 's'} ago. To avoid any interruption, please renew as soon as you can.`
-    : `Your <strong>${order.plan}</strong>${order.domain ? ` (${order.domain})` : ''} is coming up for renewal ${daysLeft === 0 ? 'today' : `in ${daysLeft} day${daysLeft === 1 ? '' : 's'}`}.`;
+    : daysLeft === 0
+      ? `Your <strong>${order.plan}</strong>${order.domain ? ` (${order.domain})` : ''} is due for renewal <strong>today</strong>. Please pay today to keep it online &mdash; there is a 2-day grace period, after which the service is paused until it is renewed.`
+      : `Your <strong>${order.plan}</strong>${order.domain ? ` (${order.domain})` : ''} is coming up for renewal in ${daysLeft} day${daysLeft === 1 ? '' : 's'}.`;
 
   const html = renderEmail({
     heading,
@@ -197,10 +201,39 @@ async function sendPendingWelcomes(summary) {
   }
 }
 
+// Days until the due date, counted in Lusaka calendar days (so "due on the 19th" means the 19th in Zambia).
+const lusakaDay = (d) => new Date(new Date(d).getTime() + 2 * 3600 * 1000).toISOString().slice(0, 10);
+const daysUntil = (due) => Math.round((Date.parse(lusakaDay(due)) - Date.parse(lusakaDay(new Date()))) / 864e5);
+
+// Renewal rules (agreed 19 Nov 2026):
+//   7 days before  -> one reminder
+//   on the due day -> one reminder ("pay today to keep your site online")
+//   2 days after   -> (grace period over) the site is paused (pauseSite) and the client is told; paying switches it back on.
+//   No other emails. Never pauses anything that is more than 4 days overdue (old records must not
+//   all switch off at once when this goes live) -- those are only listed for Nadine Cloud to look at.
+const REMIND_ON = new Set([7, 0]);
+const GRACE_DAYS = 2; // due on the 18th -> paused on the 20th if still unpaid
+const PAUSABLE_TYPES = new Set(['managed', 'hosting', 'wordpress', 'builder', 'bundle', 'database']);
+
+function buildPausedEmail(order) {
+  const payUrl = order.type === 'managed'
+    ? `${SITE_URL}/checkout/?type=managed&client=${encodeURIComponent(order.reference)}&plan=${encodeURIComponent(order.plan)}&amount=${encodeURIComponent(Number(order.amount))}&period=${order.period === 'yr' ? 'yr' : 'mo'}`
+    : `${SITE_URL}${RENEWAL_PAGE[order.type] || '/contact'}`;
+  const html = renderEmail({
+    heading: `${order.domain || order.plan} has been paused`,
+    bodyHtml: `<p style="margin:0 0 14px">Hi ${order.name || 'there'},</p><p style="margin:0 0 14px">We didn't receive the renewal for <strong>${order.plan}</strong>${order.domain ? ` (${order.domain})` : ''}, which was due 2 days ago, so the website has been paused. Nothing has been deleted.</p><p style="margin:0">Pay below by mobile money or card and it comes back online automatically within minutes.</p>`,
+    ctaText: 'Pay and switch my site back on',
+    ctaUrl: payUrl,
+  });
+  const text = `Hi ${order.name || 'there'},\n\nWe didn't receive the renewal for ${order.plan}${order.domain ? ` (${order.domain})` : ''}, which was due 2 days ago, so the website has been paused. Nothing has been deleted.\n\nPay here and it comes back online automatically: ${payUrl}\n\n— Nadine Cloud`;
+  return { subject: `Your website has been paused: ${order.domain || order.plan}`, html, text };
+}
+
 async function sendDueReminders() {
-  const summary = { due: 0, sent: 0, failed: 0 };
+  const summary = { due: 0, sent: 0, failed: 0, paused: 0, skippedOld: 0 };
   if (!dbConfigured()) return summary;
   await ensureSchema();
+  const { pauseSite } = require('./whm');
 
   let rows;
   try {
@@ -208,7 +241,8 @@ async function sendDueReminders() {
       `SELECT * FROM orders
        WHERE status = 'paid'
          AND expires_at IS NOT NULL
-         AND expires_at <= now() + interval '7 days'
+         AND expires_at <= now() + interval '8 days'
+         AND suspended_at IS NULL
          AND (reminder_sent_at IS NULL OR reminder_sent_at::date < now()::date)`
     );
     rows = result.rows;
@@ -221,9 +255,31 @@ async function sendDueReminders() {
   for (const order of rows) {
     try {
       if (await alreadyRenewed(order)) continue;
-      summary.due += 1;
+      const daysLeft = daysUntil(order.expires_at);
 
-      const daysLeft = daysBetween(new Date(order.expires_at), new Date());
+      // ---- 2-day grace period (policy agreed 19 Nov 2026): days 1-2 after the due date nothing happens;
+      //      on day 2 after (or up to day 4, if the daily job missed a day) the site is paused ----
+      if (daysLeft < 0) {
+        if (daysLeft > -GRACE_DAYS) continue;
+        if (daysLeft < -(GRACE_DAYS + 2) || !PAUSABLE_TYPES.has(order.type) || !order.domain) { summary.skippedOld += 1; continue; }
+        const r = await pauseSite(order.domain);
+        await getPool().query('UPDATE orders SET reminder_sent_at = now() WHERE reference = $1', [order.reference]);
+        if (r.ok) {
+          await getPool().query('UPDATE orders SET suspended_at = now(), suspended_how = $2 WHERE reference = $1', [order.reference, r.how]);
+          summary.paused += 1;
+          const mail = buildPausedEmail(order);
+          await sendEmail({ to: order.email, ...mail });
+          sendEmail({ to: COPY_TO, subject: `Copy: ${order.domain} PAUSED for non-payment (sent to ${order.email})`, html: mail.html, text: mail.text }).catch(() => {});
+        } else {
+          summary.failed += 1;
+          sendEmail({ to: COPY_TO, subject: `ACTION NEEDED: could not pause ${order.domain}`, text: `${order.domain} (${order.plan}) was due ${lusakaDay(order.expires_at)} and is unpaid, but pausing failed: ${r.reason}. Pause it by hand or record the payment.` }).catch(() => {});
+        }
+        continue;
+      }
+
+      // ---- otherwise only remind exactly 7 days before and on the day ----
+      if (!REMIND_ON.has(daysLeft)) continue;
+      summary.due += 1;
       const { subject, html, text } = buildReminderEmail(order, daysLeft);
       const result = await sendEmail({ to: order.email, subject, html, text });
 
