@@ -7,56 +7,24 @@ export default function Home() {
     <>
       <Header />
 
-      <section className="hero" id="top">
-        <div className="hero-graphic" aria-hidden="true">
-          <img
-            src="/assets/hero-city.jpg"
-            alt=""
-            className="hero-servers-img"
-          />
-          <svg
-            className="hero-globe-overlay"
-            viewBox="0 0 600 600"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M40 260 Q220 120 420 240"
-              stroke="#1769FF"
-              strokeWidth={1.6}
-              strokeDasharray="4 5"
-              opacity={0.55}
-            />
-            <path
-              d="M60 420 Q260 500 460 380"
-              stroke="#2F8CFF"
-              strokeWidth={1.6}
-              strokeDasharray="4 5"
-              opacity={0.5}
-            />
-            <circle className="pulse-dot" cx={40} cy={260} r={6} fill="#7047FF" />
-            <circle className="pulse-dot" cx={420} cy={240} r={5} fill="#7047FF" />
-            <circle className="pulse-dot" cx={60} cy={420} r={5} fill="#2F8CFF" />
-            <circle className="pulse-dot" cx={460} cy={380} r={6} fill="#2F8CFF" />
-          </svg>
-        </div>
-        <div className="hero-inner">
-          <div style={{ marginBottom: 18 }}>
-            <span className="hero-badge">One cloud. Endless possibilities.</span>
+      <section className="nc-hero" id="top">
+        <img src="/assets/hero-city.jpg" alt="" className="nc-hero-bg" aria-hidden="true" />
+        <a className="nc-hero-promo" href="/vault">
+          <span className="new-pill">New</span> Meet Nadine Vault — 2 GB of free cloud storage for your phone <span aria-hidden="true">→</span>
+        </a>
+        <div className="nc-hero-inner">
+          <h1>Get your business online, for less</h1>
+          <div className="nc-switch" role="tablist" aria-label="Register or transfer a domain">
+            <a className="on" href="#top" role="tab" aria-selected="true">Register</a>
+            <a href="/domains#transfer" role="tab" aria-selected="false">Transfer</a>
           </div>
-          <span className="eyebrow">Domains · Hosting · Developer tools — Worldwide</span>
-          <h1>
-            Domains and hosting <em>built for developers</em>.
-          </h1>
-          <p className="lead">
-            Grab your domain at honest prices, then ship to fast NVMe servers
-            with free SSL, Git deploys, Node.js &amp; PHP apps and MySQL or
-            PostgreSQL databases — plus business email. One cloud, and you pay
-            your way: mobile money or card.
-          </p>
+          <DomainLookup />
+          <div className="nc-chips">
+            <a href="/domains">.com <b className="amt-live" data-zmw="330">ZMW 330</b></a>
+            <a href="/domains">.org <b className="amt-live" data-zmw="315">ZMW 315</b></a>
+            <a href="/domains">.net <b className="amt-live" data-zmw="315">ZMW 315</b></a>
+          </div>
         </div>
-
-        <DomainLookup />
       </section>
 
       <div className="strip">
@@ -125,9 +93,16 @@ export default function Home() {
       <section className="section">
         <div className="wrap">
           <div className="section-head">
-            <span className="eyebrow">Get started</span>
-            <h2>Everything you need, in one place</h2>
-            <p>Pick what you need today — bundle it all together whenever you&apos;re ready.</p>
+            <h2>Check an overview of our products and offers</h2>
+          </div>
+          <div className="nc-tabs">
+            <a className="on" href="#top"><span aria-hidden="true">★</span> Featured</a>
+            <a href="/domains">Domains</a>
+            <a href="/hosting">Hosting</a>
+            <a href="/hosting#email">Email</a>
+            <a href="/database">Database</a>
+            <a href="/vault">Vault</a>
+            <a href="/builder">Build &amp; Grow</a>
           </div>
           <div className="offer-cards">
             <div className="offer-card">

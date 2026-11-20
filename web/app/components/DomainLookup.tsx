@@ -6,31 +6,23 @@ declare global {
   }
 }
 
+// Big centred domain search on the home page (the actual check lives in /js/main.js → lookupDomain).
 export default function DomainLookup() {
   return (
-    <div className="lookup-wrap">
-      <div className="lookup" aria-label="Domain name search">
-        <div className="lookup-bar">
-          <span className="prompt" aria-hidden="true">
-            &gt;
-          </span>
-          <input
-            id="domInput"
-            type="text"
-            placeholder="yourbusiness"
-            aria-label="Domain name"
-            onKeyDown={(e) => {
-              if (e.key === "Enter") window.lookupDomain?.();
-            }}
-          />
-          <button onClick={() => window.lookupDomain?.()}>
-            Search domain
-          </button>
-        </div>
-        <div className="lookup-result" id="domResult">
-          Type a name to check .com, .org, .net and more
-        </div>
+    <>
+      <div className="nc-search">
+        <input
+          id="domInput"
+          type="text"
+          placeholder="Register a domain name to start"
+          aria-label="Domain name"
+          onKeyDown={(e) => {
+            if (e.key === "Enter") window.lookupDomain?.();
+          }}
+        />
+        <button onClick={() => window.lookupDomain?.()}>Search</button>
       </div>
-    </div>
+      <div className="nc-result" id="domResult" aria-live="polite"></div>
+    </>
   );
 }

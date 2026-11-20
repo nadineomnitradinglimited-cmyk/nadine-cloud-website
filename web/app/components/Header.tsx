@@ -42,15 +42,7 @@ export default function Header({
         <div className="wrap topbar-inner">
           <div className="topbar-left">
             <a href="/contact">Contact us</a>
-            {!hideTalkToSales && (
-              <a
-                href="https://wa.me/260964068483?text=Hi%20Nadine%20Cloud%2C%20I%27d%20like%20to%20talk%20to%20sales."
-                target="_blank"
-                rel="noopener"
-              >
-                Talk to sales
-              </a>
-            )}
+            <a href="/signup" aria-current={current("/signup")}>Sign up</a>
             <a href="/account" className="topbar-signin" aria-current={current("/account")}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                 <circle cx="12" cy="8" r="4.2" />
@@ -62,8 +54,16 @@ export default function Header({
           <div className="topbar-right">
             {/* Currency picker; filled in by /js/currency.js */}
             <div className="cur-picker" id="curPicker" suppressHydrationWarning />
-            <a href="https://wa.me/260964068483" target="_blank" rel="noopener" className="topbar-wa">
-              WhatsApp +260 964 068 483
+            <a href="https://wa.me/260964068483" target="_blank" rel="noopener" className="topbar-icon" aria-label="WhatsApp us">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M21 11.5a8.4 8.4 0 0 1-12.3 7.4L3 21l2.1-5.6A8.4 8.4 0 1 1 21 11.5Z" />
+              </svg>
+            </a>
+            <a href="/domains" className="topbar-icon" aria-label="Search domains">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" aria-hidden="true">
+                <circle cx="11" cy="11" r="7" />
+                <path d="m20 20-4-4" />
+              </svg>
             </a>
           </div>
         </div>
