@@ -111,13 +111,15 @@ header .wrap{max-width:1560px}
 @media(max-width:1560px){
   .nav{gap:24px}
   .nav-links{gap:13px}
-  /* keep the "New" badges on laptops, just smaller */
-  .nav-links > li > a .badge-new,.nav-links > li > a .badge-try{font-size:9px;padding:2px 6px;margin-left:2px;transform:translateY(-1px)}
 }
-@media(max-width:1260px){
-  .nav-links > li > a .badge-new,.nav-links > li > a .badge-try{display:none}
-  .nav-links > li.nav-vault > a .badge-new{display:inline-block}
+/* Laptops & desktops: "New" tags sit as small labels ABOVE the menu word, so the menu stays clean */
+@media(min-width:1061px){
+  .nav-links{gap:22px}
+  .nav-links > li > a{position:relative;display:inline-flex;align-items:center;padding:14px 0 4px;font-size:15px;font-weight:600;color:var(--cloud)}
+  .nav-links > li > a:hover,.nav-links > li > a[aria-current="page"]{color:var(--copper)}
+  .nav-links > li > a .badge-new,.nav-links > li > a .badge-try{position:absolute;left:0;top:-1px;margin:0;font-size:8.5px;line-height:1.35;padding:1px 5px;border-radius:4px;letter-spacing:.06em}
 }
+@media(min-width:1061px) and (max-width:1300px){.nav-links{gap:14px}.nav-links > li > a{font-size:14px}}
 /* "New" tag sitting on the corner of a button */
 .has-new{position:relative}
 .new-tag{position:absolute;top:-9px;right:-8px;padding:2px 7px;font-family:var(--body);font-size:10px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;line-height:1.4;color:#fff;background:#DC2626;border-radius:999px;box-shadow:0 3px 8px rgba(220,38,38,.35);pointer-events:none}
