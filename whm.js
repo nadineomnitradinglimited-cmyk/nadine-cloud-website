@@ -160,6 +160,13 @@ const START = '# >>> NADINE-CLOUD-PAUSE (added automatically, unpaid renewal) >>
 const END = '# <<< NADINE-CLOUD-PAUSE <<<';
 const PAGE = 'nc-paused.html';
 
+// Some clients keep their PUBLIC website online when unpaid: only the paid "database" services
+// (admin panel, booking/package builder and the admin data behind them) are suspended.
+// Map: domain -> URL path prefixes to block. Any domain not listed is paused as a whole site.
+const SCOPED_SUSPEND = {
+  'royalsouthluangwa.com': ['admin', 'builder', 'api/admin'],
+};
+
 const clean = (d) => String(d || '').trim().toLowerCase().replace(/^https?:\/\//, '').replace(/^www\./, '').replace(/\/.*$/, '');
 
 async function accountForDomain(domain) {
@@ -177,15 +184,19 @@ function addonDocroot(domain) {
   return fs.existsSync(dir) && fs.statSync(dir).isDirectory() ? dir : null;
 }
 
-function pausedPage(domain) {
+function pausedPage(domain, scoped) {
+  const title = scoped ? 'This service is temporarily suspended' : 'This website is temporarily paused';
+  const text = scoped
+    ? `The admin panel and booking tools for <strong>${domain}</strong> are suspended while the hosting and database renewal is outstanding. Your public website is still online. Please renew to restore access straight away.`
+    : `The hosting for <strong>${domain}</strong> is awaiting renewal. If you own this website, please renew to bring it back online straight away.`;
   return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex">
-<title>${domain} is temporarily paused</title>
+<title>${title}</title>
 <style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0B1220;color:#E6EEF8;font-family:system-ui,Segoe UI,Arial,sans-serif;text-align:center;padding:24px}
 .c{max-width:520px}.b{display:inline-block;margin-top:22px;background:#1769FF;color:#fff;text-decoration:none;padding:13px 22px;border-radius:10px;font-weight:700}
 h1{font-size:26px;margin:18px 0 10px}p{color:#A9B8CC;line-height:1.6}</style></head>
-<body><div class="c"><img src="https://www.nadinecloud.com/logo.png" alt="Nadine Cloud" width="150" onerror="this.remove()">
-<h1>This website is temporarily paused</h1>
-<p>The hosting for <strong>${domain}</strong> is awaiting renewal. If you own this website, please renew to bring it back online straight away.</p>
+<body><div class="c"><div style="background:#fff;border-radius:14px;padding:14px 18px;display:inline-block"><img src="https://www.nadinecloud.com/assets/email-logo.png" alt="Nadine Cloud" width="180" onerror="this.remove()"></div>
+<h1>${title}</h1>
+<p>${text}</p>
 <a class="b" href="https://wa.me/260964068483">Contact Nadine Cloud</a></div></body></html>`;
 }
 
@@ -211,10 +222,24 @@ async function pauseSite(rawDomain, why = 'Unpaid renewal') {
   if (!dir) return { ok: false, reason: 'site_folder_not_found' };
   const ht = path.join(dir, '.htaccess');
   const old = fs.existsSync(ht) ? fs.readFileSync(ht, 'utf8') : '';
-  fs.writeFileSync(path.join(dir, PAGE), pausedPage(domain));
-  const block = `${START}\nRewriteEngine On\nRewriteCond %{REQUEST_URI} !^/nc-paused\\.html$\nRewriteRule ^ /${PAGE} [R=302,L]\n${END}\n`;
+  const scope = SCOPED_SUSPEND[domain];
+  fs.writeFileSync(path.join(dir, PAGE), pausedPage(domain, Boolean(scope)));
+  let rules;
+  if (scope) {
+    // Only the listed parts: pages go to the "suspended" page, data requests are refused.
+    const esc = (p) => p.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const pages = scope.filter((p) => !p.startsWith('api/')).map(esc);
+    const apis = scope.filter((p) => p.startsWith('api/')).map(esc);
+    rules = [
+      pages.length ? `RewriteRule ^(${pages.join('|')})(\\.html)?(/.*)?$ /${PAGE} [R=302,L]` : '',
+      apis.length ? `RewriteRule ^(${apis.join('|')})(/.*)?$ - [F,L]` : '',
+    ].filter(Boolean).join('\n');
+  } else {
+    rules = `RewriteCond %{REQUEST_URI} !^/nc-paused\\.html$\nRewriteRule ^ /${PAGE} [R=302,L]`;
+  }
+  const block = `${START}\nRewriteEngine On\n${rules}\n${END}\n`;
   fs.writeFileSync(ht, block + stripBlock(old));
-  return { ok: true, how: 'htaccess' };
+  return { ok: true, how: scope ? 'htaccess-scoped' : 'htaccess' };
 }
 
 async function unpauseSite(rawDomain, how) {
