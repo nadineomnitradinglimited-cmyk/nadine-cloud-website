@@ -203,7 +203,7 @@ h1{font-size:26px;margin:18px 0 10px}p{color:#A9B8CC;line-height:1.6}</style></h
 <h1>${title}</h1>
 <p>${text}</p>
 ${pay && pay.url ? `<a class="b" href="${pay.url}" style="background:#16A34A;font-size:17px;padding:15px 28px">${pay.label || 'Pay now'}</a><br>` : ''}
-<a class="b" href="https://wa.me/260964068483" style="background:transparent;border:1px solid #5B7BAA;margin-top:12px">Contact Nadine Cloud</a></div></body></html>`;
+<a class="b" href="mailto:info@nadinecloud.com" style="background:transparent;border:1px solid #5B7BAA;margin-top:12px">Contact Nadine Cloud</a></div></body></html>`;
 }
 
 function stripBlock(text) {

@@ -108,7 +108,7 @@ async function checkPrice({ type, pkg, period, plan, domain, amount }) {
       }
       if (!quote || !quote.available) return { ok: false, error: `${domain} is not available to register.` };
       if (quote.isPremium || typeof quote.price !== 'number') {
-        return { ok: false, error: `${domain} is a premium domain. Please contact us on WhatsApp to buy it.` };
+        return { ok: false, error: `${domain} is a premium domain. Please email us to buy it.` };
       }
       const expected = Math.ceil(quote.price * (await usdToZmw()));
       return amount >= Math.floor(expected * DOMAIN_TOLERANCE) ? { ok: true } : fail(expected);

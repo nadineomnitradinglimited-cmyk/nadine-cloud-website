@@ -150,7 +150,7 @@ async function buildWelcomeEmail(o) {
     <p style="margin:18px 0 6px;color:#0B1220;font-weight:bold">Your plan</p>
     <table style="width:100%;border-collapse:collapse;border-top:1px solid #E3E9F1;border-bottom:1px solid #E3E9F1;font-size:15px">${table}</table>
     <p style="margin:18px 0 14px">A week before each due date we'll send you a reminder with your personal payment link. You can pay by <strong>mobile money or card (Visa / Mastercard)</strong>. Card details are entered on the payment provider's secure page &mdash; we never see or keep them.</p>
-    <p style="margin:0">Need anything? Just reply to this email or message us on WhatsApp.</p>
+    <p style="margin:0">Need anything? Just reply to this email or email us at info@nadinecloud.com.</p>
     <p style="margin:18px 0 0">Welcome aboard,<br><strong style="color:#0B1220">The Nadine Cloud team</strong></p>`,
   });
   const text = `Hello,
@@ -163,7 +163,7 @@ Make your payment (mobile money or card): ${payUrl}
 
 A week before each due date we will send you a reminder with your personal payment link. Card details are entered on the payment provider's secure page - we never see or keep them.
 
-Need anything? Reply to this email or message us on WhatsApp: https://wa.me/260964068483
+Need anything? Reply to this email or email us: mailto:info@nadinecloud.com
 
 Welcome aboard,
 The Nadine Cloud team`;

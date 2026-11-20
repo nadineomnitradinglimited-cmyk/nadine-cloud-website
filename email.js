@@ -79,7 +79,7 @@ function renderEmail({ heading, bodyHtml, ctaText, ctaUrl, imageUrl, imageAlt, i
     </div>
     <p style="text-align:center;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#78899C;margin-top:24px;">
       Nadine Cloud<br>
-      Questions? <a href="https://wa.me/260964068483" style="color:#1769FF;">Message us on WhatsApp</a>
+      Questions? <a href="mailto:info@nadinecloud.com" style="color:#1769FF;">Email us</a>
     </p>
   </div>
 </body>

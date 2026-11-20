@@ -293,7 +293,7 @@ async function emailAccountDetailsToCustomer(order, acct) {
   const result = await sendEmail({
     to: order.email,
     subject: `Your Nadine Cloud hosting is ready — ${acct.domain}`,
-    text: `Hi ${order.name},\n\nYour hosting account is set up and ready to go.\n\ncPanel login: https://${acct.domain}:2083\nUsername: ${acct.username}\nPassword: ${acct.password}\n\nWe'd recommend logging in and changing your password once you're in.\n\nAny trouble, reach us on WhatsApp at +260 964 068 483.\n\n— Nadine Cloud`,
+    text: `Hi ${order.name},\n\nYour hosting account is set up and ready to go.\n\ncPanel login: https://${acct.domain}:2083\nUsername: ${acct.username}\nPassword: ${acct.password}\n\nWe'd recommend logging in and changing your password once you're in.\n\nAny trouble, email us at info@nadinecloud.com.\n\n— Nadine Cloud`,
   });
   if (!result.ok) {
     console.error(`Account details email not delivered to customer for ${acct.domain}:`, result.reason);
@@ -305,7 +305,7 @@ async function emailDatabaseDetailsToCustomer(order, acct, maxsql) {
   const result = await sendEmail({
     to: order.email,
     subject: `Your Nadine Cloud database hosting is ready — ${order.plan}`,
-    text: `Hi ${order.name},\n\nYour database hosting account is set up and ready to go.\n\ncPanel login: https://${acct.domain}:2083\nUsername: ${acct.username}\nPassword: ${acct.password}\n\nFrom there, go to MySQL Databases (or PostgreSQL Databases) and use the wizard to create your database(s) — your plan covers up to ${maxsql}. Each database gets its own username/password that your app connects with directly.\n\nWe'd recommend logging in and changing your cPanel password once you're in.\n\nAny trouble, reach us on WhatsApp at +260 964 068 483.\n\n— Nadine Cloud`,
+    text: `Hi ${order.name},\n\nYour database hosting account is set up and ready to go.\n\ncPanel login: https://${acct.domain}:2083\nUsername: ${acct.username}\nPassword: ${acct.password}\n\nFrom there, go to MySQL Databases (or PostgreSQL Databases) and use the wizard to create your database(s) — your plan covers up to ${maxsql}. Each database gets its own username/password that your app connects with directly.\n\nWe'd recommend logging in and changing your cPanel password once you're in.\n\nAny trouble, email us at info@nadinecloud.com.\n\n— Nadine Cloud`,
   });
   if (!result.ok) {
     console.error(`Database account email not delivered to customer for ${acct.domain}:`, result.reason);
@@ -317,7 +317,7 @@ async function emailWordPressDetailsToCustomer(order, acct) {
   const result = await sendEmail({
     to: order.email,
     subject: `Your Nadine Cloud WordPress hosting is ready — ${acct.domain}`,
-    text: `Hi ${order.name},\n\nYour hosting account is set up.\n\ncPanel login: https://${acct.domain}:2083\nUsername: ${acct.username}\nPassword: ${acct.password}\n\nWe're installing WordPress for you now — you'll get a separate email with your WordPress admin login within a few hours.\n\nWe'd recommend logging in to cPanel and changing your password once you're in.\n\nAny trouble, reach us on WhatsApp at +260 964 068 483.\n\n— Nadine Cloud`,
+    text: `Hi ${order.name},\n\nYour hosting account is set up.\n\ncPanel login: https://${acct.domain}:2083\nUsername: ${acct.username}\nPassword: ${acct.password}\n\nWe're installing WordPress for you now — you'll get a separate email with your WordPress admin login within a few hours.\n\nWe'd recommend logging in to cPanel and changing your password once you're in.\n\nAny trouble, email us at info@nadinecloud.com.\n\n— Nadine Cloud`,
   });
   if (!result.ok) console.error(`WordPress account email not delivered to customer for ${acct.domain}:`, result.reason);
   return result;
@@ -327,7 +327,7 @@ async function emailBuilderDetailsToCustomer(order, acct) {
   const result = await sendEmail({
     to: order.email,
     subject: `Your Nadine Cloud Website Builder account is ready — ${acct.domain}`,
-    text: `Hi ${order.name},\n\nYour hosting account is set up.\n\ncPanel login: https://${acct.domain}:2083\nUsername: ${acct.username}\nPassword: ${acct.password}\n\nWe're enabling Website Builder for you now — it'll appear in cPanel within a few hours, and you can start building your site right from there.\n\nWe'd recommend logging in and changing your cPanel password once you're in.\n\nAny trouble, reach us on WhatsApp at +260 964 068 483.\n\n— Nadine Cloud`,
+    text: `Hi ${order.name},\n\nYour hosting account is set up.\n\ncPanel login: https://${acct.domain}:2083\nUsername: ${acct.username}\nPassword: ${acct.password}\n\nWe're enabling Website Builder for you now — it'll appear in cPanel within a few hours, and you can start building your site right from there.\n\nWe'd recommend logging in and changing your cPanel password once you're in.\n\nAny trouble, email us at info@nadinecloud.com.\n\n— Nadine Cloud`,
   });
   if (!result.ok) console.error(`Website Builder account email not delivered to customer for ${acct.domain}:`, result.reason);
   return result;
@@ -337,7 +337,7 @@ async function emailSslOrderConfirmation(order) {
   const result = await sendEmail({
     to: order.email,
     subject: `Your Nadine Cloud SSL certificate order — ${order.domain}`,
-    text: `Hi ${order.name},\n\nThanks for your order — we're setting up your SSL certificate for ${order.domain} now. This can take up to 24 hours depending on the certificate type (Wildcard and Extended Validation need extra verification). We'll email you once it's live on your site.\n\nAny questions, reach us on WhatsApp at +260 964 068 483.\n\n— Nadine Cloud`,
+    text: `Hi ${order.name},\n\nThanks for your order — we're setting up your SSL certificate for ${order.domain} now. This can take up to 24 hours depending on the certificate type (Wildcard and Extended Validation need extra verification). We'll email you once it's live on your site.\n\nAny questions, email us at info@nadinecloud.com.\n\n— Nadine Cloud`,
   });
   if (!result.ok) console.error(`SSL confirmation email not delivered for ${order.domain}:`, result.reason);
   return result;
@@ -347,7 +347,7 @@ async function emailCarePlanConfirmation(order) {
   const result = await sendEmail({
     to: order.email,
     subject: `Welcome to your Nadine Cloud Care Plan — ${order.plan}`,
-    text: `Hi ${order.name},\n\nThanks for signing up for ${order.plan}. Our team will reach out within 24 hours to onboard your website onto the plan and confirm what we'll need access to.\n\nAny questions in the meantime, reach us on WhatsApp at +260 964 068 483.\n\n— Nadine Cloud`,
+    text: `Hi ${order.name},\n\nThanks for signing up for ${order.plan}. Our team will reach out within 24 hours to onboard your website onto the plan and confirm what we'll need access to.\n\nAny questions in the meantime, email us at info@nadinecloud.com.\n\n— Nadine Cloud`,
   });
   if (!result.ok) console.error(`Care plan confirmation email not delivered for ${order.email}:`, result.reason);
   return result;
@@ -663,7 +663,7 @@ async function handleCheckoutInitiate(req, res) {
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return sendJson(res, 400, { error: 'A valid email is required.' });
   if (phoneDigits.length < 9) return sendJson(res, 400, { error: isCard ? 'A valid phone number is required.' : 'A valid mobile money phone number is required.' });
   if (isCard) {
-    if (!lipila.isConfigured()) return sendJson(res, 503, { error: 'Card payment isn’t switched on yet — please use mobile money, WhatsApp or the contact form.' });
+    if (!lipila.isConfigured()) return sendJson(res, 503, { error: 'Card payment isn’t switched on yet — please use mobile money, email or the contact form.' });
     if (!address1 || !city || !postalCode || !country || country === 'OTHER') {
       return sendJson(res, 400, { error: 'Please fill in your billing address (street, city, postal code and country) for card payment.' });
     }
@@ -710,7 +710,7 @@ async function handleCheckoutInitiate(req, res) {
   if (needsRegistrant) {
     if (!domain) return sendJson(res, 400, { error: 'A domain name is required.' });
     if (!address1 || !city || !postalCode || !country || country === 'OTHER') {
-      return sendJson(res, 400, { error: 'A full contact address is required to register a domain — please fill in every field, or message us on WhatsApp if your country isn’t listed.' });
+      return sendJson(res, 400, { error: 'A full contact address is required to register a domain — please fill in every field, or email us at info@nadinecloud.com if your country isn’t listed.' });
     }
   }
 
@@ -719,7 +719,7 @@ async function handleCheckoutInitiate(req, res) {
   let managed = null;
   if (type === 'managed') {
     managed = await lookupManagedClient(clientRef);
-    if (!managed) return sendJson(res, 400, { error: 'This payment link is not valid. Please use the link in your latest email from us, or message us on WhatsApp.' });
+    if (!managed) return sendJson(res, 400, { error: 'This payment link is not valid. Please use the link in your latest email from us, or email us at info@nadinecloud.com.' });
     if (Math.abs(amount - managed.amount) > 0.009) return sendJson(res, 400, { error: 'That amount does not match your agreed monthly payment.' });
     plan = managed.plan;
   } else {
@@ -781,7 +781,7 @@ async function handleCheckoutInitiate(req, res) {
     });
     if (!card.ok) {
       pendingOrders.delete(reference);
-      sendJson(res, 502, { error: 'Could not start the card payment — please try again, use mobile money, or message us on WhatsApp.' });
+      sendJson(res, 502, { error: 'Could not start the card payment — please try again, use mobile money, or email us at info@nadinecloud.com.' });
       return;
     }
     persistOrder(reference, orderRecord);
@@ -811,7 +811,7 @@ async function handleCheckoutInitiate(req, res) {
       return;
     }
     if (!process.env.LENCO_API_KEY) {
-      sendJson(res, 502, { error: 'Could not start the mobile money payment — please check the number and try again, or message us on WhatsApp.' });
+      sendJson(res, 502, { error: 'Could not start the mobile money payment — please check the number and try again, or email us at info@nadinecloud.com.' });
       return;
     }
     // Lipila refused or could not be reached: fall back to Lenco so the customer can still pay.
@@ -834,11 +834,11 @@ async function handleCheckoutInitiate(req, res) {
     });
   } catch (err) {
     if (err.code === 'LENCO_NOT_CONFIGURED') {
-      sendJson(res, 503, { error: 'Online payment isn’t switched on yet — please use WhatsApp or the contact form instead.' });
+      sendJson(res, 503, { error: 'Online payment isn’t switched on yet — please email us or use the contact form instead.' });
       return;
     }
     console.error('Lenco initiate error:', err);
-    sendJson(res, 502, { error: 'Could not start the payment — please try again or use WhatsApp.' });
+    sendJson(res, 502, { error: 'Could not start the payment — please try again or email us.' });
     return;
   }
 

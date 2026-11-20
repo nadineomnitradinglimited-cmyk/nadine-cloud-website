@@ -1,5 +1,5 @@
 (function () {
-  const GREETING = "Hi, I'm Nadine. Ask me about hosting, domains, web design or pricing — or message us on WhatsApp anytime.";
+  const GREETING = "Hi, I'm Nadine. Ask me about hosting, domains, web design or pricing — or email us anytime.";
   const NAME_KEY = 'nc_chat_name';
   const SKIPPED_KEY = 'nc_chat_skipped_name';
 
@@ -150,7 +150,7 @@
       typingRow.remove();
 
       if (!res.ok) {
-        addMessage('assistant', data.error || 'Something went wrong — please try WhatsApp instead.');
+        addMessage('assistant', data.error || 'Something went wrong — please email info@nadinecloud.com instead.');
       } else {
         addMessage('assistant', data.reply);
         history.push({ role: 'user', content: message });
@@ -159,7 +159,7 @@
       }
     } catch (err) {
       typingRow.remove();
-      addMessage('assistant', "Couldn't reach the server — please try WhatsApp at +260 964 068 483.");
+      addMessage('assistant', "Couldn't reach the server — please email info@nadinecloud.com.");
     } finally {
       sending = false;
       input.focus();

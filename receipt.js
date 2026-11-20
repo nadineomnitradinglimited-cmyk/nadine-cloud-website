@@ -141,7 +141,7 @@ function generateReceiptPdf(order, meta) {
     doc.fillColor('#FFFFFF').font('Helvetica-Bold').fontSize(12).text('Nadine Cloud', marginX, bandY + 20);
     doc.fillColor('#8FB8FF').font('Helvetica').fontSize(9).text('One Cloud. Endless Possibilities.', marginX, bandY + 37);
     doc.fillColor('#C7D3E6').font('Helvetica').fontSize(9)
-      .text('info@nadinecloud.com  ·  +260 964 068 483', 0, bandY + 22, { align: 'right', width: pageW - marginX })
+      .text('info@nadinecloud.com  ·  www.nadinecloud.com', 0, bandY + 22, { align: 'right', width: pageW - marginX })
       .text('www.nadinecloud.com  ·  PHI Mall, Lusaka, Zambia', 0, bandY + 37, { align: 'right', width: pageW - marginX });
 
     doc.end();
