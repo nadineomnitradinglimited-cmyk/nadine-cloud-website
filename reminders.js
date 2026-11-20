@@ -262,7 +262,11 @@ async function sendDueReminders() {
       if (daysLeft < 0) {
         if (daysLeft > -GRACE_DAYS) continue;
         if (daysLeft < -(GRACE_DAYS + 2) || !PAUSABLE_TYPES.has(order.type) || !order.domain) { summary.skippedOld += 1; continue; }
-        const r = await pauseSite(order.domain);
+        const payUrl = order.type === 'managed'
+          ? `${SITE_URL}/checkout/?type=managed&client=${encodeURIComponent(order.reference)}&plan=${encodeURIComponent(order.plan)}&amount=${encodeURIComponent(Number(order.amount))}&period=${order.period === 'yr' ? 'yr' : 'mo'}`
+          : `${SITE_URL}${RENEWAL_PAGE[order.type] || '/contact'}`;
+        // the locked screen gets its own "Pay ZMW … now" button
+        const r = await pauseSite(order.domain, 'Unpaid renewal', { url: payUrl, label: `Pay ZMW ${Number(order.amount).toLocaleString('en-US')} now` });
         await getPool().query('UPDATE orders SET reminder_sent_at = now() WHERE reference = $1', [order.reference]);
         if (r.ok) {
           await getPool().query('UPDATE orders SET suspended_at = now(), suspended_how = $2 WHERE reference = $1', [order.reference, r.how]);

@@ -184,7 +184,7 @@ function addonDocroot(domain) {
   return fs.existsSync(dir) && fs.statSync(dir).isDirectory() ? dir : null;
 }
 
-function pausedPage(domain, scoped) {
+function pausedPage(domain, scoped, pay) {
   const title = scoped ? 'This service is temporarily suspended' : 'This website is temporarily paused';
   const text = scoped
     ? `The admin panel and booking tools for <strong>${domain}</strong> are suspended while the hosting and database renewal is outstanding. Your public website is still online. Please renew to restore access straight away.`
@@ -197,7 +197,8 @@ h1{font-size:26px;margin:18px 0 10px}p{color:#A9B8CC;line-height:1.6}</style></h
 <body><div class="c"><div style="background:#fff;border-radius:14px;padding:14px 18px;display:inline-block"><img src="https://www.nadinecloud.com/assets/email-logo.png" alt="Nadine Cloud" width="180" onerror="this.remove()"></div>
 <h1>${title}</h1>
 <p>${text}</p>
-<a class="b" href="https://wa.me/260964068483">Contact Nadine Cloud</a></div></body></html>`;
+${pay && pay.url ? `<a class="b" href="${pay.url}" style="background:#16A34A;font-size:17px;padding:15px 28px">${pay.label || 'Pay now'}</a><br>` : ''}
+<a class="b" href="https://wa.me/260964068483" style="background:transparent;border:1px solid #5B7BAA;margin-top:12px">Contact Nadine Cloud</a></div></body></html>`;
 }
 
 function stripBlock(text) {
@@ -207,7 +208,7 @@ function stripBlock(text) {
 }
 
 // Returns { ok, how, user?, reason? }
-async function pauseSite(rawDomain, why = 'Unpaid renewal') {
+async function pauseSite(rawDomain, why = 'Unpaid renewal', pay = null) {
   const domain = clean(rawDomain);
   if (!domain || PROTECTED_DOMAINS.has(domain)) return { ok: false, reason: 'protected_or_missing_domain' };
 
@@ -223,7 +224,7 @@ async function pauseSite(rawDomain, why = 'Unpaid renewal') {
   const ht = path.join(dir, '.htaccess');
   const old = fs.existsSync(ht) ? fs.readFileSync(ht, 'utf8') : '';
   const scope = SCOPED_SUSPEND[domain];
-  fs.writeFileSync(path.join(dir, PAGE), pausedPage(domain, Boolean(scope)));
+  fs.writeFileSync(path.join(dir, PAGE), pausedPage(domain, Boolean(scope), pay));
   let rules;
   if (scope) {
     // Only the listed parts: pages go to the "suspended" page, data requests are refused.
