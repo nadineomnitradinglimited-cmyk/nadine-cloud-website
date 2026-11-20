@@ -119,6 +119,31 @@ header .wrap{max-width:1560px}
   .nav-links > li > a:hover,.nav-links > li > a[aria-current="page"]{color:var(--copper)}
   .nav-links > li > a .badge-new,.nav-links > li > a .badge-try{position:absolute;left:0;top:-1px;margin:0;font-size:8.5px;line-height:1.35;padding:1px 5px;border-radius:4px;letter-spacing:.06em}
 }
+/* ---------- top bar + logo-left / menu-right layout (laptops & desktops) ---------- */
+.topbar{display:none}
+@media(min-width:1061px){
+  .topbar{display:block;background:#F4F6FB;border-bottom:1px solid var(--line)}
+  .topbar-inner{display:flex;align-items:center;justify-content:space-between;height:40px}
+  .topbar-left,.topbar-right{display:flex;align-items:center;gap:22px}
+  .topbar a{color:var(--cloud);text-decoration:none;font-size:14px;font-weight:500;white-space:nowrap}
+  .topbar a:hover,.topbar a[aria-current="page"]{color:var(--copper)}
+  .topbar-signin{display:inline-flex;align-items:center;gap:6px;background:#E6EBF5;padding:5px 12px;border-radius:6px}
+  .topbar-wa{color:var(--text-soft)!important;font-family:var(--mono);font-size:12.5px!important}
+  .topbar .cur-picker{display:block}
+  .topbar .cur-btn{border:none;padding:4px 6px;font-size:14px;color:var(--cloud)}
+  .nav{height:80px}
+  header nav{margin-left:auto}
+  .nav-actions{margin-left:8px}
+  .nav-account,.sales-btn{display:none!important}
+  .logo-img{height:44px}
+}
+@media(min-width:1600px){
+  .nav{height:88px}
+  .nav-links{gap:30px}
+  .nav-links > li > a{font-size:17.5px}
+  .nav-links > li > a .badge-new,.nav-links > li > a .badge-try{font-size:9.5px}
+  .logo-img{height:50px}
+}
 @media(min-width:1061px) and (max-width:1300px){.nav-links{gap:14px}.nav-links > li > a{font-size:14px}}
 /* "New" tag sitting on the corner of a button */
 .has-new{position:relative}

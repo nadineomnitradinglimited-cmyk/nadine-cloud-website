@@ -37,6 +37,37 @@ export default function Header({
 
   return (
     <header>
+      {/* Thin top bar (laptops/desktops): contact, sales, sign in, currency */}
+      <div className="topbar">
+        <div className="wrap topbar-inner">
+          <div className="topbar-left">
+            <a href="/contact">Contact us</a>
+            {!hideTalkToSales && (
+              <a
+                href="https://wa.me/260964068483?text=Hi%20Nadine%20Cloud%2C%20I%27d%20like%20to%20talk%20to%20sales."
+                target="_blank"
+                rel="noopener"
+              >
+                Talk to sales
+              </a>
+            )}
+            <a href="/account" className="topbar-signin" aria-current={current("/account")}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <circle cx="12" cy="8" r="4.2" />
+                <path d="M3.5 21c.8-4.3 4.3-7 8.5-7s7.7 2.7 8.5 7z" />
+              </svg>
+              Sign in
+            </a>
+          </div>
+          <div className="topbar-right">
+            {/* Currency picker; filled in by /js/currency.js */}
+            <div className="cur-picker" id="curPicker" suppressHydrationWarning />
+            <a href="https://wa.me/260964068483" target="_blank" rel="noopener" className="topbar-wa">
+              WhatsApp +260 964 068 483
+            </a>
+          </div>
+        </div>
+      </div>
       <div className="wrap nav">
         <a className="logo" href="/" aria-label="Nadine Cloud home">
           <img src="/assets/logo-header.png" alt="Nadine Cloud" className="logo-img" />
@@ -146,23 +177,11 @@ export default function Header({
           </ul>
         </nav>
         <div className="nav-actions">
-          {/* Currency picker; filled in by /js/currency.js */}
-          <div className="cur-picker" id="curPicker" suppressHydrationWarning />
-          {!hideTalkToSales && (
-            <a
-              className="btn-sm ghost sales-btn"
-              href="https://wa.me/260964068483?text=Hi%20Nadine%20Cloud%2C%20I%27d%20like%20to%20talk%20to%20sales."
-              target="_blank"
-              rel="noopener"
-            >
-              Talk to sales
-            </a>
-          )}
-          <a className="btn-sm ghost" href="/account" aria-current={current("/account")}>
+          <a className="btn-sm ghost nav-account" href="/account" aria-current={current("/account")}>
             Account
           </a>
           {!hideGetStarted && (
-            <a className="btn-sm solid has-new" href={getStartedHref}>
+            <a className="btn-sm solid" href={getStartedHref}>
               Get started
             </a>
           )}
