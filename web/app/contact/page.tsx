@@ -4,7 +4,7 @@ import Footer from "../components/Footer";
 
 const TITLE = "Contact Us — Nadine Cloud";
 const DESCRIPTION =
-  "Get in touch with Nadine Cloud for web design, hosting or domains. WhatsApp, call or email us — we reply the same day.";
+  "Get in touch with Nadine Cloud for web design, hosting or domains. Email us — we reply the same day.";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -77,12 +77,13 @@ export default function Contact() {
                 style={{ borderRadius: 16, width: "100%", height: "auto", display: "block", boxShadow: "0 1px 2px rgba(11,18,32,.05), 0 12px 30px rgba(11,18,32,.08)" }}
               />
               <div className="contact-card">
-                <h3>Visit or call</h3>
-                <p><strong>Nadine Cloud</strong><br />Serving clients worldwide</p>
+                <h3>Email us</h3>
+                <p><strong>Nadine Cloud</strong><br />Serving clients worldwide — we reply the same day.</p>
                 <a className="mono" href="mailto:info@nadinecloud.com">info@nadinecloud.com</a><br />
-                <a className="mono" href="tel:+260964068483">+260 964 068 483</a>
+                <a className="mono" href="mailto:billing@nadinecloud.com">billing@nadinecloud.com</a> <span style={{ color: "var(--text-mute)", fontSize: 13 }}>(payments)</span><br />
+                <a className="mono" href="mailto:support@nadinecloud.com">support@nadinecloud.com</a> <span style={{ color: "var(--text-mute)", fontSize: 13 }}>(technical help)</span>
                 <br />
-                <a className="btn-wa" href="https://wa.me/260964068483?text=Hi%20Nadine%20Cloud%2C%20I%27d%20like%20to%20get%20my%20business%20online." target="_blank" rel="noopener">Chat on WhatsApp</a>
+                <a className="btn-primary" href="mailto:info@nadinecloud.com?body=Hi%20Nadine%20Cloud%2C%20I%27d%20like%20to%20get%20my%20business%20online." target="_blank" rel="noopener">Email us</a>
               </div>
               <div className="contact-card">
                 <h3>How ordering works</h3>

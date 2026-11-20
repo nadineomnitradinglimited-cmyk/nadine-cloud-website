@@ -79,7 +79,7 @@ async function handleContact(req, res) {
   const result = await sendEmail({ subject: 'New enquiry from nadinecloud.com', text });
 
   if (!result.ok) {
-    sendJson(res, 502, { error: 'Something went wrong sending that. Please try WhatsApp or email instead.' });
+    sendJson(res, 502, { error: 'Something went wrong sending that. Please email info@nadinecloud.com instead.' });
     return;
   }
 

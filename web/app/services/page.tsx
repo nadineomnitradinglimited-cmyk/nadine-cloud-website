@@ -97,7 +97,7 @@ export default function Services() {
             <div className="step">
               <div className="num">04</div>
               <h3>Launch &amp; support</h3>
-              <p>Your site goes live on our hosting, with backups and WhatsApp support on hand whenever you need us.</p>
+              <p>Your site goes live on our hosting, with backups and email support on hand whenever you need us.</p>
             </div>
           </div>
         </div>
@@ -110,7 +110,7 @@ export default function Services() {
           <p>Get a fixed quote for your website within a day — no obligation.</p>
           <div className="actions">
             <a className="btn-primary" href="/contact">Request a quote</a>
-            <a className="btn-ghost" href="https://wa.me/260964068483?text=Hi%20Nadine%20Cloud%2C%20I%27d%20like%20a%20quote%20for%20a%20website." target="_blank" rel="noopener">Chat on WhatsApp</a>
+            <a className="btn-ghost" href="mailto:info@nadinecloud.com?body=Hi%20Nadine%20Cloud%2C%20I%27d%20like%20a%20quote%20for%20a%20website." target="_blank" rel="noopener">Email us</a>
           </div>
         </div>
       </section>

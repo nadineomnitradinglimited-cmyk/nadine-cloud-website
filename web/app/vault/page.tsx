@@ -27,9 +27,9 @@ export const metadata: Metadata = {
 };
 
 const WA_EARLY =
-  "https://wa.me/260964068483?text=Hi%20Nadine%20Cloud%2C%20I%27d%20like%20early%20access%20to%20Nadine%20Vault.";
+  "mailto:info@nadinecloud.com?body=Hi%20Nadine%20Cloud%2C%20I%27d%20like%20early%20access%20to%20Nadine%20Vault.";
 const waPlan = (name: string) =>
-  `https://wa.me/260964068483?text=${encodeURIComponent(`Hi Nadine Cloud, I'd like the Nadine Vault ${name} plan.`)}`;
+  `mailto:info@nadinecloud.com?body=${encodeURIComponent(`Hi Nadine Cloud, I'd like the Nadine Vault ${name} plan.`)}`;
 
 const CLOUD_ICON = (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
@@ -175,7 +175,7 @@ export default function Vault() {
           <div className="faq">
             <details className="faq-item" open>
               <summary>When can I download the app?</summary>
-              <p>Nadine Vault for Android is launching on Google Play soon. Message us on WhatsApp for early access and we&apos;ll let you know the moment it&apos;s live. An iPhone and computer version will follow.</p>
+              <p>Nadine Vault for Android is launching on Google Play soon. Email us for early access and we&apos;ll let you know the moment it&apos;s live. An iPhone and computer version will follow.</p>
             </details>
             <details className="faq-item">
               <summary>Where are my files stored?</summary>
@@ -199,7 +199,7 @@ export default function Vault() {
           <h2>Get Nadine Vault early</h2>
           <p>Join the early-access list and start with 2 GB free.</p>
           <div className="actions">
-            <a className="btn-primary" href={WA_EARLY} target="_blank" rel="noopener">Get early access on WhatsApp</a>
+            <a className="btn-primary" href={WA_EARLY} target="_blank" rel="noopener">Get early access by email</a>
             <a className="btn-ghost" href="/contact">Contact us</a>
           </div>
         </div>

@@ -103,7 +103,7 @@ export default function Care() {
           <div className="section-head">
             <span className="eyebrow">Questions</span>
             <h2>Care Plan FAQ</h2>
-            <p>Anything else, just ask us on WhatsApp.</p>
+            <p>Anything else, just email us at info@nadinecloud.com.</p>
           </div>
           <div className="faq">
             <details className="faq-item" open>
@@ -129,7 +129,7 @@ export default function Care() {
           <p>We&apos;ll reach out to onboard you within 24 hours of signing up.</p>
           <div className="actions">
             <a className="btn-primary" href="/contact">Choose a plan</a>
-            <a className="btn-ghost" href="https://wa.me/260964068483?text=Hi%20Nadine%20Cloud%2C%20I%27d%20like%20to%20ask%20about%20a%20Care%20Plan." target="_blank" rel="noopener">Chat on WhatsApp</a>
+            <a className="btn-ghost" href="mailto:info@nadinecloud.com?body=Hi%20Nadine%20Cloud%2C%20I%27d%20like%20to%20ask%20about%20a%20Care%20Plan." target="_blank" rel="noopener">Email us</a>
           </div>
         </div>
       </section>

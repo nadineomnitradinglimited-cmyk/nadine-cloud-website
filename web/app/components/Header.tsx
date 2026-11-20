@@ -54,9 +54,10 @@ export default function Header({
           <div className="topbar-right">
             {/* Currency picker; filled in by /js/currency.js */}
             <div className="cur-picker" id="curPicker" suppressHydrationWarning />
-            <a href="https://wa.me/260964068483" target="_blank" rel="noopener" className="topbar-icon" aria-label="WhatsApp us">
+            <a href="mailto:info@nadinecloud.com" className="topbar-icon" aria-label="Email us">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <path d="M21 11.5a8.4 8.4 0 0 1-12.3 7.4L3 21l2.1-5.6A8.4 8.4 0 1 1 21 11.5Z" />
+                <rect x="3" y="5" width="18" height="14" rx="2" />
+                <path d="m3 7 9 6 9-6" />
               </svg>
             </a>
             <a href="/domains" className="topbar-icon" aria-label="Search domains">
@@ -164,7 +165,7 @@ export default function Header({
                 </a>
                 <a href="/work">Our work</a>
                 <a href="/about">About us</a>
-                <a href="https://wa.me/260964068483?text=Hi%20Nadine%20Cloud%2C%20I%27d%20like%20to%20talk%20to%20sales." target="_blank" rel="noopener">
+                <a href="mailto:info@nadinecloud.com?body=Hi%20Nadine%20Cloud%2C%20I%27d%20like%20to%20talk%20to%20sales." target="_blank" rel="noopener">
                   Talk to sales
                 </a>
               </div>

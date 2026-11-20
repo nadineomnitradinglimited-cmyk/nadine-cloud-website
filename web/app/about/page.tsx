@@ -54,7 +54,7 @@ export default function About() {
               <h2>24/7 human support, whenever you need us.</h2>
               <p style={{ color: "var(--text-soft)", marginBottom: 14 }}>
                 Our site has a chat assistant to answer quick questions any time of day — but behind it is a real
-                team, reachable on WhatsApp, email and calls, worldwide. If the bot can&apos;t help, a person always
+                team, reachable by email, worldwide. If the bot can&apos;t help, a person always
                 can.
               </p>
               <p style={{ color: "var(--text-soft)", marginBottom: 22 }}>
@@ -64,11 +64,11 @@ export default function About() {
               </p>
               <a
                 className="btn-wa"
-                href="https://wa.me/260964068483?text=Hi%20Nadine%20Cloud%2C%20I%27d%20like%20to%20get%20in%20touch."
+                href="mailto:info@nadinecloud.com?body=Hi%20Nadine%20Cloud%2C%20I%27d%20like%20to%20get%20in%20touch."
                 target="_blank"
                 rel="noopener"
               >
-                Chat on WhatsApp
+                Email us
               </a>
             </div>
           </div>
@@ -104,7 +104,7 @@ export default function About() {
           </div>
           <div className="network-list">
             <div>100% remote — no office visit required</div>
-            <div>WhatsApp, email and calls, wherever you are</div>
+            <div>By email, wherever you are</div>
             <div>Prices shown in your local currency</div>
             <div>Real people behind every support conversation</div>
           </div>
@@ -120,11 +120,11 @@ export default function About() {
             <a className="btn-primary" href="/contact">Contact us</a>
             <a
               className="btn-ghost"
-              href="https://wa.me/260964068483?text=Hi%20Nadine%20Cloud%2C%20I%27d%20like%20to%20know%20more%20about%20your%20company."
+              href="mailto:info@nadinecloud.com?body=Hi%20Nadine%20Cloud%2C%20I%27d%20like%20to%20know%20more%20about%20your%20company."
               target="_blank"
               rel="noopener"
             >
-              Chat on WhatsApp
+              Email us
             </a>
           </div>
         </div>

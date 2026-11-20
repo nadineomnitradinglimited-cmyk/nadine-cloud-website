@@ -34,7 +34,7 @@ export default function Home() {
           <span>Sitejet Builder &amp; WordPress Manager</span>
           <span>Free SSL on every site</span>
           <span>Daily backups</span>
-          <span>WhatsApp support</span>
+          <span>Email support</span>
         </div>
       </div>
 
@@ -522,7 +522,7 @@ export default function Home() {
           </div>
           <div className="network-list">
             <div>100% remote — no office visit required</div>
-            <div>WhatsApp, email and calls, wherever you are</div>
+            <div>By email, wherever you are</div>
             <div>Prices shown in your local currency</div>
             <div>Support around the clock</div>
           </div>
@@ -534,7 +534,7 @@ export default function Home() {
           <div className="section-head">
             <span className="eyebrow">Questions</span>
             <h2>Frequently asked questions</h2>
-            <p>Anything else, just ask us on WhatsApp.</p>
+            <p>Anything else, just email us at info@nadinecloud.com.</p>
           </div>
           <div className="faq">
             <details className="faq-item" open>
@@ -547,11 +547,11 @@ export default function Home() {
             </details>
             <details className="faq-item">
               <summary>Do you work with international clients?</summary>
-              <p>Yes — we build, host and support websites for businesses worldwide. Everything is handled remotely over WhatsApp, email and calls.</p>
+              <p>Yes — we build, host and support websites for businesses worldwide. Everything is handled remotely by email.</p>
             </details>
             <details className="faq-item">
               <summary>How do I get a quote?</summary>
-              <p>Tell us what you need on WhatsApp or through the contact form and we&apos;ll reply the same day with a plan and a price.</p>
+              <p>Tell us what you need by email or through the contact form and we&apos;ll reply the same day with a plan and a price.</p>
             </details>
           </div>
         </div>
@@ -564,7 +564,7 @@ export default function Home() {
           <p>Tell us what you need — a new website, hosting, or a domain — and we&apos;ll reply the same day.</p>
           <div className="actions">
             <a className="btn-primary" href="/contact">Get a quote</a>
-            <a className="btn-ghost" href="https://wa.me/260964068483?text=Hi%20Nadine%20Cloud%2C%20I%27d%20like%20to%20get%20my%20business%20online." target="_blank" rel="noopener">Chat on WhatsApp</a>
+            <a className="btn-ghost" href="mailto:info@nadinecloud.com?body=Hi%20Nadine%20Cloud%2C%20I%27d%20like%20to%20get%20my%20business%20online." target="_blank" rel="noopener">Email us</a>
           </div>
         </div>
       </section>

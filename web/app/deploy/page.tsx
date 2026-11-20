@@ -33,7 +33,7 @@ deployment:
     - /bin/cp -R * $DEPLOYPATH`;
 
 const WA_HELP =
-  "https://wa.me/260964068483?text=Hi%20Nadine%20Cloud%2C%20I%20need%20help%20deploying%20my%20website.";
+  "mailto:info@nadinecloud.com?body=Hi%20Nadine%20Cloud%2C%20I%20need%20help%20deploying%20my%20website.";
 
 export default function Deploy() {
   return (
@@ -211,7 +211,7 @@ export default function Deploy() {
           <h2>Stuck? Our team will deploy it with you.</h2>
           <p>Send us your GitHub link and what you&apos;re building — we&apos;ll get it live.</p>
           <div className="actions">
-            <a className="btn-primary" href={WA_HELP} target="_blank" rel="noopener">Chat on WhatsApp</a>
+            <a className="btn-primary" href={WA_HELP} target="_blank" rel="noopener">Email us</a>
             <a className="btn-ghost" href="/hosting#hosting">See hosting plans</a>
           </div>
         </div>

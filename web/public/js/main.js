@@ -54,11 +54,11 @@ function lookupDomain(){
               priceText += ' <span style="color:var(--text-mute)">(renews at ' + usd(r.renewalPrice + DOMAIN_MARKUP_USD) + '/yr)</span>';
             }
           }
-          // Normal domains go straight to checkout with the server's ZMW quote. Premium or unquoted ones still go to WhatsApp.
+          // Normal domains go straight to checkout with the server's ZMW quote. Premium or unquoted ones go to email.
           const action = typeof r.priceZmw === 'number'
             ? '<a href="/checkout?type=domain&plan=' + encodeURIComponent(r.domain + ' registration') + '&amount=' + r.priceZmw +
               '&domain=' + encodeURIComponent(r.domain) + '" style="color:#7047FF;font-weight:600">Register it</a>'
-            : '<a href="https://wa.me/260964068483?text=' + waText + '" target="_blank" rel="noopener" style="color:#7047FF">Ask us to register it</a>';
+            : '<a href="mailto:info@nadinecloud.com?body=' + waText + '" target="_blank" rel="noopener" style="color:#7047FF">Ask us to register it</a>';
           return '<span class="ok">✓</span> <strong>' + r.domain + '</strong> is available' + priceText + ' &nbsp;' + action;
         }
         return '<span style="color:var(--text-mute)">✗ ' + r.domain + ' is already taken</span>';
@@ -69,7 +69,7 @@ function lookupDomain(){
       if (seq !== domainLookupSeq) return;
       const waText = encodeURIComponent('Hi Nadine Cloud, is ' + raw + '.com available to register?');
       out.innerHTML = 'We\'ll confirm if <strong>' + raw + '.com</strong> is available, from ' + usd(12.99 + DOMAIN_MARKUP_USD) + ' USD/yr' +
-        ' &nbsp;·&nbsp; <a href="https://wa.me/260964068483?text=' + waText + '" target="_blank" rel="noopener" style="color:#7047FF">Ask on WhatsApp</a>' +
+        ' &nbsp;·&nbsp; <a href="mailto:info@nadinecloud.com?body=' + waText + '" target="_blank" rel="noopener" style="color:#7047FF">Ask us by email</a>' +
         ' &nbsp;·&nbsp; <a href="contact" style="color:#7047FF">Contact form</a>';
     });
 }
@@ -108,12 +108,12 @@ function lookupDomain(){
           status.textContent = "Thanks — we've got your message and will reply the same day.";
           status.classList.add('ok');
         } else {
-          status.textContent = data.error || 'Something went wrong sending that. Please try WhatsApp or email instead.';
+          status.textContent = data.error || 'Something went wrong sending that. Please email info@nadinecloud.com instead.';
           status.classList.add('err');
         }
       })
       .catch(() => {
-        status.textContent = 'Something went wrong sending that. Please try WhatsApp or email instead.';
+        status.textContent = 'Something went wrong sending that. Please email info@nadinecloud.com instead.';
         status.classList.add('err');
       })
       .finally(() => {

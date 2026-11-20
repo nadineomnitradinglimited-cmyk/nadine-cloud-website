@@ -4,7 +4,7 @@ import Footer from "../components/Footer";
 
 const TITLE = "Hosting Plans — Nadine Cloud";
 const DESCRIPTION =
-  "Fast NVMe cPanel hosting with free SSL, daily backups and WhatsApp support. Flexible monthly to 3-year billing, shown in your local currency — no surprises.";
+  "Fast NVMe cPanel hosting with free SSL, daily backups and email support. Flexible monthly to 3-year billing, shown in your local currency — no surprises.";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -236,7 +236,7 @@ export default function Hosting() {
           <div className="section-head">
             <span className="eyebrow">Questions</span>
             <h2>Hosting FAQ</h2>
-            <p>Anything else, just ask us on WhatsApp.</p>
+            <p>Anything else, just email us at info@nadinecloud.com.</p>
           </div>
           <div className="faq">
             <details className="faq-item" open>
@@ -261,7 +261,7 @@ export default function Hosting() {
             </details>
             <details className="faq-item">
               <summary>What happens if my site goes down?</summary>
-              <p>We monitor all hosting 24/7 and target 99.9% uptime. If there&apos;s an issue, message us on WhatsApp and we&apos;ll respond the same day.</p>
+              <p>We monitor all hosting 24/7 and target 99.9% uptime. If there&apos;s an issue, email us and we&apos;ll respond the same day.</p>
             </details>
           </div>
         </div>
@@ -274,7 +274,7 @@ export default function Hosting() {
           <p>Most accounts are activated the same day you order.</p>
           <div className="actions">
             <a className="btn-primary" href="/contact">Choose a plan</a>
-            <a className="btn-ghost" href="https://wa.me/260964068483?text=Hi%20Nadine%20Cloud%2C%20I%27d%20like%20to%20sign%20up%20for%20hosting." target="_blank" rel="noopener">Chat on WhatsApp</a>
+            <a className="btn-ghost" href="mailto:info@nadinecloud.com?body=Hi%20Nadine%20Cloud%2C%20I%27d%20like%20to%20sign%20up%20for%20hosting." target="_blank" rel="noopener">Email us</a>
           </div>
         </div>
       </section>

@@ -192,7 +192,7 @@
           } else if (data.status === 'failed') {
             clearInterval(polling);
             statusEl.className = 'form-status err';
-            statusEl.innerHTML = 'The card payment did not go through' + (data.reason ? ' (' + data.reason.replace(/[<>&]/g, '') + ')' : '') + '. You were not charged. <a href="/hosting/" style="color:var(--copper);font-weight:600">Start again</a> or message us on WhatsApp.';
+            statusEl.innerHTML = 'The card payment did not go through' + (data.reason ? ' (' + data.reason.replace(/[<>&]/g, '') + ')' : '') + '. You were not charged. <a href="/hosting/" style="color:var(--copper);font-weight:600">Start again</a> or email us at info@nadinecloud.com.';
             document.getElementById('ckSummaryAmount').textContent = 'Not paid';
           } else if (tries >= 40) {
             clearInterval(polling);
@@ -311,7 +311,7 @@
         }, 3000);
       })
       .catch(() => {
-        setStatus('Something went wrong — please try again or use WhatsApp.', 'err');
+        setStatus('Something went wrong — please try again or email us.', 'err');
         submitBtn.disabled = false;
       });
   });

@@ -187,7 +187,7 @@
         }, 3000);
       })
       .catch(() => {
-        setStatus('Something went wrong — please try again or use WhatsApp.', 'err');
+        setStatus('Something went wrong — please try again or email us.', 'err');
         submitBtn.disabled = false;
       });
   });

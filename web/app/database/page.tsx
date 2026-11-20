@@ -115,7 +115,7 @@ export default function Database() {
           <div className="section-head">
             <span className="eyebrow">Questions</span>
             <h2>Database Hosting FAQ</h2>
-            <p>Anything else, just ask us on WhatsApp.</p>
+            <p>Anything else, just email us at info@nadinecloud.com.</p>
           </div>
           <div className="faq">
             <details className="faq-item" open>
@@ -132,7 +132,7 @@ export default function Database() {
             </details>
             <details className="faq-item">
               <summary>Can I upgrade my plan later?</summary>
-              <p>Yes — message us on WhatsApp and we&apos;ll move you up to a bigger plan.</p>
+              <p>Yes — email us and we&apos;ll move you up to a bigger plan.</p>
             </details>
           </div>
         </div>
@@ -145,7 +145,7 @@ export default function Database() {
           <p>Most accounts are activated the same day you order.</p>
           <div className="actions">
             <a className="btn-primary" href="/contact">Choose a plan</a>
-            <a className="btn-ghost" href="https://wa.me/260964068483?text=Hi%20Nadine%20Cloud%2C%20I%27d%20like%20to%20sign%20up%20for%20database%20hosting." target="_blank" rel="noopener">Chat on WhatsApp</a>
+            <a className="btn-ghost" href="mailto:info@nadinecloud.com?body=Hi%20Nadine%20Cloud%2C%20I%27d%20like%20to%20sign%20up%20for%20database%20hosting." target="_blank" rel="noopener">Email us</a>
           </div>
         </div>
       </section>
