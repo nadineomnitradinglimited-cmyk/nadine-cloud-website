@@ -136,7 +136,9 @@ header .wrap{max-width:1560px}
   .topbar a{font-size:15px}
   .nav{height:84px}
   header{background:#fff;backdrop-filter:none}
-  header nav{margin-left:auto}
+  .nav{position:relative}
+  /* menu centred in the middle of the bar */
+  header nav{position:absolute;left:50%;transform:translateX(-50%)}
   .nav-actions{display:none}
   .logo-img{height:44px}
 }
