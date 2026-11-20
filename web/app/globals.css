@@ -111,7 +111,47 @@ header .wrap{max-width:1560px}
 @media(max-width:1560px){
   .nav{gap:24px}
   .nav-links{gap:13px}
+  /* keep the "New" badges on laptops, just smaller */
+  .nav-links > li > a .badge-new,.nav-links > li > a .badge-try{font-size:9px;padding:2px 6px;margin-left:2px;transform:translateY(-1px)}
+}
+@media(max-width:1260px){
   .nav-links > li > a .badge-new,.nav-links > li > a .badge-try{display:none}
+  .nav-links > li.nav-vault > a .badge-new{display:inline-block}
+}
+/* "New" tag sitting on the corner of a button */
+.has-new{position:relative}
+.new-tag{position:absolute;top:-9px;right:-8px;padding:2px 7px;font-family:var(--body);font-size:10px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;line-height:1.4;color:#fff;background:#DC2626;border-radius:999px;box-shadow:0 3px 8px rgba(220,38,38,.35);pointer-events:none}
+/* ---------- Nadine Vault ---------- */
+.vault-band{background:linear-gradient(135deg,#001355 0%,#0B2A8A 55%,#1E6FF0 100%);color:#fff;position:relative;overflow:hidden}
+.vault-band::before{content:"";position:absolute;inset:0;background:radial-gradient(600px 320px at 85% 20%,rgba(120,190,255,.25),transparent 65%);pointer-events:none}
+.vault-grid{position:relative;display:grid;grid-template-columns:1.15fr .85fr;gap:48px;align-items:center}
+.vault-band .eyebrow{color:#8CC8FF}
+.vault-band h2{color:#fff;margin:10px 0 14px}
+.vault-band h2 em{font-style:normal;color:#7FC4FF}
+.vault-band p.lead{color:rgba(255,255,255,.82);font-size:17px;max-width:540px;margin-bottom:22px}
+.vault-points{list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:10px 22px;margin:0 0 28px;padding:0}
+.vault-points li{color:rgba(255,255,255,.92);font-size:14.5px;padding-left:24px;position:relative}
+.vault-points li::before{content:"✓";position:absolute;left:0;color:#4ADE80;font-weight:800}
+.vault-actions{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+.vault-actions .btn-primary{background:#22C55E}
+.vault-actions .btn-primary:hover{background:#16A34A}
+.vault-actions .btn-ghost{color:#fff;border-color:rgba(255,255,255,.45)}
+.vault-actions .btn-ghost:hover{background:rgba(255,255,255,.08);border-color:#fff}
+.vault-soon{display:block;margin-top:14px;font-family:var(--mono);font-size:12px;letter-spacing:.06em;color:rgba(255,255,255,.65);text-transform:uppercase}
+.vault-phone{justify-self:center;width:min(300px,80%);border-radius:34px;border:8px solid #0A0F1F;box-shadow:0 30px 70px rgba(0,0,0,.45);background:#0A0F1F;overflow:hidden}
+.vault-phone img{display:block;width:100%;height:auto}
+.vault-logo{display:block;width:56px;height:56px;border-radius:14px;box-shadow:0 8px 24px rgba(0,0,0,.35);margin-bottom:16px}
+.vault-plans .plans{grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
+.vault-plans .plan{padding:26px 20px}
+.vault-plans .plan.featured{padding-top:60px}
+.vault-plans .plan .price .amt{font-size:28px}
+.vault-plans .plan .price .per{white-space:nowrap}
+.vault-plans .plan-stats .n{white-space:nowrap}
+.vault-plans .plan .for{min-height:42px}
+.vault-plans .plan ul li{font-size:14px}
+@media(max-width:860px){
+  .vault-grid{grid-template-columns:1fr;gap:34px}
+  .vault-points{grid-template-columns:1fr}
 }
 @media(max-width:1440px){
   .nav-wide{display:none}
@@ -526,7 +566,9 @@ footer a:hover{color:var(--copper-bright)}
 .chat-send{width:38px;height:38px;border-radius:50%;background:var(--copper);border:none;color:#fff;display:flex;align-items:center;justify-content:center;flex:none;transition:background .2s}
 .chat-send:hover{background:var(--copper-bright)}
 @media(max-width:480px){
-  .chat-widget{right:14px;bottom:14px}
+  .chat-widget{right:12px;bottom:12px}
+  .chat-bubble{width:46px;height:46px}
+  .chat-panel{bottom:58px}
   .chat-panel{width:calc(100vw - 28px);height:calc(100vh - 110px)}
 }
 

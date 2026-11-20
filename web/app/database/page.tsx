@@ -70,7 +70,7 @@ export default function Database() {
                 <li>Manage via Control Panel</li>
                 <li>High Uptime Guarantee</li>
               </ul>
-              <a className="cta" href="/checkout?type=database&pkg=dbstarter&plan=Nadine+Cloud+%E2%80%94+Starter+Database&amount=500&period=mo">Get Starter</a>
+              <a className="cta has-new" href="/checkout?type=database&pkg=dbstarter&plan=Nadine+Cloud+%E2%80%94+Starter+Database&amount=500&period=mo">Get Starter <span className="new-tag">New</span></a>
             </div>
             <div className="plan featured">
               <div className="plan-icon">{DB_ICON}</div>
@@ -87,7 +87,7 @@ export default function Database() {
                 <li>Advanced Management</li>
                 <li>Priority Support</li>
               </ul>
-              <a className="cta" href="/checkout?type=database&pkg=dbpro&plan=Nadine+Cloud+%E2%80%94+Professional+Database&amount=1000&period=mo">Get Professional</a>
+              <a className="cta has-new" href="/checkout?type=database&pkg=dbpro&plan=Nadine+Cloud+%E2%80%94+Professional+Database&amount=1000&period=mo">Get Professional <span className="new-tag">New</span></a>
             </div>
             <div className="plan">
               <div className="plan-icon">{DB_ICON}</div>
@@ -104,7 +104,7 @@ export default function Database() {
                 <li>Dedicated Resources</li>
                 <li>Premium Support</li>
               </ul>
-              <a className="cta" href="/checkout?type=database&pkg=dbenterprise&plan=Nadine+Cloud+%E2%80%94+Enterprise+Database&amount=2000&period=mo">Get Enterprise</a>
+              <a className="cta has-new" href="/checkout?type=database&pkg=dbenterprise&plan=Nadine+Cloud+%E2%80%94+Enterprise+Database&amount=2000&period=mo">Get Enterprise <span className="new-tag">New</span></a>
             </div>
           </div>
         </div>

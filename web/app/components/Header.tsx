@@ -89,6 +89,11 @@ export default function Header({
                 <a href="/database#faq">Help Center</a>
               </div>
             </li>
+            <li className="nav-vault">
+              <a href="/vault" aria-current={current("/vault")}>
+                Vault <span className="badge-new">New</span>
+              </a>
+            </li>
             <li className="has-dropdown">
               <a href="/marketing" aria-current={current("/marketing")}>
                 Marketing <span className="badge-new">New</span> <NavCaret />
@@ -157,7 +162,7 @@ export default function Header({
             Account
           </a>
           {!hideGetStarted && (
-            <a className="btn-sm solid" href={getStartedHref}>
+            <a className="btn-sm solid has-new" href={getStartedHref}>
               Get started
             </a>
           )}

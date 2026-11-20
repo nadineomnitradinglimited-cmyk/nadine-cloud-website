@@ -207,6 +207,33 @@ export default function Home() {
         </div>
       </section>
 
+      <section className="section vault-band" id="vault">
+        <div className="wrap vault-grid">
+          <div>
+            <img className="vault-logo" src="/assets/vault-icon.png" alt="Nadine Vault app icon" width={56} height={56} />
+            <span className="eyebrow">Introducing · New from Nadine Cloud</span>
+            <h2>Nadine <em>Vault</em> — your files, your space, anywhere.</h2>
+            <p className="lead">Our new phone app that keeps your photos, videos and documents safe in the cloud. Lose your phone, keep your memories — and open your files from anywhere.</p>
+            <ul className="vault-points">
+              <li>2 GB free, forever</li>
+              <li>Automatic photo &amp; video backup</li>
+              <li>Upload and open any file</li>
+              <li>Fingerprint app lock &amp; encryption</li>
+              <li>More space from ZMW 25/month</li>
+              <li>Pay with mobile money</li>
+            </ul>
+            <div className="vault-actions">
+              <a className="btn-primary has-new" href="/vault">Discover Nadine Vault <span className="new-tag">New</span></a>
+              <a className="btn-ghost" href="/vault#plans">See storage plans</a>
+            </div>
+            <span className="vault-soon">Android app · coming soon to Google Play</span>
+          </div>
+          <div className="vault-phone">
+            <img src="/assets/vault-home.png" alt="Nadine Vault home screen showing storage used and recent files" width={390} height={844} loading="lazy" />
+          </div>
+        </div>
+      </section>
+
       <section className="section" id="services">
         <div className="wrap">
           <div className="section-head">
