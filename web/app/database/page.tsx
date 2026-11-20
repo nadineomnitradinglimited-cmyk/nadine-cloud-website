@@ -57,105 +57,54 @@ export default function Database() {
           <div className="plans">
             <div className="plan">
               <div className="plan-icon">{DB_ICON}</div>
-              <h3>Nadine Cloud — Orin</h3>
-              <div className="for">Perfect for small projects and simple applications</div>
-              <div className="price"><span className="amt amt-live" data-zmw="79">ZMW 79</span> <span className="per">/month</span><small className="price-note" hidden></small></div>
+              <h3>Starter Package</h3>
+              <div className="for">Perfect for small projects and websites</div>
+              <div className="price"><span className="amt amt-live" data-zmw="500">ZMW 500</span> <span className="per">/month</span><small className="price-note" hidden></small></div>
               <div className="plan-stats">
-                <div><span className="n">1</span><span className="l">Database</span></div>
-                <div><span className="n">2 GB</span><span className="l">Storage</span></div>
+                <div><span className="n">2</span><span className="l">Databases</span></div>
+                <div><span className="n">1 GB</span><span className="l">Storage</span></div>
               </div>
               <ul>
                 <li>PostgreSQL / MySQL</li>
-                <li>Daily Backups</li>
-                <li>Secure Connection</li>
-                <li>Standard Support</li>
+                <li>Automatic Backups</li>
+                <li>Manage via Control Panel</li>
+                <li>High Uptime Guarantee</li>
               </ul>
-              <a className="cta" href="/checkout?type=database&pkg=orin&plan=Nadine+Cloud+%E2%80%94+Orin&amount=79&period=mo">Get Orin</a>
+              <a className="cta" href="/checkout?type=database&pkg=dbstarter&plan=Nadine+Cloud+%E2%80%94+Starter+Database&amount=500&period=mo">Get Starter</a>
             </div>
             <div className="plan featured">
               <div className="plan-icon">{DB_ICON}</div>
-              <h3>Nadine Cloud — Kaia</h3>
-              <div className="for">Great for business systems, POS and growing websites</div>
-              <div className="price"><span className="amt amt-live" data-zmw="149">ZMW 149</span> <span className="per">/month</span><small className="price-note" hidden></small></div>
+              <h3>Professional Package</h3>
+              <div className="for">Ideal for growing businesses and applications</div>
+              <div className="price"><span className="amt amt-live" data-zmw="1000">ZMW 1,000</span> <span className="per">/month</span><small className="price-note" hidden></small></div>
               <div className="plan-stats">
-                <div><span className="n">3</span><span className="l">Databases</span></div>
+                <div><span className="n">5</span><span className="l">Databases</span></div>
                 <div><span className="n">5 GB</span><span className="l">Storage</span></div>
               </div>
               <ul>
                 <li>PostgreSQL / MySQL</li>
-                <li>Daily Backups</li>
-                <li>Secure Connection</li>
-                <li>Standard Support</li>
-              </ul>
-              <a className="cta" href="/checkout?type=database&pkg=kaia&plan=Nadine+Cloud+%E2%80%94+Kaia&amount=149&period=mo">Get Kaia</a>
-            </div>
-            <div className="plan">
-              <div className="plan-icon">{DB_ICON}</div>
-              <h3>Nadine Cloud — Velora</h3>
-              <div className="for">For growing applications and multiple databases</div>
-              <div className="price"><span className="amt amt-live" data-zmw="249">ZMW 249</span> <span className="per">/month</span><small className="price-note" hidden></small></div>
-              <div className="plan-stats">
-                <div><span className="n">5</span><span className="l">Databases</span></div>
-                <div><span className="n">15 GB</span><span className="l">Storage</span></div>
-              </div>
-              <ul>
-                <li>PostgreSQL / MySQL</li>
-                <li>Daily Backups</li>
-                <li>Secure Connection</li>
+                <li>Automatic Backups</li>
+                <li>Advanced Management</li>
                 <li>Priority Support</li>
               </ul>
-              <a className="cta" href="/checkout?type=database&pkg=velora&plan=Nadine+Cloud+%E2%80%94+Velora&amount=249&period=mo">Get Velora</a>
+              <a className="cta" href="/checkout?type=database&pkg=dbpro&plan=Nadine+Cloud+%E2%80%94+Professional+Database&amount=1000&period=mo">Get Professional</a>
             </div>
             <div className="plan">
               <div className="plan-icon">{DB_ICON}</div>
-              <h3>Nadine Cloud — Zenix</h3>
-              <div className="for">Built for demanding applications and larger data</div>
-              <div className="price"><span className="amt amt-live" data-zmw="399">ZMW 399</span> <span className="per">/month</span><small className="price-note" hidden></small></div>
+              <h3>Enterprise Package</h3>
+              <div className="for">Built for high-demand and enterprise needs</div>
+              <div className="price"><span className="amt amt-live" data-zmw="2000">ZMW 2,000</span> <span className="per">/month</span><small className="price-note" hidden></small></div>
               <div className="plan-stats">
                 <div><span className="n">10</span><span className="l">Databases</span></div>
-                <div><span className="n">30 GB</span><span className="l">Storage</span></div>
+                <div><span className="n">20 GB</span><span className="l">Storage</span></div>
               </div>
               <ul>
                 <li>PostgreSQL / MySQL</li>
-                <li>Daily Backups</li>
-                <li>Secure Connection</li>
+                <li>Automatic Backups</li>
+                <li>Dedicated Resources</li>
                 <li>Premium Support</li>
               </ul>
-              <a className="cta" href="/checkout?type=database&pkg=zenix&plan=Nadine+Cloud+%E2%80%94+Zenix&amount=399&period=mo">Get Zenix</a>
-            </div>
-            <div className="plan">
-              <div className="plan-icon">{DB_ICON}</div>
-              <h3>Nadine Cloud — Astra</h3>
-              <div className="for">For heavier workloads and larger teams</div>
-              <div className="price"><span className="amt amt-live" data-zmw="649">ZMW 649</span> <span className="per">/month</span><small className="price-note" hidden></small></div>
-              <div className="plan-stats">
-                <div><span className="n">20</span><span className="l">Databases</span></div>
-                <div><span className="n">60 GB</span><span className="l">Storage</span></div>
-              </div>
-              <ul>
-                <li>PostgreSQL / MySQL</li>
-                <li>Daily Backups</li>
-                <li>Secure Connection</li>
-                <li>Premium Support</li>
-              </ul>
-              <a className="cta" href="/checkout?type=database&pkg=astra&plan=Nadine+Cloud+%E2%80%94+Astra&amount=649&period=mo">Get Astra</a>
-            </div>
-            <div className="plan">
-              <div className="plan-icon">{DB_ICON}</div>
-              <h3>Nadine Cloud — Vantis</h3>
-              <div className="for">Built for large-scale, high-demand applications</div>
-              <div className="price"><span className="amt amt-live" data-zmw="999">ZMW 999</span> <span className="per">/month</span><small className="price-note" hidden></small></div>
-              <div className="plan-stats">
-                <div><span className="n">40</span><span className="l">Databases</span></div>
-                <div><span className="n">120 GB</span><span className="l">Storage</span></div>
-              </div>
-              <ul>
-                <li>PostgreSQL / MySQL</li>
-                <li>Daily Backups</li>
-                <li>Secure Connection</li>
-                <li>Dedicated Support</li>
-              </ul>
-              <a className="cta" href="/checkout?type=database&pkg=vantis&plan=Nadine+Cloud+%E2%80%94+Vantis&amount=999&period=mo">Get Vantis</a>
+              <a className="cta" href="/checkout?type=database&pkg=dbenterprise&plan=Nadine+Cloud+%E2%80%94+Enterprise+Database&amount=2000&period=mo">Get Enterprise</a>
             </div>
           </div>
         </div>

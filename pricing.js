@@ -28,7 +28,9 @@ const HOSTING = {
 };
 
 // Fixed-price products (price for the billing period the site sells them in).
-const DATABASE = { orin: 79, kaia: 149, velora: 249, zenix: 399, astra: 649, vantis: 999 };
+// Database packages (flyer, 20 Nov 2026): Starter 500, Professional 1,000, Enterprise 2,000 per month.
+// The older plans stay valid for clients already on them, but are no longer shown on the site.
+const DATABASE = { dbstarter: 500, dbpro: 1000, dbenterprise: 2000, orin: 79, kaia: 149, velora: 249, zenix: 399, astra: 649, vantis: 999 };
 const WORDPRESS = { wpstarter: 149, wpgrowth: 279, wppro: 449 };
 const CARE = { 'care-essential': 199, 'care-growth': 349, 'care-premium': 599 };
 const SSL = { 'ssl-standard': 350, 'ssl-wildcard': 1200, 'ssl-ev': 2500 };

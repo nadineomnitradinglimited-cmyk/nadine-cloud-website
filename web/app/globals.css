@@ -105,7 +105,30 @@ header .wrap{max-width:1560px}
 .cur-menu button:hover{background:var(--surface-2);color:var(--copper)}
 .cur-menu button[aria-selected="true"]{color:var(--copper);font-weight:700}
 .cur-menu-note{font-size:11.5px;color:var(--text-mute);padding:8px 10px 6px;border-top:1px solid var(--line);margin-top:4px;line-height:1.45}
+/* "More" dropdown only exists for medium laptops (see below) */
+.nav-more{display:none}
+/* Laptops (up to 1560px wide): keep the full menu with dropdowns, just make it more compact */
 @media(max-width:1560px){
+  .nav{gap:24px}
+  .nav-links{gap:13px}
+  .nav-links > li > a .badge-new,.nav-links > li > a .badge-try{display:none}
+}
+@media(max-width:1440px){
+  .nav-wide{display:none}
+  .nav-more{display:block}
+  .sales-btn{display:none}
+}
+@media(max-width:1180px){
+  .nav-links{gap:11px}
+  .nav-links a{font-size:13px}
+  .logo-img{height:34px}
+  .cur-picker{display:none}
+}
+/* Tablets and phones: the ☰ menu */
+@media(max-width:1060px){
+  .nav-wide{display:block}
+  .nav-more{display:none}
+  .nav-links > li > a .badge-new,.nav-links > li > a .badge-try{display:inline-block}
   .nav-links{position:fixed;inset:68px 0 auto 0;background:var(--surface);flex-direction:column;align-items:flex-start;padding:24px;border-bottom:1px solid var(--line);display:none;gap:18px;overflow-y:auto;max-height:calc(100vh - 68px)}
   .nav-links.open{display:flex}
   .nav-links a{font-size:15px}

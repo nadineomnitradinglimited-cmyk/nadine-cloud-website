@@ -102,20 +102,36 @@ export default function Header({
                 <a href="/marketing#ads">Paid Ads Management</a>
               </div>
             </li>
-            <li>
+            <li className="nav-wide">
               <a href="/domains#transfer">
                 Transfer <span className="badge-try">Try Me</span>
               </a>
             </li>
-            <li>
+            <li className="nav-wide">
               <a href="/work" aria-current={current("/work")}>
                 Our work
               </a>
             </li>
-            <li>
+            <li className="nav-wide">
               <a href="/about" aria-current={current("/about")}>
                 About
               </a>
+            </li>
+            {/* On medium-width laptops the three links above move into this "More" menu so everything fits */}
+            <li className="has-dropdown nav-more">
+              <a href="/about">
+                More <NavCaret />
+              </a>
+              <div className="nav-dropdown">
+                <a href="/domains#transfer">
+                  Transfer a domain <span className="badge-try">Try Me</span>
+                </a>
+                <a href="/work">Our work</a>
+                <a href="/about">About us</a>
+                <a href="https://wa.me/260964068483?text=Hi%20Nadine%20Cloud%2C%20I%27d%20like%20to%20talk%20to%20sales." target="_blank" rel="noopener">
+                  Talk to sales
+                </a>
+              </div>
             </li>
             <li>
               <a href="/contact" aria-current={current("/contact")}>
@@ -129,7 +145,7 @@ export default function Header({
           <div className="cur-picker" id="curPicker" suppressHydrationWarning />
           {!hideTalkToSales && (
             <a
-              className="btn-sm ghost"
+              className="btn-sm ghost sales-btn"
               href="https://wa.me/260964068483?text=Hi%20Nadine%20Cloud%2C%20I%27d%20like%20to%20talk%20to%20sales."
               target="_blank"
               rel="noopener"

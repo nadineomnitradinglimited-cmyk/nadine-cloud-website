@@ -16,6 +16,11 @@ const HOSTING_PACKAGES = {
 // cPanel's Database Wizard, up to MAXSQL, same self-serve model as email
 // accounts on the hosting packages above.
 const DATABASE_PACKAGES = {
+  // Current packages (flyer, 20 Nov 2026). QUOTA is in MB.
+  dbstarter: { QUOTA: 1000, BWLIMIT: 10000, MAXPOP: 0, MAXADDON: 0, MAXSQL: 2 },
+  dbpro: { QUOTA: 5000, BWLIMIT: 50000, MAXPOP: 0, MAXADDON: 0, MAXSQL: 5 },
+  dbenterprise: { QUOTA: 20000, BWLIMIT: 200000, MAXPOP: 0, MAXADDON: 0, MAXSQL: 10 },
+  // Older packages, kept for clients already on them.
   orin: { QUOTA: 2000, BWLIMIT: 10000, MAXPOP: 0, MAXADDON: 0, MAXSQL: 1 },
   kaia: { QUOTA: 5000, BWLIMIT: 25000, MAXPOP: 0, MAXADDON: 0, MAXSQL: 3 },
   velora: { QUOTA: 15000, BWLIMIT: 75000, MAXPOP: 0, MAXADDON: 0, MAXSQL: 5 },
