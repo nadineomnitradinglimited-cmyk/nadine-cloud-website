@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const { handleChat } = require('./chat');
 const { handleAdminClients, handleAdminRecordPayment, handleLipilaWebhook, handleCheckoutInitiate, handleCheckoutStatus, handleLencoWebhook, handleReceiptDownload, handleValidatePromo, handleAdminPromoCodes } = require('./payments');
-const { handleContact } = require('./contact');
+const { handleContact, handleClientInbox } = require('./contact');
 const { handleSignup, handleLogin, handleLogout, handleMe } = require('./auth');
 const { handleDomainCheck } = require('./registrar');
 const { startReminderScheduler, handleSendReminders } = require('./reminders');
@@ -242,6 +242,11 @@ const server = http.createServer((req, res) => {
   if (req.method === 'POST' && urlPath === '/api/contact') {
     if (USE_RUST_API) proxyToRust(req, res, req.url);
     else handleContact(req, res);
+    return;
+  }
+
+  if (req.method === 'POST' && urlPath === '/api/client-inbox') {
+    handleClientInbox(req, res);
     return;
   }
 
