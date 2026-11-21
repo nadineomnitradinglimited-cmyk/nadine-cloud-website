@@ -8,6 +8,8 @@ export default function Home() {
       <Header />
 
       <section className="nc-hero" id="top">
+        {/* left: illustrated universe · right: the VR photo — they blend in the middle */}
+        <img src="/assets/hero-universe.svg" alt="" className="nc-hero-space" aria-hidden="true" />
         <img src="/assets/hero-city.jpg" alt="" className="nc-hero-bg" aria-hidden="true" />
         <a className="nc-hero-promo" href="/vault">
           <span className="new-pill">New</span> Meet Nadine Vault — 2 GB of free cloud storage for your phone <span aria-hidden="true">→</span>
