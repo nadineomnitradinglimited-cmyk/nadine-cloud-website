@@ -219,3 +219,34 @@ function lookupDomain(){
     input.placeholder = word.slice(0, Math.max(0,Math.min(i,word.length)));
   },110);
 })();
+
+// Top bar: show "Hi, <name>" + "Log out" instead of "Sign in" / "Sign up" when the visitor is logged in.
+(function showLoggedInState(){
+  function apply(){
+    const signin = document.getElementById('tbSignin');
+    const signinText = document.getElementById('tbSigninText');
+    const signup = document.getElementById('tbSignup');
+    if (!signin || !signinText) return;
+    fetch('/api/auth/me', { credentials: 'same-origin' })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (!data || !data.user) return;
+        const first = String(data.user.name || '').trim().split(/\s+/)[0] || 'there';
+        signinText.textContent = 'Hi, ' + first;
+        signin.setAttribute('title', 'My account');
+        if (signup) {
+          signup.textContent = 'Log out';
+          signup.setAttribute('href', '#');
+          signup.removeAttribute('aria-current');
+          signup.addEventListener('click', function(e){
+            e.preventDefault();
+            fetch('/api/auth/logout', { method: 'POST', credentials: 'same-origin' })
+              .finally(() => { window.location.href = '/'; });
+          });
+        }
+      })
+      .catch(() => {});
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', apply);
+  else apply();
+})();
