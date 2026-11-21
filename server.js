@@ -4,7 +4,7 @@ const path = require('path');
 const { handleChat } = require('./chat');
 const { handleAdminClients, handleAdminRecordPayment, handleLipilaWebhook, handleCheckoutInitiate, handleCheckoutStatus, handleLencoWebhook, handleReceiptDownload, handleValidatePromo, handleAdminPromoCodes } = require('./payments');
 const { handleContact, handleClientInbox } = require('./contact');
-const { handleSignup, handleLogin, handleLogout, handleMe } = require('./auth');
+const { handleSignup, handleLogin, handleLogout, handleMe, handleSendCode, handleVerifyCode } = require('./auth');
 const { handleDomainCheck } = require('./registrar');
 const { startReminderScheduler, handleSendReminders } = require('./reminders');
 const { handleGenerate, handleRefine, handlePreview, handleExport } = require('./ai-builder');
@@ -265,6 +265,16 @@ const server = http.createServer((req, res) => {
   if (req.method === 'POST' && urlPath === '/api/auth/logout') {
     if (USE_RUST_AUTH) proxyToRust(req, res, req.url);
     else handleLogout(req, res);
+    return;
+  }
+
+  if (req.method === 'POST' && urlPath === '/api/auth/send-code') {
+    handleSendCode(req, res);
+    return;
+  }
+
+  if (req.method === 'POST' && urlPath === '/api/auth/verify-code') {
+    handleVerifyCode(req, res);
     return;
   }
 

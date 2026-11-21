@@ -103,6 +103,9 @@ async function ensureSchema() {
     // Unpaid renewals: when (and how) a client's site was paused, so paying can bring it back.
     await getPool().query('ALTER TABLE orders ADD COLUMN IF NOT EXISTS suspended_at TIMESTAMPTZ; ALTER TABLE orders ADD COLUMN IF NOT EXISTS suspended_how TEXT;')
       .catch((err) => console.error('Could not add orders.suspended_* (site pausing will wait):', err.message));
+    // Email confirmation (6-digit code): an account only sees orders linked by email once its email is confirmed.
+    await getPool().query('ALTER TABLE users ADD COLUMN IF NOT EXISTS email_verified_at TIMESTAMPTZ; CREATE TABLE IF NOT EXISTS email_codes (user_id INTEGER PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE, code_hash TEXT NOT NULL, expires_at TIMESTAMPTZ NOT NULL, attempts INTEGER NOT NULL DEFAULT 0, sent_at TIMESTAMPTZ NOT NULL DEFAULT now());')
+      .catch((err) => console.error('Could not add email confirmation tables (will retry):', err.message));
     return true;
   });
   return schemaReady;
