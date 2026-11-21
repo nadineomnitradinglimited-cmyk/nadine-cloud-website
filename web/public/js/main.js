@@ -250,3 +250,17 @@ function lookupDomain(){
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', apply);
   else apply();
 })();
+
+// Home page opened with ?q=name (e.g. from the account dashboard search): fill the domain search and run it.
+(function(){
+  function run(){
+    var q = new URLSearchParams(location.search).get('q');
+    var input = document.getElementById('domInput');
+    if (!q || !input || typeof lookupDomain !== 'function') return;
+    input.value = q;
+    lookupDomain();
+    input.scrollIntoView({ block: 'center' });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function(){ setTimeout(run, 300); });
+  else setTimeout(run, 300);
+})();
