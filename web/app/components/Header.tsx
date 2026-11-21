@@ -42,13 +42,14 @@ export default function Header({
         <div className="wrap topbar-inner">
           <div className="topbar-left">
             <a href="/contact">Contact us</a>
-            <a href="/signup" aria-current={current("/signup")}>Sign up</a>
-            <a href="/account" className="topbar-signin" aria-current={current("/account")}>
+            <a href="/signup" id="tbSignup" aria-current={current("/signup")}>Sign up</a>
+            {/* /js/main.js swaps these for "Hi, <name>" + "Log out" when the visitor is logged in */}
+            <a href="/account" id="tbSignin" className="topbar-signin" aria-current={current("/account")}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                 <circle cx="12" cy="8" r="4.2" />
                 <path d="M3.5 21c.8-4.3 4.3-7 8.5-7s7.7 2.7 8.5 7z" />
               </svg>
-              Sign in
+              <span id="tbSigninText">Sign in</span>
             </a>
           </div>
           <div className="topbar-right">
