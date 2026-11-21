@@ -70,7 +70,7 @@ function lookupDomain(){
       const waText = encodeURIComponent('Hi Nadine Cloud, is ' + raw + '.com available to register?');
       out.innerHTML = 'We\'ll confirm if <strong>' + raw + '.com</strong> is available, from ' + usd(12.99 + DOMAIN_MARKUP_USD) + ' USD/yr' +
         ' &nbsp;·&nbsp; <a href="mailto:info@nadinecloud.com?body=' + waText + '" target="_blank" rel="noopener" style="color:#7047FF">Ask us by email</a>' +
-        ' &nbsp;·&nbsp; <a href="contact" style="color:#7047FF">Contact form</a>';
+        ' &nbsp;·&nbsp; <a href="/contact/" style="color:#7047FF">Contact form</a>';
     });
 }
 
