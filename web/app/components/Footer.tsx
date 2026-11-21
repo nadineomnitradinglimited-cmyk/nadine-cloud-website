@@ -21,8 +21,11 @@ export default function Footer({ productsExtra = [], supportLinks = DEFAULT_SUPP
           <div>
             <h4>Nadine Cloud</h4>
             <p>
-              Web design, cloud hosting, domains and business email for
-              businesses worldwide.
+              A Nadine Technologies company — AI chatbots, robotics, operating
+              systems, custom phones, security devices, apps and cloud.
+            </p>
+            <p style={{ marginTop: 8, fontSize: 13 }}>
+              Founded in Oman · Operating in South Africa, Kenya &amp; Zambia
             </p>
             <p style={{ marginTop: 14 }}>
               <a
@@ -90,8 +93,8 @@ export default function Footer({ productsExtra = [], supportLinks = DEFAULT_SUPP
           </div>
         </div>
         <div className="foot-bottom">
-          <span>© 2026 Nadine Cloud. All rights reserved.</span>
-          <span>Serving clients worldwide</span>
+          <span>© 2026 Nadine Technologies. All rights reserved.</span>
+          <span>Oman · South Africa · Kenya · Zambia</span>
         </div>
       </div>
     </footer>

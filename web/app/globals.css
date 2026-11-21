@@ -800,3 +800,51 @@ footer a:hover{color:var(--copper-bright)}
   .has-dropdown .nav-dropdown::before{content:"";position:absolute;left:-12px;right:-12px;top:-22px;height:22px}
   .has-dropdown:hover .nav-dropdown,.has-dropdown:focus-within .nav-dropdown{visibility:visible;opacity:1;transform:none;transition-delay:0s}
 }
+
+/* ===== About: Nadine Technologies ===== */
+.tp-hero{background:radial-gradient(120% 90% at 85% 0%,#0B3A7A 0%,#061B37 55%,#030E1F 100%)!important;color:#fff}
+.tp-hero h1,.tp-hero p{color:#fff}
+.tp-hero p{opacity:.85}
+.tp-hero .eyebrow{color:#38E1FF}
+.tp-grid{display:grid;gap:18px}
+.tp-4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.tp-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+@media(max-width:1000px){.tp-4,.tp-3{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){.tp-4,.tp-3{grid-template-columns:minmax(0,1fr)}}
+.tp-card{background:#fff;border:1px solid rgba(7,97,238,.14);border-radius:16px;padding:22px;box-shadow:0 1px 2px rgba(11,18,32,.04),0 10px 24px rgba(11,18,32,.05);min-width:0}
+.tp-card h3{font-size:1.05rem;margin:0 0 6px}
+.tp-card h3 a{color:inherit}
+.tp-card p{color:var(--text-soft);font-size:.93rem;line-height:1.55;margin:0}
+.tp-ic{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#0AA8F8,#0761EE);display:flex;align-items:center;justify-content:center;margin-bottom:14px}
+.tp-ic svg{width:24px;height:24px;fill:none;stroke:#fff;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.tp-tag{display:inline-block;font-size:.62rem;font-weight:700;letter-spacing:.06em;padding:3px 8px;border-radius:999px;background:#FF3B5C;color:#fff;vertical-align:middle;margin-left:4px}
+.tp-list{list-style:none;padding:0;margin:0}
+.tp-list li{position:relative;padding-left:24px;margin-bottom:10px}
+.tp-list li:before{content:"";position:absolute;left:0;top:7px;width:11px;height:11px;border-radius:3px;background:linear-gradient(135deg,#0AA8F8,#0761EE)}
+.tp-values{display:grid;gap:12px;margin-top:12px}
+.tp-values div{background:#fff;border:1px solid rgba(7,97,238,.14);border-radius:12px;padding:14px 16px}
+.tp-values b{display:block;margin-bottom:2px}
+.tp-values span{color:var(--text-soft);font-size:.92rem}
+
+/* ===== Futuristic tech band (home + about) ===== */
+.nt-future{position:relative;overflow:hidden;background:radial-gradient(90% 120% at 80% 0%,#0B3A7A 0%,#061B37 45%,#030E1F 100%)!important;color:#E8F1FF}
+.nt-future::before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(56,225,255,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(56,225,255,.08) 1px,transparent 1px);background-size:48px 48px;-webkit-mask-image:radial-gradient(ellipse at 50% 30%,#000 20%,transparent 75%);mask-image:radial-gradient(ellipse at 50% 30%,#000 20%,transparent 75%);pointer-events:none}
+.nt-future::after{content:"";position:absolute;width:520px;height:520px;right:-140px;top:-180px;border-radius:50%;background:radial-gradient(circle,rgba(10,168,248,.35),transparent 65%);pointer-events:none}
+.nt-future .wrap{position:relative;z-index:1}
+.nt-future h2{color:#fff}
+.nt-future p{color:#B7C8E2}
+.nt-future .eyebrow{color:#38E1FF}
+.nt-future a:not(.nt-tile){color:#38E1FF}
+.nt-tiles{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:16px;margin-top:36px}
+@media(max-width:1100px){.nt-tiles{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:560px){.nt-tiles{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.nt-tile{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;padding:24px 12px 20px;border-radius:18px;background:linear-gradient(160deg,rgba(255,255,255,.07),rgba(255,255,255,.015));border:1px solid rgba(56,225,255,.22);box-shadow:inset 0 0 24px rgba(10,168,248,.06);color:#fff;text-decoration:none;transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease;min-width:0}
+.nt-tile:hover{transform:translateY(-4px);border-color:rgba(56,225,255,.7);box-shadow:0 0 0 1px rgba(56,225,255,.25),0 12px 40px rgba(10,168,248,.35),inset 0 0 24px rgba(10,168,248,.12)}
+.nt-tile svg{width:58px;height:58px;fill:none;stroke:#38E1FF;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 0 6px rgba(56,225,255,.75));margin-bottom:8px}
+.nt-tile b{font-size:.98rem;line-height:1.25}
+.nt-tile span{font-size:.8rem;color:#9DB3D3}
+.nt-tile .nt-soon{font-size:.66rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#fff;background:#FF3B5C;padding:3px 9px;border-radius:999px;box-shadow:0 0 12px rgba(255,59,92,.6)}
+.nt-future .tp-card{background:linear-gradient(160deg,rgba(255,255,255,.07),rgba(255,255,255,.015));border:1px solid rgba(56,225,255,.22);box-shadow:none}
+.nt-future .tp-card h3{color:#fff}
+.nt-future .tp-card p{color:#9DB3D3}
+.nt-future .tp-ic{box-shadow:0 0 18px rgba(10,168,248,.6)}

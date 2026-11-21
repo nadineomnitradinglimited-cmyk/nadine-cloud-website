@@ -39,7 +39,7 @@ export default function Terms() {
 
       <section className="section legal-body">
         <div className="wrap">
-          <p>Nadine Cloud is a service of Nadine Omni Trading Limited (&quot;we&quot;, &quot;us&quot;). By ordering web design, hosting, domain or email services, you agree to these terms.</p>
+          <p>Nadine Cloud is a service of Nadine Technologies (&quot;we&quot;, &quot;us&quot;). By ordering web design, hosting, domain or email services, you agree to these terms.</p>
 
           <h2>Services</h2>
           <p>Hosting is billed monthly or annually in advance. Domains are registered for one year and renew annually. Web design projects are quoted individually and require a deposit before work begins.</p>

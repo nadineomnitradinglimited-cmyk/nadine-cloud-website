@@ -92,6 +92,42 @@ export default function Home() {
         </div>
       </section>
 
+      <section className="section nt-future">
+        <div className="wrap">
+          <div className="section-head" style={{ marginBottom: 0 }}>
+            <span className="eyebrow">Nadine Technologies</span>
+            <h2>More than hosting — a pure technology company.</h2>
+            <p>Nadine Cloud is part of Nadine Technologies, founded in Oman with operations in South Africa, Kenya and Zambia. Beyond websites and hosting, we build AI chatbots, custom operating systems, custom-built phones, security devices and defence technology — and we are now building our own robots. <a href="/about">Read more about us →</a></p>
+          </div>
+          <div className="nt-tiles">
+            <a href="/about" className="nt-tile">
+              <svg viewBox="0 0 48 48"><path d="M24 4v6" /><circle cx="24" cy="4" r="2" /><rect x="10" y="10" width="28" height="20" rx="7" /><circle cx="18" cy="20" r="3" /><circle cx="30" cy="20" r="3" /><path d="M20 26h8" /><path d="M6 17v6M42 17v6" /><rect x="15" y="32" width="18" height="12" rx="4" /><path d="M15 36l-5 5M33 36l5 5" /></svg>
+              <b>Robotics</b><span className="nt-soon">Coming soon</span>
+            </a>
+            <a href="/about" className="nt-tile">
+              <svg viewBox="0 0 48 48"><path d="M6 8h28a4 4 0 0 1 4 4v14a4 4 0 0 1-4 4H18l-8 7v-7H6a4 4 0 0 1-4-4V12a4 4 0 0 1 4-4z" /><circle cx="13" cy="19" r="1.6" /><circle cx="20" cy="19" r="1.6" /><circle cx="27" cy="19" r="1.6" /><path d="M40 16h2a4 4 0 0 1 4 4v12a4 4 0 0 1-4 4h-2v5l-6-5h-8" /></svg>
+              <b>AI Chatbots</b><span>Answer customers 24/7</span>
+            </a>
+            <a href="/about" className="nt-tile">
+              <svg viewBox="0 0 48 48"><rect x="8" y="8" width="32" height="32" rx="4" /><rect x="16" y="16" width="16" height="16" rx="2" /><path d="M20 16V4M28 16V4M20 44V32M28 44V32M16 20H4M16 28H4M44 20H32M44 28H32" /><path d="M21 24h6" /></svg>
+              <b>AI &amp; Operating Systems</b><span>Our own custom OS</span>
+            </a>
+            <a href="/about" className="nt-tile">
+              <svg viewBox="0 0 48 48"><rect x="13" y="3" width="22" height="42" rx="5" /><path d="M21 7h6M22 40h4" /><path d="M19 18l5-4 5 4v8l-5 4-5-4z" /></svg>
+              <b>Custom Phones</b><span>Built to order</span>
+            </a>
+            <a href="/about" className="nt-tile">
+              <svg viewBox="0 0 48 48"><path d="M24 3l17 7v12c0 11-7.5 19-17 23C14.5 41 7 33 7 22V10z" /><rect x="17" y="21" width="14" height="11" rx="2" /><path d="M20 21v-4a4 4 0 0 1 8 0v4" /><circle cx="24" cy="26.5" r="1.4" /></svg>
+              <b>Security Devices</b><span>CCTV · alarms · access</span>
+            </a>
+            <a href="/about" className="nt-tile">
+              <svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="18" /><circle cx="24" cy="24" r="10" /><circle cx="24" cy="24" r="2.5" /><path d="M24 2v8M24 38v8M2 24h8M38 24h8" /></svg>
+              <b>Defence Technology</b><span>For authorised agencies</span>
+            </a>
+          </div>
+        </div>
+      </section>
+
       <section className="section">
         <div className="wrap">
           <div className="section-head">
@@ -511,22 +547,6 @@ export default function Home() {
             <span className="tech-badge payment-badge" style={{ borderColor: "rgba(0,166,81,.4)" }}><img src="/assets/zamtel-money.png" alt="" width={20} height={20} style={{ borderRadius: "50%" }} />Zamtel Kwacha</span>
             <span className="tech-badge payment-badge"><svg viewBox="0 0 24 24"><circle cx="9" cy="12" r="7" fill="#EB001B" /><circle cx="15" cy="12" r="7" fill="#F79E1B" fillOpacity="0.85" /></svg>Mastercard</span>
             <span className="tech-badge payment-badge"><span style={{ fontFamily: "Georgia, serif", fontStyle: "italic", fontWeight: 800, color: "#1A1F71", fontSize: 15, letterSpacing: "-0.02em" }}>VISA</span></span>
-          </div>
-        </div>
-      </section>
-
-      <section className="section network-section">
-        <div className="wrap">
-          <div className="section-head" style={{ marginBottom: 0 }}>
-            <span className="eyebrow">Worldwide</span>
-            <h2>Wherever your business is, we can build it.</h2>
-            <p>Nadine Cloud is a remote-first team — every website, hosting account and support conversation happens online. Whether you&apos;re down the road or on the other side of the world, the process is the same: message us, tell us what you need, and we take it from there.</p>
-          </div>
-          <div className="network-list">
-            <div>100% remote — no office visit required</div>
-            <div>By email, wherever you are</div>
-            <div>Prices shown in your local currency</div>
-            <div>Support around the clock</div>
           </div>
         </div>
       </section>
