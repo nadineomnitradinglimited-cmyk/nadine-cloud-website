@@ -213,7 +213,7 @@ function stripBlock(text) {
 }
 
 // Returns { ok, how, user?, reason? }
-async function pauseSite(rawDomain, why = 'Unpaid renewal', pay = null) {
+async function pauseSite(rawDomain, why = 'Unpaid renewal', pay = null, opts = {}) {
   const domain = clean(rawDomain);
   if (!domain || PROTECTED_DOMAINS.has(domain)) return { ok: false, reason: 'protected_or_missing_domain' };
 
@@ -228,7 +228,7 @@ async function pauseSite(rawDomain, why = 'Unpaid renewal', pay = null) {
   if (!dir) return { ok: false, reason: 'site_folder_not_found' };
   const ht = path.join(dir, '.htaccess');
   const old = fs.existsSync(ht) ? fs.readFileSync(ht, 'utf8') : '';
-  const scope = SCOPED_SUSPEND[domain];
+  const scope = opts.whole ? null : SCOPED_SUSPEND[domain];
   fs.writeFileSync(path.join(dir, PAGE), pausedPage(domain, Boolean(scope), pay));
   let rules;
   if (scope) {
@@ -280,7 +280,87 @@ async function resumePausedSite(rawDomain) {
   return { ok: true, resumed: true };
 }
 
+// ---------------------------------------------------------------------------------------------
+// Nadine Command Center (the owner's PC) → pause / unpause / list client sites.
+// Every request is SIGNED with an Ed25519 private key that only exists on the owner's PC; this server
+// only holds the PUBLIC key (~/.nc-watch-pubkey.pem). Headers: x-nc-ts (ms), x-nc-nonce, x-nc-sig
+// (base64 signature of `${ts}.${nonce}.${body}`). Requests older than 5 minutes or replayed are refused.
+const WATCH_PUBKEY_FILE = path.join(os.homedir(), '.nc-watch-pubkey.pem');
+const seenNonces = new Map();
+function watchSigned(req, body) {
+  try {
+    const pub = fs.readFileSync(WATCH_PUBKEY_FILE, 'utf8');
+    const ts = Number(req.headers['x-nc-ts']);
+    const nonce = String(req.headers['x-nc-nonce'] || '');
+    const sig = String(req.headers['x-nc-sig'] || '');
+    if (!ts || Math.abs(Date.now() - ts) > 5 * 60000 || !/^[A-Za-z0-9_-]{16,64}$/.test(nonce) || seenNonces.has(nonce)) return false;
+    const ok = crypto.verify(null, Buffer.from(`${ts}.${nonce}.${body}`), pub, Buffer.from(sig, 'base64'));
+    if (ok) {
+      seenNonces.set(nonce, Date.now());
+      for (const [k, v] of seenNonces) if (Date.now() - v > 10 * 60000) seenNonces.delete(k);
+    }
+    return ok;
+  } catch {
+    return false;
+  }
+}
+// Client sites served from folders in our account (/home/nadine14/<domain>), never our own site.
+function hostedSites() {
+  let names = [];
+  try { names = fs.readdirSync(os.homedir()); } catch { /* ignore */ }
+  return names
+    .filter((n) => /^[a-z0-9-]+(\.[a-z0-9-]+)+$/i.test(n) && !PROTECTED_DOMAINS.has(n.toLowerCase()))
+    .filter((n) => { try { return fs.statSync(path.join(os.homedir(), n)).isDirectory(); } catch { return false; } })
+    .map((domain) => {
+      const ht = path.join(os.homedir(), domain, '.htaccess');
+      const txt = fs.existsSync(ht) ? fs.readFileSync(ht, 'utf8') : '';
+      const paused = txt.includes(START);
+      const pausedScoped = paused && /RewriteRule \^\(/.test(txt.slice(txt.indexOf(START), txt.indexOf(END)));
+      return { domain, paused, pausedHow: paused ? (pausedScoped ? 'admin-only' : 'whole-site') : null, scopedByDefault: Boolean(SCOPED_SUSPEND[domain]) };
+    });
+}
+function readRaw(req, max = 4000) {
+  return new Promise((resolve, reject) => {
+    let data = '';
+    req.on('data', (c) => { data += c; if (data.length > max) { reject(new Error('too large')); req.destroy(); } });
+    req.on('end', () => resolve(data));
+    req.on('error', reject);
+  });
+}
+async function handleWatchSites(req, res) {
+  const send = (code, obj) => { res.writeHead(code, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' }); res.end(JSON.stringify(obj)); };
+  let body = '';
+  try { body = await readRaw(req); } catch { return send(400, { error: 'Bad request.' }); }
+  if (!watchSigned(req, body)) return send(403, { error: 'Not allowed.' });
+  let p = {};
+  try { p = JSON.parse(body || '{}'); } catch { return send(400, { error: 'Bad request.' }); }
+  const sites = hostedSites();
+  if (p.action === 'list') return send(200, { sites });
+  const domain = clean(p.domain);
+  if (!sites.some((s) => s.domain === domain)) return send(404, { error: 'That site is not hosted in our account.' });
+  let pool = null;
+  try { pool = require('./db').getPool(); } catch { /* database not configured */ }
+  if (p.action === 'pause') {
+    const r = await pauseSite(domain, 'Paused from Nadine Command Center', null, { whole: Boolean(p.whole) });
+    if (r.ok && pool) {
+      await pool.query(`UPDATE orders SET suspended_at = now(), suspended_how = $2 WHERE lower(regexp_replace(domain, '^www\\.', '')) = $1 AND suspended_at IS NULL`, [domain, r.how]).catch(() => {});
+    }
+    console.log(`[command-center] pause ${domain} (${p.whole ? 'whole site' : 'default'}) -> ${JSON.stringify(r)}`);
+    return send(r.ok ? 200 : 500, { ...r, sites: hostedSites() });
+  }
+  if (p.action === 'unpause') {
+    const r = await unpauseSite(domain, 'htaccess');
+    if (r.ok && pool) {
+      await pool.query(`UPDATE orders SET suspended_at = NULL, suspended_how = NULL WHERE lower(regexp_replace(domain, '^www\\.', '')) = $1`, [domain]).catch(() => {});
+    }
+    console.log(`[command-center] unpause ${domain} -> ${JSON.stringify(r)}`);
+    return send(r.ok ? 200 : 500, { ...r, sites: hostedSites() });
+  }
+  return send(400, { error: 'Unknown action.' });
+}
+
 module.exports = {
+  handleWatchSites,
   pauseSite, unpauseSite, resumePausedSite, stripBlock,
   whmRequest, ensurePackagesExist, createAccount, PACKAGES, WHM_HOST,
   HOSTING_PACKAGES, DATABASE_PACKAGES, WORDPRESS_PACKAGES, BUILDER_PACKAGES,
