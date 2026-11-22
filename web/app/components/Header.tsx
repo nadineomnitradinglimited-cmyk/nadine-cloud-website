@@ -128,6 +128,16 @@ export default function Header({
               </a>
             </li>
             <li className="has-dropdown">
+              <a href="/ai-chatbots" aria-current={current("/ai-chatbots") || current("/business-systems") || current("/automation")}>
+                Solutions <span className="badge-new">New</span> <NavCaret />
+              </a>
+              <div className="nav-dropdown">
+                <a href="/ai-chatbots">AI Chatbots</a>
+                <a href="/business-systems">Pharmacy &amp; Clinic Systems</a>
+                <a href="/automation">Business Automation</a>
+              </div>
+            </li>
+            <li className="has-dropdown">
               <a href="/marketing" aria-current={current("/marketing")}>
                 Marketing <span className="badge-new">New</span> <NavCaret />
               </a>

@@ -59,6 +59,15 @@ export default function Footer({ productsExtra = [], supportLinks = DEFAULT_SUPP
               <li>
                 <a href="/marketing">Marketing</a>
               </li>
+              <li>
+                <a href="/ai-chatbots">AI Chatbots</a>
+              </li>
+              <li>
+                <a href="/business-systems">Pharmacy &amp; Clinic Systems</a>
+              </li>
+              <li>
+                <a href="/automation">Business Automation</a>
+              </li>
             </ul>
           </div>
           <div>
