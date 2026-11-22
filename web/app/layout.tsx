@@ -3,9 +3,17 @@ import Script from "next/script";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Nadine Cloud — Domains & Hosting for Developers",
+  title: "Nadine Cloud — Websites, Hosting & AI for Your Business",
   description:
-    "Domains at honest prices, fast NVMe hosting with free SSL, Git deploys, Node.js & PHP apps, MySQL and PostgreSQL databases, and business email. Pay by mobile money or card.",
+    "Get your business online for less: a professional website, fast hosting, your own domain and business email — plus AI chatbots, business systems and automation by Nadine Technologies. Pay by mobile money or card.",
+  openGraph: {
+    type: "website",
+    siteName: "Nadine Cloud",
+    title: "Nadine Cloud — Websites, Hosting & AI for Your Business",
+    description:
+      "Get your business online for less: a professional website, fast hosting, your own domain and business email — plus AI chatbots, business systems and automation by Nadine Technologies.",
+    url: "https://www.nadinecloud.com/",
+  },
   icons: {
     icon: "/favicon.svg",
   },
