@@ -197,6 +197,15 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  // Nadine Command Center (owner's PC, signed requests): list / pause / unpause client sites.
+  if (req.method === 'POST' && urlPath === '/api/admin/watch-sites') {
+    require('./whm').handleWatchSites(req, res).catch((err) => {
+      console.error('watch-sites failed:', err);
+      if (!res.headersSent) { res.writeHead(500, { 'Content-Type': 'application/json' }); res.end(JSON.stringify({ error: 'Could not do that.' })); }
+    });
+    return;
+  }
+
   // Record a payment made outside the website (cash / MoMo / bank) for a hand-hosted client.
   if (req.method === 'POST' && urlPath === '/api/admin/record-payment') {
     handleAdminRecordPayment(req, res).catch((err) => {
