@@ -1289,7 +1289,10 @@ async function handleBillingBar(req, res) {
     lastPaid: latest && latest.how !== 'Account opened' ? fmt(latest.paidOn) : '—',
     lastSub: latest && latest.how !== 'Account opened' ? `ZMW ${latest.amount.toLocaleString('en-US')} · ${latest.how}` : '',
     paidUntil: fmt(due), nextDue: fmt(due), usedPct: Math.round(used * 100),
-    history: history.filter((h) => h.how !== 'Account opened').slice(0, 4).map((h) => `${fmt(h.paidOn)} · ZMW ${h.amount.toLocaleString('en-US')} · ${h.how} · until ${fmt(h.until)}`),
+    // Each line shows the period the payment covered (from the previous period's end), then when and how it was paid.
+    history: history.map((h, i) => ({ ...h, from: history[i + 1] ? history[i + 1].until : null }))
+      .filter((h) => h.how !== 'Account opened').slice(0, 4)
+      .map((h) => `${h.from ? `${fmt(h.from)} – ` : 'Until '}${fmt(h.until)} · ZMW ${h.amount.toLocaleString('en-US')} · paid ${fmt(h.paidOn)} · ${h.how}`),
   };
   const data = JSON.stringify({ level, text, payUrl, card });
   js(`/* Nadine Cloud billing */
