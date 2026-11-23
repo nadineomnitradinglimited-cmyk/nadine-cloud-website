@@ -50,7 +50,7 @@ function generateReceiptPdf(order, meta) {
     const currency = order.currency || 'ZMW';
     const paidDate = meta.paidAt.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
     // Customers only ever see our own brand for payments, never the payment provider's name.
-    const method = `Nadine Pay (${order.method === 'card' ? 'Card' : 'Mobile Money'})`;
+    const method = order.methodLabel || `Nadine Pay (${order.method === 'card' ? 'Card' : 'Mobile Money'})`;
 
     // header: blue accent strip, logo on the left, RECEIPT + reference on the right
     doc.rect(0, 0, pageW, 8).fill(BLUE);
@@ -69,9 +69,14 @@ function generateReceiptPdf(order, meta) {
     doc.fillColor('#FFFFFF').font('Helvetica-Bold').fontSize(11).text('PAID', marginX, y + 7, { width: 78, align: 'center' });
     doc.fillColor(TEXT_SOFT).font('Helvetica').fontSize(10.5).text('Payment received. Thank you!', marginX + 92, y + 7);
     // "Paid with Nadine Pay" mark on the right of the same row
-    const payW = 96;
-    doc.image(PAY_LOGO, pageW - marginX - payW, y - 12, { width: payW });
-    doc.fillColor(TEXT_MUTE).font('Helvetica').fontSize(9).text('Paid with', 0, y + 8, { align: 'right', width: pageW - marginX - payW - 8 });
+    // (only when the money really came through Nadine Pay; hand-recorded payments show their own method)
+    if (!order.methodLabel) {
+      const payW = 96;
+      doc.image(PAY_LOGO, pageW - marginX - payW, y - 12, { width: payW });
+      doc.fillColor(TEXT_MUTE).font('Helvetica').fontSize(9).text('Paid with', 0, y + 8, { align: 'right', width: pageW - marginX - payW - 8 });
+    } else {
+      doc.fillColor(TEXT_SOFT).font('Helvetica-Bold').fontSize(10).text(`Paid with ${order.methodLabel}`, 0, y + 7, { align: 'right', width: pageW - marginX });
+    }
 
     // billed to / order details
     y += 52;
@@ -99,7 +104,7 @@ function generateReceiptPdf(order, meta) {
     y += 30;
     doc.fillColor(INK).font('Helvetica-Bold').fontSize(11.5).text(order.plan, marginX + 16, y + 16, { width: innerW - 180 });
     if (order.domain) {
-      doc.fillColor(TEXT_MUTE).font('Helvetica').fontSize(9.5).text(`Domain: ${order.domain}`, marginX + 16, y + 32);
+      doc.fillColor(TEXT_MUTE).font('Helvetica').fontSize(9.5).text(`Domain: ${order.domain}${order.periodLabel ? `  ·  ${order.periodLabel}` : ""}`, marginX + 16, y + 32, { width: innerW - 180 });
     }
     doc.fillColor(INK).font('Helvetica-Bold').fontSize(11.5).text(money(order.amount, currency), 0, y + 16, { align: 'right', width: pageW - marginX - 16 });
     y += order.domain ? 54 : 46;
@@ -142,7 +147,7 @@ function generateReceiptPdf(order, meta) {
     doc.fillColor('#8FB8FF').font('Helvetica').fontSize(9).text('One Cloud. Endless Possibilities.', marginX, bandY + 37);
     doc.fillColor('#C7D3E6').font('Helvetica').fontSize(9)
       .text('info@nadinecloud.com  ·  www.nadinecloud.com', 0, bandY + 22, { align: 'right', width: pageW - marginX })
-      .text('www.nadinecloud.com  ·  PHI Mall, Lusaka, Zambia', 0, bandY + 37, { align: 'right', width: pageW - marginX });
+      .text('billing@nadinecloud.com  ·  Lusaka, Zambia', 0, bandY + 37, { align: 'right', width: pageW - marginX });
 
     doc.end();
   });
