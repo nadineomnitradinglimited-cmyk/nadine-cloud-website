@@ -192,6 +192,15 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  // "Pay now" bar shown on a hand-hosted client's own admin screen (script tag on their site).
+  if (req.method === 'GET' && urlPath === '/api/billing-bar.js') {
+    require('./payments').handleBillingBar(req, res).catch((err) => {
+      console.error('billing-bar failed:', err);
+      if (!res.headersSent) { res.writeHead(200, { 'Content-Type': 'application/javascript' }); res.end('/* billing bar unavailable */'); }
+    });
+    return;
+  }
+
   if (req.method === 'POST' && urlPath === '/api/admin/send-reminders') {
     handleSendReminders(req, res);
     return;
