@@ -1227,7 +1227,8 @@ async function handleBillingBar(req, res) {
   const q = new URLSearchParams(req.url.split('?')[1] || '');
   const ref = (q.get('client') || '').trim();
   const js = (body) => {
-    res.writeHead(200, { 'Content-Type': 'application/javascript; charset=utf-8', 'Cache-Control': 'public, max-age=300', 'Access-Control-Allow-Origin': '*' });
+    // no-store: Cloudflare must never keep a copy (it once served a 4-hour-old version), and the billing state is live data
+    res.writeHead(200, { 'Content-Type': 'application/javascript; charset=utf-8', 'Cache-Control': 'no-store, max-age=0', 'CDN-Cache-Control': 'no-store', 'Access-Control-Allow-Origin': '*' });
     res.end(body);
   };
   if (!/^MAN-[A-Za-z0-9._-]{1,76}$/.test(ref) || !dbConfigured()) return js('/* Nadine Cloud billing bar: no client */');
