@@ -50,7 +50,7 @@ function computeExpiryDate(type, period) {
   const months = PERIOD_MONTHS[period] || (ANNUAL_TYPES.has(type) ? 12 : null);
   if (!months) return null;
   const d = new Date();
-  d.setMonth(d.getMonth() + months);
+  d.setUTCMonth(d.getUTCMonth() + months);
   return d;
 }
 
@@ -403,7 +403,9 @@ async function lookupManagedClient(ref) {
     if (!row) return null;
     const period = row.period === 'yr' ? 'yr' : 'mo';
     const next = new Date(row.expires_at || Date.now());
-    next.setMonth(next.getMonth() + (period === 'yr' ? 12 : 1)); // keep the same day every month / every year
+    // keep the same day AND time every month / every year. UTC months (not the server's local clock, which
+    // shifts an hour with US daylight saving) -- Lusaka has no daylight saving, so the Lusaka due date stays put.
+    next.setUTCMonth(next.getUTCMonth() + (period === 'yr' ? 12 : 1));
     return { plan: row.plan, amount: Number(row.amount), email: row.email, nextExpiry: next, period };
   } catch (err) {
     console.error('lookupManagedClient failed:', err);
@@ -1060,7 +1062,7 @@ async function handleAdminClients(req, res) {
 
   // expiresAt sets the due date directly (e.g. "the 19th"); otherwise it is startDate plus `months`.
   const expires = explicitExpiry || new Date(start);
-  if (!explicitExpiry) expires.setMonth(expires.getMonth() + months);
+  if (!explicitExpiry) expires.setUTCMonth(expires.getUTCMonth() + months);
   const reference = 'MAN-' + Date.now() + '-' + crypto.randomBytes(3).toString('hex');
   try {
     await getPool().query(
@@ -1103,7 +1105,7 @@ async function handleAdminRecordPayment(req, res) {
   const b = base.rows[0];
   // lookupManagedClient already gives "latest paid period + 1"; extra months add on from there.
   const expires = new Date(managed.nextExpiry);
-  if (months > 1) expires.setMonth(expires.getMonth() + (managed.period === 'yr' ? 12 : 1) * (months - 1));
+  if (months > 1) expires.setUTCMonth(expires.getUTCMonth() + (managed.period === 'yr' ? 12 : 1) * (months - 1));
   const amount = Number.isFinite(Number(p.amount)) && Number(p.amount) > 0 ? Number(p.amount) : Number(b.amount) * months;
   const reference = 'MANPAY-' + Date.now() + '-' + crypto.randomBytes(3).toString('hex');
   await getPool().query(

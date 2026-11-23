@@ -30,16 +30,21 @@ function daysBetween(a, b) {
   return Math.round((a.getTime() - b.getTime()) / (24 * 60 * 60 * 1000));
 }
 
-// A newer paid order for the same customer and product means this one was
-// already renewed -- checked fresh every run rather than stored as a flag,
-// so there's nothing to get out of sync.
+// Another paid order for the same customer and product that runs LATER than this one means this one was
+// already renewed -- checked fresh every run rather than stored as a flag, so there's nothing to get out of sync.
+// Compared entirely inside the database: passing created_at through JavaScript loses the microseconds, which
+// made every order look "renewed by itself" -- so no reminder or pause ever fired for payment-created orders.
+// For hand-hosted (managed) clients the site must match too, so one client's two sites are kept apart.
 async function alreadyRenewed(order) {
   const result = await getPool().query(
-    `SELECT 1 FROM orders
-     WHERE email = $1 AND type = $2 AND pkg IS NOT DISTINCT FROM $3
-       AND status = 'paid' AND created_at > $4
+    `SELECT 1 FROM orders o, orders me
+     WHERE me.reference = $1 AND o.reference <> me.reference
+       AND o.email = me.email AND o.type = me.type AND o.pkg IS NOT DISTINCT FROM me.pkg
+       AND (o.type <> 'managed' OR o.domain IS NOT DISTINCT FROM me.domain)
+       AND o.status = 'paid'
+       AND (o.expires_at > me.expires_at OR (o.expires_at IS NULL AND o.created_at > me.created_at))
      LIMIT 1`,
-    [order.email, order.type, order.pkg, order.created_at]
+    [order.reference]
   );
   return result.rowCount > 0;
 }
