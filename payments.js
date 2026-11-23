@@ -1218,4 +1218,71 @@ async function sweepPendingPayments() {
 }
 setInterval(() => { sweepPendingPayments().catch(() => {}); }, SWEEP_EVERY_MS).unref();
 
-module.exports = { handleAdminClients, handleAdminRecordPayment, lookupManagedClient, handleLipilaWebhook, handleCheckoutInitiate, handleCheckoutStatus, handleLencoWebhook, handleReceiptDownload, handleValidatePromo, handleAdminPromoCodes };
+// ---- "Pay now" bar on a hand-hosted client's own admin screen ----
+// The client's admin page loads  <script src="https://www.nadinecloud.com/api/billing-bar.js?client=MAN-…" defer>
+// and this returns a small self-contained script with their current billing state baked in, so the amount,
+// due date and payment link always come from our records (nothing to update on their site each month).
+// Shows only what the client's own payment link already shows (plan, amount, due date).
+async function handleBillingBar(req, res) {
+  const q = new URLSearchParams(req.url.split('?')[1] || '');
+  const ref = (q.get('client') || '').trim();
+  const js = (body) => {
+    res.writeHead(200, { 'Content-Type': 'application/javascript; charset=utf-8', 'Cache-Control': 'public, max-age=300', 'Access-Control-Allow-Origin': '*' });
+    res.end(body);
+  };
+  if (!/^MAN-[A-Za-z0-9._-]{1,76}$/.test(ref) || !dbConfigured()) return js('/* Nadine Cloud billing bar: no client */');
+  await ensureSchema();
+  const r = await getPool().query(
+    `SELECT o.plan, o.amount, o.period, o.domain,
+            (SELECT max(x.expires_at) FROM orders x WHERE x.email = o.email AND x.type = 'managed' AND x.status = 'paid'
+               AND x.domain IS NOT DISTINCT FROM o.domain) AS paid_until,
+            (SELECT bool_or(x.suspended_at IS NOT NULL) FROM orders x WHERE x.email = o.email AND x.type = 'managed'
+               AND x.status = 'paid' AND x.domain IS NOT DISTINCT FROM o.domain
+               AND x.expires_at = (SELECT max(y.expires_at) FROM orders y WHERE y.email = o.email AND y.type = 'managed' AND y.status = 'paid' AND y.domain IS NOT DISTINCT FROM o.domain)) AS paused
+     FROM orders o WHERE o.reference = $1 AND o.type = 'managed' AND o.status = 'paid'`,
+    [ref]
+  );
+  const row = r.rows[0];
+  if (!row || !row.paid_until) return js('/* Nadine Cloud billing bar: unknown client */');
+  const lusakaDay = (d) => new Date(new Date(d).getTime() + 2 * 3600 * 1000).toISOString().slice(0, 10);
+  const due = lusakaDay(row.paid_until);
+  const daysLeft = Math.round((Date.parse(due) - Date.parse(lusakaDay(new Date()))) / 864e5);
+  const fmt = (iso, plus = 0) => new Date(Date.parse(iso) + plus * 864e5).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
+  const amount = `ZMW ${Number(row.amount).toLocaleString('en-US')}`;
+  const payUrl = `https://www.nadinecloud.com/checkout/?type=managed&client=${encodeURIComponent(ref)}&plan=${encodeURIComponent(row.plan)}&amount=${encodeURIComponent(Number(row.amount))}&period=${row.period === 'yr' ? 'yr' : 'mo'}`;
+  let level; let text;
+  if (row.paused || daysLeft < -3) { level = 'red'; text = `Admin tools paused — ${amount} was due on ${fmt(due)}. Pay to switch them back on.`; }
+  else if (daysLeft < 0) { level = 'red'; text = `Overdue: ${amount} was due on ${fmt(due)}. Pay by ${fmt(due, 3)} to avoid a pause.`; }
+  else if (daysLeft === 0) { level = 'amber'; text = `${amount} is due today (${fmt(due)}).`; }
+  else if (daysLeft <= 7) { level = 'amber'; text = `${amount} due on ${fmt(due)} — in ${daysLeft} day${daysLeft === 1 ? '' : 's'}.`; }
+  else { level = 'calm'; text = `Hosting paid until ${fmt(due)}. Next: ${amount}.`; }
+  const data = JSON.stringify({ level, text, payUrl });
+  js(`/* Nadine Cloud billing bar */
+(function () {
+  var d = ${data};
+  function show() {
+    if (document.getElementById('nc-billing-bar')) return;
+    var host = document.createElement('div'); host.id = 'nc-billing-bar';
+    host.style.cssText = 'position:fixed;right:16px;bottom:16px;z-index:2147483000;max-width:calc(100vw - 32px)';
+    var root = host.attachShadow ? host.attachShadow({ mode: 'open' }) : host;
+    var c = { calm: ['#0B1220', '#E6EEFF', '#1769FF'], amber: ['#3A2600', '#FFF4DC', '#D97706'], red: ['#fff', '#C62828', '#fff'] }[d.level];
+    var btnText = d.level === 'red' ? '#C62828' : '#fff';
+    root.innerHTML = '<style>.b{font:500 13px/1.35 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;display:flex;align-items:center;gap:10px;padding:9px 10px 9px 14px;border-radius:12px;box-shadow:0 6px 24px rgba(11,18,32,.22);color:' + c[0] + ';background:' + c[1] + '}' +
+      '.t{flex:1;min-width:0}.k{display:block;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;opacity:.75;font-weight:700}' +
+      'a{flex:none;text-decoration:none;font-weight:700;padding:7px 12px;border-radius:9px;background:' + c[2] + ';color:' + btnText + '}' +
+      'button{flex:none;border:0;background:none;color:inherit;opacity:.6;font-size:16px;cursor:pointer;padding:2px 4px}</style>' +
+      '<div class="b" role="status"><span class="t"><span class="k">Nadine Cloud billing</span></span><a target="_blank" rel="noopener">Pay now</a>' +
+      (d.level === 'calm' ? '<button aria-label="Hide">&times;</button>' : '') + '</div>';
+    root.querySelector('.t').appendChild(document.createTextNode(d.text));
+    root.querySelector('a').href = d.payUrl;
+    var x = root.querySelector('button');
+    if (x) x.onclick = function () { try { sessionStorage.setItem('ncBarHidden', '1'); } catch (e) {} host.remove(); };
+    try { if (d.level === 'calm' && sessionStorage.getItem('ncBarHidden')) return; } catch (e) {}
+    document.body.appendChild(host);
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', show); else show();
+})();
+`);
+}
+
+module.exports = { handleBillingBar, handleAdminClients, handleAdminRecordPayment, lookupManagedClient, handleLipilaWebhook, handleCheckoutInitiate, handleCheckoutStatus, handleLencoWebhook, handleReceiptDownload, handleValidatePromo, handleAdminPromoCodes };
