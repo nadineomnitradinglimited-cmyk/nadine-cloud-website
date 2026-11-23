@@ -52,14 +52,14 @@ function buildReminderEmail(order, daysLeft) {
     : `${SITE_URL}${page}`;
   const overdue = daysLeft < 0;
   const heading = overdue
-    ? `${order.plan} is overdue for renewal`
+    ? `Final reminder: ${order.plan} is overdue`
     : daysLeft === 0
       ? `${order.plan} is due for renewal today`
       : `${order.plan} renews in ${daysLeft} day${daysLeft === 1 ? '' : 's'}`;
   const dueLine = overdue
-    ? `Your <strong>${order.plan}</strong>${order.domain ? ` (${order.domain})` : ''} was due for renewal ${Math.abs(daysLeft)} day${Math.abs(daysLeft) === 1 ? '' : 's'} ago. To avoid any interruption, please renew as soon as you can.`
+    ? `Your <strong>${order.plan}</strong>${order.domain ? ` (${order.domain})` : ''} was due for renewal ${Math.abs(daysLeft)} day${Math.abs(daysLeft) === 1 ? '' : 's'} ago. <strong>Today is the last day of your 3-day grace period</strong> &mdash; if it is not renewed today, the service will be paused tomorrow. Please pay now.`
     : daysLeft === 0
-      ? `Your <strong>${order.plan}</strong>${order.domain ? ` (${order.domain})` : ''} is due for renewal <strong>today</strong>. Please pay today to keep it online &mdash; there is a 2-day grace period, after which the service is paused until it is renewed.`
+      ? `Your <strong>${order.plan}</strong>${order.domain ? ` (${order.domain})` : ''} is due for renewal <strong>today</strong>. Please pay today to keep it online &mdash; there is a 3-day grace period, after which the service is paused until it is renewed.`
       : `Your <strong>${order.plan}</strong>${order.domain ? ` (${order.domain})` : ''} is coming up for renewal in ${daysLeft} day${daysLeft === 1 ? '' : 's'}.`;
 
   const html = renderEmail({
@@ -72,7 +72,7 @@ function buildReminderEmail(order, daysLeft) {
 
   return {
     subject: overdue
-      ? `Action needed: ${order.plan} renewal is overdue`
+      ? `Final reminder: ${order.plan} will be paused tomorrow`
       : `Reminder: ${order.plan} renews ${daysLeft === 0 ? 'today' : `in ${daysLeft} day${daysLeft === 1 ? '' : 's'}`}`,
     html,
     text,
@@ -205,14 +205,16 @@ async function sendPendingWelcomes(summary) {
 const lusakaDay = (d) => new Date(new Date(d).getTime() + 2 * 3600 * 1000).toISOString().slice(0, 10);
 const daysUntil = (due) => Math.round((Date.parse(lusakaDay(due)) - Date.parse(lusakaDay(new Date()))) / 864e5);
 
-// Renewal rules (agreed 19 Nov 2026):
-//   7 days before  -> one reminder
-//   on the due day -> one reminder ("pay today to keep your site online")
-//   2 days after   -> (grace period over) the site is paused (pauseSite) and the client is told; paying switches it back on.
-//   No other emails. Never pauses anything that is more than 4 days overdue (old records must not
-//   all switch off at once when this goes live) -- those are only listed for Nadine Cloud to look at.
-const REMIND_ON = new Set([7, 0]);
-const GRACE_DAYS = 2; // due on the 18th -> paused on the 20th if still unpaid
+// Renewal rules -- Client Service & Payment Policy v2.0 (Nov 2026):
+//   7 days before   -> reminder with the payment link
+//   on the due day  -> reminder ("pay today")
+//   day 3 after     -> FINAL reminder (last day of the 3-day grace period)
+//   day 4 after     -> grace period over: the site/admin tools are paused (pauseSite) and the client is told;
+//                      paying switches it back on automatically.
+//   No other emails. Never pauses anything more than 2 days past its pause day (old records must not
+//   all switch off at once) -- those are only listed for Nadine Cloud to look at.
+const GRACE_DAYS = 3; // due on the 18th -> grace 19th-21st -> paused on the 22nd if still unpaid
+const REMIND_ON = new Set([7, 0, -GRACE_DAYS]);
 const PAUSABLE_TYPES = new Set(['managed', 'hosting', 'wordpress', 'builder', 'bundle', 'database']);
 
 function buildPausedEmail(order) {
@@ -221,11 +223,11 @@ function buildPausedEmail(order) {
     : `${SITE_URL}${RENEWAL_PAGE[order.type] || '/contact'}`;
   const html = renderEmail({
     heading: `${order.domain || order.plan} has been paused`,
-    bodyHtml: `<p style="margin:0 0 14px">Hi ${order.name || 'there'},</p><p style="margin:0 0 14px">We didn't receive the renewal for <strong>${order.plan}</strong>${order.domain ? ` (${order.domain})` : ''}, which was due 2 days ago, so the website has been paused. Nothing has been deleted.</p><p style="margin:0">Pay below by mobile money or card and it comes back online automatically within minutes.</p>`,
+    bodyHtml: `<p style="margin:0 0 14px">Hi ${order.name || 'there'},</p><p style="margin:0 0 14px">We didn't receive the renewal for <strong>${order.plan}</strong>${order.domain ? ` (${order.domain})` : ''}, which was due ${Math.abs(daysUntil(order.expires_at))} days ago, so the service has been paused after the 3-day grace period. Nothing has been deleted.</p><p style="margin:0">Pay below by mobile money or card and it comes back online automatically within minutes.</p>`,
     ctaText: 'Pay and switch my site back on',
     ctaUrl: payUrl,
   });
-  const text = `Hi ${order.name || 'there'},\n\nWe didn't receive the renewal for ${order.plan}${order.domain ? ` (${order.domain})` : ''}, which was due 2 days ago, so the website has been paused. Nothing has been deleted.\n\nPay here and it comes back online automatically: ${payUrl}\n\n— Nadine Cloud`;
+  const text = `Hi ${order.name || 'there'},\n\nWe didn't receive the renewal for ${order.plan}${order.domain ? ` (${order.domain})` : ''}, which was due ${Math.abs(daysUntil(order.expires_at))} days ago, so the service has been paused after the 3-day grace period. Nothing has been deleted.\n\nPay here and it comes back online automatically: ${payUrl}\n\n— Nadine Cloud`;
   return { subject: `Your website has been paused: ${order.domain || order.plan}`, html, text };
 }
 
@@ -257,11 +259,10 @@ async function sendDueReminders() {
       if (await alreadyRenewed(order)) continue;
       const daysLeft = daysUntil(order.expires_at);
 
-      // ---- 2-day grace period (policy agreed 19 Nov 2026): days 1-2 after the due date nothing happens;
-      //      on day 2 after (or up to day 4, if the daily job missed a day) the site is paused ----
-      if (daysLeft < 0) {
-        if (daysLeft > -GRACE_DAYS) continue;
-        if (daysLeft < -(GRACE_DAYS + 2) || !PAUSABLE_TYPES.has(order.type) || !order.domain) { summary.skippedOld += 1; continue; }
+      // ---- 3-day grace period: days 1-3 after the due date the service keeps running (final reminder on day 3);
+      //      on day 4 (or up to day 6, if the daily job missed a day) the site is paused ----
+      if (daysLeft < -GRACE_DAYS) {
+        if (daysLeft < -(GRACE_DAYS + 3) || !PAUSABLE_TYPES.has(order.type) || !order.domain) { summary.skippedOld += 1; continue; }
         const payUrl = order.type === 'managed'
           ? `${SITE_URL}/checkout/?type=managed&client=${encodeURIComponent(order.reference)}&plan=${encodeURIComponent(order.plan)}&amount=${encodeURIComponent(Number(order.amount))}&period=${order.period === 'yr' ? 'yr' : 'mo'}`
           : `${SITE_URL}${RENEWAL_PAGE[order.type] || '/contact'}`;
@@ -281,7 +282,7 @@ async function sendDueReminders() {
         continue;
       }
 
-      // ---- otherwise only remind exactly 7 days before and on the day ----
+      // ---- otherwise only remind exactly 7 days before, on the day, and on the last grace day (day 3) ----
       if (!REMIND_ON.has(daysLeft)) continue;
       summary.due += 1;
       const { subject, html, text } = buildReminderEmail(order, daysLeft);
