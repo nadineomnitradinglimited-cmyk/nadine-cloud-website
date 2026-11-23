@@ -1256,11 +1256,85 @@ async function handleBillingBar(req, res) {
   else if (daysLeft === 0) { level = 'amber'; text = `${amount} is due today (${fmt(due)}).`; }
   else if (daysLeft <= 7) { level = 'amber'; text = `${amount} due on ${fmt(due)} — in ${daysLeft} day${daysLeft === 1 ? '' : 's'}.`; }
   else { level = 'calm'; text = `Hosting paid until ${fmt(due)}. Next: ${amount}.`; }
-  const data = JSON.stringify({ level, text, payUrl });
-  js(`/* Nadine Cloud billing bar */
+  // ---- Full "Subscription" card (same idea as the Optic Zone app's card), used when the client's admin page
+  //      has a spot for it: <div data-nc-subscription></div>. Without such a spot, the small floating bar is shown.
+  const hist = await getPool().query(
+    `SELECT x.reference, x.amount, x.paid_at, x.created_at, x.expires_at, x.promo_code
+       FROM orders x, orders o
+      WHERE o.reference = $1 AND x.email = o.email AND x.type = 'managed' AND x.status = 'paid'
+        AND x.domain IS NOT DISTINCT FROM o.domain AND x.expires_at IS NOT NULL
+      ORDER BY x.expires_at DESC LIMIT 6`,
+    [ref]
+  );
+  const METHOD = { 'manual:momo': 'Mobile money', 'manual:cash': 'Cash', 'manual:bank': 'Bank transfer', 'manual:other': 'Recorded by Nadine Cloud' };
+  const history = hist.rows.map((h) => ({
+    paidOn: lusakaDay(h.paid_at || h.created_at),
+    until: lusakaDay(h.expires_at),
+    amount: Number(h.amount),
+    how: /^MAN-/.test(h.reference) ? 'Account opened' : (METHOD[h.promo_code] || 'Nadine Pay'),
+  }));
+  const latest = history[0];
+  const prevEnd = history[1] ? history[1].until : null;
+  const startIso = prevEnd || new Date(Date.parse(due) - (row.period === 'yr' ? 365 : 30) * 864e5).toISOString().slice(0, 10);
+  const span = Math.max(1, (Date.parse(due) - Date.parse(startIso)) / 864e5);
+  const used = Math.min(1, Math.max(0, (Date.parse(lusakaDay(new Date())) - Date.parse(startIso)) / 864e5 / span));
+  const state = row.paused || daysLeft < -3 ? 'paused' : daysLeft < 0 ? 'overdue' : daysLeft === 0 ? 'today' : daysLeft <= 7 ? 'soon' : 'active';
+  const pill = state === 'paused' ? 'Admin tools paused — payment overdue'
+    : state === 'overdue' ? `Overdue by ${-daysLeft} day${daysLeft === -1 ? '' : 's'} · pauses ${fmt(due, 4)}`
+    : state === 'today' ? 'Payment due today'
+    : state === 'soon' ? `Due in ${daysLeft} day${daysLeft === 1 ? '' : 's'}`
+    : `Active · ${daysLeft} days left`;
+  const card = {
+    plan: row.plan, amount, per: row.period === 'yr' ? 'year' : 'month', state, pill,
+    lastPaid: latest && latest.how !== 'Account opened' ? fmt(latest.paidOn) : '—',
+    lastSub: latest && latest.how !== 'Account opened' ? `ZMW ${latest.amount.toLocaleString('en-US')} · ${latest.how}` : '',
+    paidUntil: fmt(due), nextDue: fmt(due), usedPct: Math.round(used * 100),
+    history: history.filter((h) => h.how !== 'Account opened').slice(0, 4).map((h) => `${fmt(h.paidOn)} · ZMW ${h.amount.toLocaleString('en-US')} · ${h.how} · until ${fmt(h.until)}`),
+  };
+  const data = JSON.stringify({ level, text, payUrl, card });
+  js(`/* Nadine Cloud billing */
 (function () {
   var d = ${data};
+  var NP_ICON = '<svg width="30" height="30" viewBox="0 0 48 48" aria-hidden="true"><rect width="48" height="48" rx="13" fill="#FFFFFF"/><circle cx="24" cy="24" r="13" fill="#054194"/><circle cx="24" cy="24" r="10" fill="none" stroke="#FFFFFF" stroke-width="1.6"/><path d="M20.5 17.5v13M20.5 24.5l6.5-7M22.4 22.5l5 8" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  var NP_TILE = '<svg width="46" height="46" viewBox="0 0 48 48" aria-hidden="true"><defs><linearGradient id="npt" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#09AAFE"/><stop offset="1" stop-color="#054194"/></linearGradient></defs><rect width="48" height="48" rx="13" fill="url(#npt)"/><circle cx="24" cy="24" r="13" fill="#FFFFFF"/><circle cx="24" cy="24" r="10" fill="none" stroke="#054194" stroke-width="1.6"/><path d="M20.5 17.5v13M20.5 24.5l6.5-7M22.4 22.5l5 8" fill="none" stroke="#001D54" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (m) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[m]; }); }
+  function cardHtml() {
+    var c = d.card;
+    var tone = { active: ['rgba(74,222,128,.12)', '#4ade80'], soon: ['rgba(245,158,11,.14)', '#fbbf24'], today: ['rgba(248,113,113,.14)', '#f87171'], overdue: ['rgba(248,113,113,.14)', '#f87171'], paused: ['#c62828', '#ffffff'] }[c.state];
+    var due = c.state !== 'active';
+    return '<style>' +
+      ':host{display:block}.c{font-family:Raleway,system-ui,sans-serif;background:#111a13;border:1px solid #1e2e22;border-top:3px solid #c9a227;padding:1.4rem 1.5rem;color:#ececec;display:flex;flex-direction:column;gap:1.1rem}' +
+      '.h{display:flex;flex-wrap:wrap;align-items:center;gap:.9rem}.ti{flex:1;min-width:200px}.t{font-family:"Playfair Display",Georgia,serif;font-size:1.35rem;color:#f5f0e8}' +
+      '.s{font-size:.85rem;color:#cfd5d2;line-height:1.5}.p{display:inline-flex;align-items:center;gap:.45rem;padding:.45rem .9rem;border-radius:999px;font-size:.82rem;font-weight:700}' +
+      '.g{display:flex;flex-wrap:wrap;gap:.8rem}.f{flex:1 1 170px;padding:.9rem 1rem;background:rgba(255,255,255,.03);border:1px solid #1e2e22}' +
+      '.k{font-size:.68rem;letter-spacing:.18em;text-transform:uppercase;color:#c9a227;margin-bottom:.3rem}.v{font-family:"Playfair Display",Georgia,serif;font-size:1.15rem;color:#f5f0e8}.v.red{color:#f87171}' +
+      '.tr{height:8px;background:rgba(255,255,255,.06);border-radius:4px;overflow:hidden}.fi{height:8px;border-radius:4px}' +
+      '.ft{display:flex;flex-wrap:wrap;align-items:center;gap:.9rem}.ft .s{flex:1;min-width:220px}' +
+      'a.pay{display:inline-flex;align-items:center;gap:.6rem;min-height:46px;padding:0 1.2rem 0 .45rem;border-radius:12px;background:#054194;border-bottom:3px solid #09AAFE;color:#fff;text-decoration:none;font-weight:700;font-size:.92rem;letter-spacing:.02em}' +
+      'a.pay:hover{background:#0a4fb0}.hi{font-size:.8rem;color:#cfd5d2;line-height:1.8}</style>' +
+      '<div class="c">' +
+        '<div class="h">' + NP_TILE + '<div class="ti"><div class="t">Subscription</div><div class="s">' + esc(c.plan) + ' · ' + esc(c.amount) + ' per ' + esc(c.per) + ' · billed by Nadine Cloud</div></div>' +
+          '<span class="p" style="background:' + tone[0] + ';color:' + tone[1] + '">' + esc(c.pill) + '</span></div>' +
+        '<div class="g">' +
+          '<div class="f"><div class="k">Last payment</div><div class="v">' + esc(c.lastPaid) + '</div>' + (c.lastSub ? '<div class="s">' + esc(c.lastSub) + '</div>' : '') + '</div>' +
+          '<div class="f"><div class="k">Paid until</div><div class="v">' + esc(c.paidUntil) + '</div></div>' +
+          '<div class="f"><div class="k">Next payment due</div><div class="v' + (due ? ' red' : '') + '">' + esc(c.nextDue) + '</div><div class="s">' + esc(c.amount) + '</div></div>' +
+        '</div>' +
+        '<div><div class="tr"><div class="fi" style="width:' + c.usedPct + '%;background:' + (c.state === 'active' ? '#4ade80' : tone[1]) + '"></div></div><div class="s" style="margin-top:.35rem">' + c.usedPct + '% of this period used</div></div>' +
+        '<div class="ft"><div class="s">Pay by mobile money or card and your admin tools stay switched on. A receipt is emailed straight away. Questions: billing@nadinecloud.com</div>' +
+          '<a class="pay" target="_blank" rel="noopener" href="' + esc(d.payUrl) + '">' + NP_ICON + 'Pay now · Nadine Pay</a></div>' +
+        (c.history.length ? '<div><div class="k">Payment history</div><div class="hi">' + c.history.map(esc).join('<br>') + '</div></div>' : '') +
+      '</div>';
+  }
   function show() {
+    var spots = document.querySelectorAll('[data-nc-subscription]');
+    if (spots.length) {
+      for (var i = 0; i < spots.length; i++) {
+        var root = spots[i].shadowRoot || (spots[i].attachShadow ? spots[i].attachShadow({ mode: 'open' }) : spots[i]);
+        root.innerHTML = cardHtml();
+      }
+      return;
+    }
     if (document.getElementById('nc-billing-bar')) return;
     var host = document.createElement('div'); host.id = 'nc-billing-bar';
     host.style.cssText = 'position:fixed;right:16px;bottom:16px;z-index:2147483000;max-width:calc(100vw - 32px)';
