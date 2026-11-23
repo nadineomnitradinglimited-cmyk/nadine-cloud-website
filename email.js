@@ -11,6 +11,28 @@ const RESEND_API = 'https://api.resend.com/emails';
 const NOTIFY_TO = 'info@nadinecloud.com';
 const FROM = 'Nadine Cloud <info@nadinecloud.com>';
 
+// Extra people who should also get every email sent to a client's main address (e.g. a lodge's general Gmail
+// plus the manager's own address). Kept in the billing_contacts table; added by Nadine Cloud, never by clients.
+let contactsTableReady = false;
+async function extraContacts(to) {
+  if (!to) return [];
+  try {
+    const db = require('./db');
+    if (!db.isConfigured()) return [];
+    if (!contactsTableReady) {
+      await db.getPool().query(`CREATE TABLE IF NOT EXISTS billing_contacts (
+        primary_email TEXT NOT NULL, extra_email TEXT NOT NULL, name TEXT, added_at TIMESTAMPTZ DEFAULT now(),
+        PRIMARY KEY (primary_email, extra_email))`);
+      contactsTableReady = true;
+    }
+    const r = await db.getPool().query('SELECT extra_email FROM billing_contacts WHERE lower(primary_email) = lower($1)', [to]);
+    return r.rows.map((x) => x.extra_email).filter((e) => e && e.toLowerCase() !== String(to).toLowerCase());
+  } catch (err) {
+    console.error('billing_contacts lookup failed (sending without copies):', err.message);
+    return [];
+  }
+}
+
 async function sendEmail({ subject, text, html, to, attachments, replyTo }) {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
@@ -19,6 +41,8 @@ async function sendEmail({ subject, text, html, to, attachments, replyTo }) {
   }
 
   const payload = { from: FROM, to: [to || NOTIFY_TO], subject, text };
+  const cc = await extraContacts(to);
+  if (cc.length) payload.cc = cc;
   if (html) payload.html = html;
   if (attachments && attachments.length) payload.attachments = attachments;
   if (replyTo) payload.reply_to = [replyTo];
