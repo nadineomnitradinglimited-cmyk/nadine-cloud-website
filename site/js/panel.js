@@ -70,8 +70,9 @@
       <div class="ncp-bar"><i class="${pct >= 95 ? 'full' : pct >= 80 ? 'hi' : ''}" style="width:${Math.max(pct, 2)}%"></i></div></div>`;
   }
 
+const NEWSITE = '<div style="display:flex;gap:10px;align-items:flex-start;background:#EAF2FF;border:1px solid #BBD3FF;color:#1E3A8A;border-radius:12px;padding:12px 14px;margin-bottom:16px;font-size:14px"><span style="font-size:18px">⏳</span><div><b>Your website is being switched on.</b> New hosting usually starts working within 2 to 5 minutes. You can already connect GitHub, create databases and email accounts — if your site shows "not found" for a moment, just refresh a little later.</div></div>';
   function overviewTab(a) {
-    return `<div class="ncp-grid">
+    return `${a.justCreated ? NEWSITE : ''}<div class="ncp-grid">
         ${usageCard('Disk space', a.usage.diskusage)}${usageCard('Bandwidth this month', a.usage.bandwidthusage)}
         ${usageCard('Email accounts', a.usage.emailaccounts)}${usageCard('Databases', a.usage.mysqldatabases)}
       </div>

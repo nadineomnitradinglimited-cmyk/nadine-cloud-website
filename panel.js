@@ -48,7 +48,7 @@ async function accountForDomain(domain) {
   if (hit && Date.now() - hit.at < 10 * 60 * 1000) return hit.acct;
   const j = await whm('/json-api/listaccts?api.version=1&searchtype=domain&searchmethod=exact&search=' + encodeURIComponent(d));
   const a = (j.data && j.data.acct || []).find((x) => String(x.domain).toLowerCase() === d) || null;
-  const acct = a ? { user: a.user, domain: a.domain, plan: String(a.plan || '').replace(/^nadine14_/, ''), suspended: !!a.suspended, ip: a.ip, startdate: a.startdate } : null;
+  const acct = a ? { user: a.user, domain: a.domain, plan: String(a.plan || '').replace(/^nadine14_/, ''), suspended: !!a.suspended, ip: a.ip, startdate: a.startdate, started: Number(a.unix_startdate) || null } : null;
   acctCache.set(d, { at: Date.now(), acct });
   return acct;
 }
@@ -102,6 +102,8 @@ async function overview(acct) {
   const p = await getPool().query('SELECT repo_url, branch, auto_deploy, last_commit, last_message, updated_at FROM panel_projects WHERE domain = $1', [acct.domain.toLowerCase()]);
   return {
     domain: acct.domain, plan: acct.plan, suspended: acct.suspended, since: acct.startdate,
+    // a brand-new account is not served by the web server for a few minutes
+    justCreated: !!(acct.started && Date.now() / 1000 - acct.started < 15 * 60),
     usage: s,
     ssl: cert ? { ok: true, validUntil: cert.certificate && cert.certificate.not_after ? new Date(cert.certificate.not_after * 1000).toISOString() : null } : { ok: false },
     emailCount: (pops.data || []).filter((x) => x.login !== 'Main Account').length,
