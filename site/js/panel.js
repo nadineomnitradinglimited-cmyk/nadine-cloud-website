@@ -11,6 +11,8 @@
     rocket: '<path d="M5 15c-1.5 1.5-2 5-2 5s3.5-.5 5-2M14 4c3-1 6-1 6-1s0 3-1 6l-6 6-5-5 6-6Z"/><circle cx="15" cy="9" r="1.5"/>',
     plus: '<path d="M12 5v14M5 12h14"/>', ext: '<path d="M14 4h6v6M20 4l-9 9M19 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h5"/>',
     refresh: '<path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7"/>', trash: '<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/>',
+    db: '<ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v6c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/><path d="M4 11v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/>',
+    copy: '<rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/>', key: '<circle cx="8" cy="15" r="4"/><path d="m11 12 9-9M17 6l3 3"/>',
   };
   const ic = (n, s) => `<svg viewBox="0 0 24 24" width="${s || 18}" height="${s || 18}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${I[n]}</svg>`;
   const ago = (d) => { const s = (Date.now() - new Date(d)) / 1000; if (s < 60) return 'just now'; if (s < 3600) return Math.floor(s / 60) + ' min ago'; if (s < 86400) return Math.floor(s / 3600) + ' h ago'; return Math.floor(s / 86400) + ' d ago'; };
@@ -95,6 +97,8 @@
           <details><summary style="cursor:pointer;font-size:13.5px;color:#55607A">Private repository?</summary>
             <label style="display:block;margin-top:8px">GitHub access token (read-only)<input name="token" type="password" placeholder="github_pat_…" autocomplete="off"></label>
             <p class="ncp-note">Create a fine-grained token on GitHub with read-only access to this one repository.</p></details>
+          <label class="ncp-switch" style="font-weight:600"><input type="checkbox" name="withdb" checked> Also create a database for this site</label>
+          <p class="ncp-note" style="margin:-4px 0 0">We create it, give it a strong password and save the connection details where your site can read them.</p>
           <div><button class="ncp-go" type="submit">${ic('rocket')} Connect &amp; deploy</button></div>
           <div class="ncp-msgline" data-out></div>
         </form>
@@ -102,9 +106,15 @@
       const f = body.querySelector('[data-f="connect"]');
       f.addEventListener('submit', async (e) => {
         e.preventDefault(); const btn = f.querySelector('button'); const out = f.querySelector('[data-out]'); btn.disabled = true; out.className = 'ncp-msgline'; out.textContent = 'Connecting to GitHub…';
-        const x = await api('/api/panel/deploy/connect', { method: 'POST', body: JSON.stringify({ domain: a.domain, repo: f.repo.value, branch: f.branch.value, token: f.token.value || undefined }) });
+        const x = await api('/api/panel/deploy/connect', { method: 'POST', body: JSON.stringify({ domain: a.domain, repo: f.repo.value, branch: f.branch.value, token: f.token.value || undefined, database: f.withdb.checked ? 'site' : undefined }) });
         if (!x.ok) { out.className = 'ncp-msgline bad'; out.textContent = x.j.error || 'Could not connect.'; btn.disabled = false; return; }
-        out.className = 'ncp-msgline good'; out.textContent = x.j.message || 'Connected.'; setTimeout(() => deployTab(a, body), 20000);
+        out.className = 'ncp-msgline good'; out.textContent = x.j.message || 'Connected.';
+        if (x.j.database && x.j.database.password) {           // site + database: show the new database's details once
+          const box = document.createElement('div'); box.innerHTML = credsBox(x.j.database); f.after(box); bindCreds(box);
+        } else if (x.j.database && x.j.database.error) {
+          out.textContent += ' (The database could not be created: ' + x.j.database.error + ' — try again in the Databases tab.)';
+        }
+        if (!(x.j.database && x.j.database.password)) setTimeout(() => deployTab(a, body), 20000);
       });
       return;
     }
@@ -119,6 +129,68 @@
           ${d.log ? `<details style="flex-basis:100%"><summary style="cursor:pointer;font-size:13px;color:#55607A">Details</summary><div class="ncp-code" style="display:block;white-space:pre-wrap;margin-top:6px">${esc(d.log)}</div></details>` : ''}</div>`).join('') : '<p class="ncp-note">No deployments yet — the first one starts within a minute.</p>'}</div>`;
     body.querySelector('[data-now]').addEventListener('click', async (e) => { e.target.disabled = true; e.target.textContent = 'Deploying…'; await api('/api/panel/deploy/now', { method: 'POST', body: JSON.stringify({ domain: a.domain }) }); deployTab(a, body); });
     body.querySelector('[data-auto]').addEventListener('change', (e) => api('/api/panel/deploy/auto', { method: 'POST', body: JSON.stringify({ domain: a.domain, on: e.target.checked }) }));
+  }
+
+  // ---------- Databases ----------
+  function credsBox(d) {
+    const row = (k, v, secret) => `<div class="ncp-row" style="padding:8px 0"><span style="width:110px;color:#55607A;font-size:13px;font-weight:600">${esc(k)}</span>
+      <span class="ncp-code" style="flex:1;min-width:160px;${secret ? 'filter:blur(4px);cursor:pointer' : ''}" ${secret ? 'data-reveal title="Click to show"' : ''}>${esc(v)}</span>
+      <button class="ncp-go ghost" type="button" data-copy="${esc(v)}" style="height:32px;padding:0 10px">${ic('copy', 14)} Copy</button></div>`;
+    return `<div style="border:1.5px solid #BBD3FF;background:#F5F9FF;border-radius:12px;padding:14px 16px;margin:12px 0">
+      <b style="color:#0B1220">${ic('key', 16)} Connection details for ${esc(d.database)}</b>
+      <p class="ncp-note" style="margin:4px 0 6px">Copy the password now — for your safety it is not shown again (you can always set a new one).</p>
+      ${row('Host', d.host || 'localhost')}${row('Port', String(d.port || 3306))}${row('Database', d.database)}${row('User', d.user)}${row('Password', d.password, true)}
+      ${d.configSaved ? `<p class="ncp-note" style="margin-top:10px">✓ <b>Already connected for your website:</b> the details are saved in a private file next to your website folder (never visible to visitors).<br>
+        PHP: <span class="ncp-code">$db = require __DIR__ . '/../${esc(d.configFile)}';</span><br>
+        Other apps: read <span class="ncp-code">${esc(d.envFile)}</span> (DB_HOST, DB_NAME, DB_USER, DB_PASSWORD, DATABASE_URL).</p>` : ''}
+    </div>`;
+  }
+  function bindCreds(root) {
+    root.querySelectorAll('[data-copy]').forEach((b) => b.addEventListener('click', () => { try { navigator.clipboard.writeText(b.dataset.copy); b.textContent = 'Copied ✓'; } catch (e) { /* ignore */ } }));
+    root.querySelectorAll('[data-reveal]').forEach((s) => s.addEventListener('click', () => { s.style.filter = 'none'; }));
+  }
+  async function dbTab(a, body, fresh) {
+    body.innerHTML = '<p class="ncp-note">Loading…</p>';
+    const r = await api('/api/panel/databases?domain=' + encodeURIComponent(a.domain));
+    if (!r.ok) { body.innerHTML = `<p class="ncp-msgline bad">${esc(r.j.error || 'Could not load.')}</p>`; return; }
+    const list = r.j.databases || [];
+    const full = r.j.max !== null && r.j.max !== 'unlimited' && list.length >= Number(r.j.max);
+    body.innerHTML = `${fresh ? credsBox(fresh) : ''}
+      <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px">
+        <b style="font-size:15px">${list.length} database${list.length === 1 ? '' : 's'}${r.j.max !== null ? ` <span style="color:#94A3B8;font-weight:500">of ${esc(r.j.max)} on your plan</span>` : ''}</b>
+        <button class="ncp-go ghost" type="button" data-pma>${ic('db', 16)} Open phpMyAdmin</button></div>
+      ${list.map((d) => `<div class="ncp-row"><span class="ncp-msg"><b>${ic('db', 15)} ${esc(d.name)}</b><small>${esc(d.sizeMB)} MB · user ${esc((d.users || [])[0] || '—')}</small></span>
+          <button class="ncp-go ghost" type="button" data-pw="${esc(d.name)}" style="height:36px">${ic('key', 15)} New password</button>
+          <button class="ncp-go ghost" type="button" data-deldb="${esc(d.name)}" style="height:36px;color:#B91C1C;border-color:#F3B4B4">${ic('trash', 15)} Delete</button></div>`).join('') || '<p class="ncp-note">No databases yet. Create one below — it is connected to your website automatically.</p>'}
+      ${full ? '<p class="ncp-msgline bad" style="margin-top:14px">Your plan\'s database limit is reached. Upgrade your plan for more databases.</p>' : `
+      <form class="ncp-form" data-f="newdb" style="margin-top:18px">
+        <label>New database name<input name="name" placeholder="e.g. bookings, shop, site" required maxlength="16"></label>
+        <p class="ncp-note" style="margin:0">We create the database, a user with its own strong password, and connect it to your website — all in one step.</p>
+        <div><button class="ncp-go" type="submit">${ic('plus', 16)} Create database</button></div>
+        <div class="ncp-msgline" data-out></div></form>`}`;
+    bindCreds(body);
+    body.querySelector('[data-pma]').addEventListener('click', async (e) => {
+      const w = window.open('about:blank', '_blank');
+      const x = await api('/api/panel/phpmyadmin', { method: 'POST', body: JSON.stringify({ domain: a.domain }) });
+      if (x.ok && x.j.url) { if (w) w.location = x.j.url; } else { if (w) w.close(); alert(x.j.error || 'Could not open phpMyAdmin.'); }
+    });
+    const f = body.querySelector('[data-f="newdb"]');
+    if (f) f.addEventListener('submit', async (e) => {
+      e.preventDefault(); const out = f.querySelector('[data-out]'); const btn = f.querySelector('button'); btn.disabled = true; out.className = 'ncp-msgline'; out.textContent = 'Creating…';
+      const x = await api('/api/panel/databases', { method: 'POST', body: JSON.stringify({ domain: a.domain, name: f.name.value }) });
+      if (!x.ok) { out.className = 'ncp-msgline bad'; out.textContent = x.j.error || 'Could not create it.'; btn.disabled = false; return; }
+      dbTab(a, body, x.j);
+    });
+    body.querySelectorAll('[data-pw]').forEach((b) => b.addEventListener('click', async () => {
+      if (!window.confirm('Set a new password for ' + b.dataset.pw + '? Your website\'s saved connection file is updated automatically.')) return;
+      const x = await api('/api/panel/databases/password', { method: 'POST', body: JSON.stringify({ domain: a.domain, database: b.dataset.pw }) });
+      if (x.ok) dbTab(a, body, x.j); else alert(x.j.error || 'Could not change it.');
+    }));
+    body.querySelectorAll('[data-deldb]').forEach((b) => b.addEventListener('click', async () => {
+      if (!window.confirm('Delete the database ' + b.dataset.deldb + ' and ALL its data? This cannot be undone.')) return;
+      const x = await api('/api/panel/databases/delete', { method: 'POST', body: JSON.stringify({ domain: a.domain, database: b.dataset.deldb }) });
+      if (x.ok) dbTab(a, body); else alert(x.j.error || 'Could not delete it.');
+    }));
   }
 
   function genPassword() { const c = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789'; const a = new Uint32Array(14); crypto.getRandomValues(a); return Array.from(a, (n) => c[n % c.length]).join('') + '#' + (a[0] % 9); }
@@ -163,6 +235,7 @@
       <div class="ncp-tabs" role="tablist">
         <button class="ncp-tab on" data-t="overview">${ic('panel', 16)} Overview</button>
         <button class="ncp-tab" data-t="deploy">${ic('git', 16)} Deploy from GitHub</button>
+        <button class="ncp-tab" data-t="db">${ic('db', 16)} Databases</button>
         <button class="ncp-tab" data-t="email">${ic('mail', 16)} Email accounts</button>
       </div><div class="ncp-body">${overviewTab(a)}</div>`;
     const body = el.querySelector('.ncp-body');
@@ -171,6 +244,7 @@
       if (t.dataset.t === 'overview') body.innerHTML = overviewTab(a);
       if (t.dataset.t === 'deploy') deployTab(a, body);
       if (t.dataset.t === 'email') emailTab(a, body);
+      if (t.dataset.t === 'db') dbTab(a, body);
     }));
     el.querySelector('[data-cpanel]').addEventListener('click', async (e) => {
       const b = e.currentTarget; const w = window.open('about:blank', '_blank'); b.disabled = true;
