@@ -107,6 +107,7 @@ export default function Account() {
       </section>
 
       <Footer />
+      <Script src="/js/panel.js" strategy="afterInteractive" />
       <Script src="/js/account.js" strategy="afterInteractive" />
     </>
   );

@@ -255,7 +255,8 @@
     attention: pageAttention,
     services: () => pageServices(),
     domains: pageDomains,
-    hosting: () => pageServices((s) => ['hosting', 'managed', 'builder', 'bundle', 'wordpress', 'care'].includes(s.type), 'Hosting &amp; websites', 'Your hosting plans, websites and care plans.'),
+    // #ncPanel is filled by /js/panel.js with live controls (open cPanel, email, deploy from GitHub) when available
+    hosting: () => pageServices((s) => ['hosting', 'managed', 'builder', 'bundle', 'wordpress', 'care'].includes(s.type), 'Hosting &amp; websites', 'Your hosting plans, websites and care plans.').replace('</p></div>', '</p></div><div id="ncPanel"></div>'),
     databases: () => pageServices((s) => s.type === 'database' || s.type === 'managed', 'Databases', 'Your database hosting. Hosting + Database plans include their database.'),
     email: () => pageServices((s) => s.type === 'email', 'Business email', 'Professional email at your own domain.') + '<a class="ac-btn pay" style="margin-top:18px" href="/hosting#email">Get business email</a>',
     ssl: pageSsl,
@@ -275,6 +276,7 @@
       try { localStorage.setItem('nc-note-' + n.dataset.note, '1'); } catch (e) { /* ignore */ }
       n.remove();
     }));
+    try { document.dispatchEvent(new CustomEvent('nc:account-page', { detail: tab })); } catch (e) { /* ignore */ }
   }
   function go(tab) {
     try { history.replaceState(null, '', '#' + tab); } catch (e) { /* ignore */ }
