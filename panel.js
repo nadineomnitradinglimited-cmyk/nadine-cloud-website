@@ -83,6 +83,7 @@ async function ensureTables() {
   await getPool().query(`CREATE TABLE IF NOT EXISTS panel_deployments (
     id SERIAL PRIMARY KEY, project_id INT NOT NULL REFERENCES panel_projects(id) ON DELETE CASCADE, commit_id TEXT, message TEXT, author TEXT,
     status TEXT NOT NULL, log TEXT, trigger TEXT, started_at TIMESTAMPTZ DEFAULT now(), finished_at TIMESTAMPTZ)`);
+  await getPool().query('ALTER TABLE panel_projects ADD COLUMN IF NOT EXISTS repo_root TEXT');
   tablesReady = true;
 }
 
@@ -108,32 +109,36 @@ async function overview(acct) {
 }
 
 // ---------- GitHub deploys ----------
-const repoRoot = (user) => `/home/${user}/repositories/nc-site`;
+// each connected repository gets its own folder (stored per project), so leftovers can never block a new connection
+const repoRoot = (project) => project.repo_root || `/home/${project.cpanel_user}/repositories/nc-site`;
+const repoRel = (project) => repoRoot(project).replace(/^\/home\/[^/]+\//, '');
 function cleanRepoUrl(url, token) {
   const u = String(url || '').trim().replace(/\.git$/, '') + '.git';
   if (!/^https:\/\/github\.com\/[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+\.git$/.test(u)) return null;
   return token ? u.replace('https://', `https://${encodeURIComponent(token)}@`) : u;
 }
-async function copyToWebsite(acct) {
-  const list = await uapi(acct.user, 'Fileman', 'list_files', { dir: 'repositories/nc-site', show_hidden: '1' });
+async function copyToWebsite(acct, project) {
+  const list = await uapi(acct.user, 'Fileman', 'list_files', { dir: repoRel(project), show_hidden: '1' });
   if (!list.status) return { ok: false, log: 'Could not read the repository: ' + firstError(list) };
   // never publish the .git folder or the deploy settings
   const items = (list.data || []).map((f) => f.file).filter((f) => f !== '.git' && f !== '.github' && f !== '.cpanel.yml');
   if (!items.length) return { ok: false, log: 'The repository is empty.' };
-  const r = await api2(acct.user, 'Fileman', 'fileop', { op: 'copy', sourcefiles: items.map((f) => 'repositories/nc-site/' + f).join(','), destfiles: `/home/${acct.user}/public_html`, doubledecode: '0' });
+  const r = await api2(acct.user, 'Fileman', 'fileop', { op: 'copy', sourcefiles: items.map((f) => repoRel(project) + '/' + f).join(','), destfiles: `/home/${acct.user}/public_html`, doubledecode: '0' });
   const res = r.data || [];
   const failed = res.filter((x) => !x.result);
   return { ok: res.length > 0 && failed.length === 0, log: `Copied ${res.length - failed.length} of ${items.length} items to the website${failed.length ? ' — failed: ' + failed.map((x) => x.src.split('/').pop()).join(', ') : ''}.` };
 }
-async function repoHead(acct) {
+async function repoHead(acct, project) {
   const r = await uapi(acct.user, 'VersionControl', 'retrieve');
-  const repo = (r.data || []).find((x) => x.repository_root === repoRoot(acct.user));
+  const repo = (r.data || []).find((x) => x.repository_root === repoRoot(project));
   return repo ? { branch: repo.branch, id: repo.last_update && repo.last_update.identifier, message: repo.last_update && repo.last_update.message, author: repo.last_update && repo.last_update.author } : null;
 }
 async function runDeploy(project, acct, trigger) {
   await ensureTables();
-  const pull = await uapi(acct.user, 'VersionControl', 'update', { repository_root: repoRoot(acct.user), branch: project.branch });
-  const head = await repoHead(acct);
+  const before = await repoHead(acct, project);
+  const branch = project.branch || (before && before.branch) || 'main';   // empty = the repository's own default branch
+  const pull = await uapi(acct.user, 'VersionControl', 'update', { repository_root: repoRoot(project), branch });
+  const head = await repoHead(acct, project);
   if (!pull.status || !head) {
     await getPool().query('INSERT INTO panel_deployments (project_id, status, log, trigger, finished_at) VALUES ($1, $2, $3, $4, now())', [project.id, 'failed', 'Could not get the latest code from GitHub: ' + firstError(pull), trigger]);
     return { ok: false };
@@ -141,7 +146,7 @@ async function runDeploy(project, acct, trigger) {
   if (trigger === 'auto' && head.id && head.id === project.last_commit) return { ok: true, unchanged: true };
   const ins = await getPool().query('INSERT INTO panel_deployments (project_id, commit_id, message, author, status, trigger) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id',
     [project.id, head.id, String(head.message || '').slice(0, 500), String(head.author || '').replace(/<[^>]*>/, '').trim().slice(0, 120), 'building', trigger]);
-  const copy = await copyToWebsite(acct);
+  const copy = await copyToWebsite(acct, project);
   await getPool().query('UPDATE panel_deployments SET status = $2, log = $3, finished_at = now() WHERE id = $1', [ins.rows[0].id, copy.ok ? 'live' : 'failed', copy.log]);
   if (copy.ok) await getPool().query('UPDATE panel_projects SET last_commit = $2, last_message = $3, updated_at = now() WHERE id = $1', [project.id, head.id, String(head.message || '').slice(0, 500)]);
   return { ok: copy.ok };
@@ -229,12 +234,13 @@ async function handlePanel(req, res, urlPath) {
       await ensureTables();
       const url = cleanRepoUrl(p.repo, p.token);
       if (!url) return send(res, 400, { error: 'Paste the GitHub link of your repository, like https://github.com/your-name/your-site' });
-      const branch = /^[A-Za-z0-9._/-]{1,80}$/.test(String(p.branch || '')) ? String(p.branch) : 'main';
+      const branch = /^[A-Za-z0-9._/-]{1,80}$/.test(String(p.branch || '').trim()) ? String(p.branch).trim() : '';
       const exists = await getPool().query('SELECT id FROM panel_projects WHERE domain = $1', [acct.domain.toLowerCase()]);
       if (exists.rows[0]) return send(res, 409, { error: 'A repository is already connected to this website.' });
-      const c = await uapi(acct.user, 'VersionControl', 'create', { type: 'git', name: 'nc-site', repository_root: repoRoot(acct.user), source_repository: JSON.stringify({ remote_name: 'origin', url }), checkout: '1' });
+      const root = `/home/${acct.user}/repositories/nc-site-${Date.now().toString(36)}`;
+      const c = await uapi(acct.user, 'VersionControl', 'create', { type: 'git', name: 'nc-site-' + Date.now().toString(36), repository_root: root, source_repository: JSON.stringify({ remote_name: 'origin', url }), checkout: '1' });
       if (!c.status) return send(res, 400, { error: 'GitHub refused: ' + firstError(c) + ' (for a private repository, add an access token).' });
-      const ins = await getPool().query('INSERT INTO panel_projects (domain, cpanel_user, repo_url, branch) VALUES ($1, $2, $3, $4) RETURNING *', [acct.domain.toLowerCase(), acct.user, url, branch]);
+      const ins = await getPool().query('INSERT INTO panel_projects (domain, cpanel_user, repo_url, branch, repo_root) VALUES ($1, $2, $3, $4, $5) RETURNING *', [acct.domain.toLowerCase(), acct.user, url, branch, root]);
       setTimeout(() => runDeploy(ins.rows[0], acct, 'first').catch(() => {}), 15000);   // cloning finishes in the background
       return send(res, 200, { ok: true, message: 'Connected. Your first deploy starts in a few seconds.' });
     }
