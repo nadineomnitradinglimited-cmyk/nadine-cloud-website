@@ -6,4 +6,4 @@
 :HL["/assets/mtn-momo.png","image"]
 :HL["/assets/airtel-money.png","image"]
 :HL["/assets/zamtel-money.png","image"]
-0:{"tree":{"name":"","param":null,"prefetchHints":4176,"slots":{"children":{"name":"__PAGE__","param":null,"prefetchHints":4256,"slots":null}}},"staleTime":300,"buildId":"C8LkPIUf0cmy0Y9z0uTky"}
+0:{"tree":{"name":"","param":null,"prefetchHints":4176,"slots":{"children":{"name":"__PAGE__","param":null,"prefetchHints":4256,"slots":null}}},"staleTime":300,"buildId":"D9OpBzRqbrEF1lhNcekFX"}
