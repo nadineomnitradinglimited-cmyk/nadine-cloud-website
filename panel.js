@@ -109,6 +109,42 @@ async function overview(acct) {
   };
 }
 
+// ---------- Databases (site + database) ----------
+// One click: database + its own user + full access on that database, and the connection details saved in a private
+// file the website can read (in the home folder, OUTSIDE public_html, so visitors can never download it).
+function strongPassword() {
+  const c = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789';
+  return Array.from(crypto.randomBytes(22), (b) => c[b % c.length]).join('');
+}
+async function dbRestrictions(user) {
+  const r = await uapi(user, 'Mysql', 'get_restrictions');
+  const d = r.data || {};
+  return { prefix: d.prefix || (user.slice(0, 16) + '_'), maxDb: Number(d.max_database_name_length) || 64, maxUser: Number(d.max_username_length) || 32 };
+}
+async function writeDbConfig(acct, short, database, user, password) {
+  const php = `<?php\n// Database connection for ${acct.domain} (created by Nadine Cloud). Keep this file private.\n// In your site:  $db = require __DIR__ . '/../nadinecloud-db-${short}.php';\nreturn [\n  'host' => 'localhost',\n  'port' => 3306,\n  'database' => '${database}',\n  'user' => '${user}',\n  'password' => '${password}',\n];\n`;
+  const env = `# Database connection for ${acct.domain} (created by Nadine Cloud). Keep this file private.\nDB_HOST=localhost\nDB_PORT=3306\nDB_NAME=${database}\nDB_USER=${user}\nDB_PASSWORD=${password}\nDATABASE_URL=mysql://${encodeURIComponent(user)}:${encodeURIComponent(password)}@localhost:3306/${database}\n`;
+  const a = await uapi(acct.user, 'Fileman', 'save_file_content', { dir: `/home/${acct.user}`, file: `nadinecloud-db-${short}.php`, content: php });
+  const b = await uapi(acct.user, 'Fileman', 'save_file_content', { dir: `/home/${acct.user}`, file: `nadinecloud-db-${short}.env`, content: env });
+  return !!(a.status && b.status);
+}
+async function createDatabase(acct, rawName) {
+  const short = String(rawName || '').toLowerCase().replace(/[^a-z0-9_]/g, '').slice(0, 16);
+  if (!short) return { ok: false, error: 'Use letters and numbers for the database name, e.g. bookings.' };
+  const { prefix, maxDb, maxUser } = await dbRestrictions(acct.user);
+  const database = (prefix + short).slice(0, maxDb);
+  const user = (prefix + short).slice(0, maxUser);
+  const password = strongPassword();
+  const c = await uapi(acct.user, 'Mysql', 'create_database', { name: database });
+  if (!c.status) return { ok: false, error: firstError(c) };
+  const u = await uapi(acct.user, 'Mysql', 'create_user', { name: user, password });
+  if (!u.status) { await uapi(acct.user, 'Mysql', 'delete_database', { name: database }); return { ok: false, error: firstError(u) }; }
+  const g = await uapi(acct.user, 'Mysql', 'set_privileges_on_database', { user, database, privileges: 'ALL PRIVILEGES' });
+  if (!g.status) return { ok: false, error: firstError(g) };
+  const saved = await writeDbConfig(acct, short, database, user, password);
+  return { ok: true, database, user, password, host: 'localhost', port: 3306, configSaved: saved, configFile: `nadinecloud-db-${short}.php`, envFile: `nadinecloud-db-${short}.env`, short };
+}
+
 // ---------- GitHub deploys ----------
 // each connected repository gets its own folder (stored per project), so leftovers can never block a new connection
 const repoRoot = (project) => project.repo_root || `/home/${project.cpanel_user}/repositories/nc-site`;
@@ -238,6 +274,49 @@ async function handlePanel(req, res, urlPath) {
       const r = await uapi(acct.user, 'Email', 'delete_pop', { email: email.split('@')[0], domain: acct.domain });
       return r.status ? send(res, 200, { ok: true }) : send(res, 400, { error: firstError(r) });
     }
+    if (req.method === 'GET' && urlPath === '/api/panel/databases') {
+      const r = await uapi(acct.user, 'Mysql', 'list_databases');
+      const lim = await uapi(acct.user, 'StatsBar', 'get_stats', { display: 'mysqldatabases' });
+      const m = (lim.data || [])[0] || {};
+      return send(res, 200, {
+        databases: (r.data || []).map((d) => ({ name: d.database, sizeMB: Math.round((Number(d.disk_usage) || 0) / 1048576 * 10) / 10, users: d.users || [] })),
+        used: Number(m._count ?? m.count) || (r.data || []).length, max: m._max ?? m.max ?? null,
+      });
+    }
+    if (req.method === 'POST' && urlPath === '/api/panel/databases') {
+      const r = await createDatabase(acct, p.name);
+      return r.ok ? send(res, 200, r) : send(res, 400, { error: r.error });
+    }
+    if (req.method === 'POST' && urlPath === '/api/panel/databases/password') {
+      const database = String(p.database || '');
+      const list = await uapi(acct.user, 'Mysql', 'list_databases');
+      const db = (list.data || []).find((d) => d.database === database);
+      if (!db) return send(res, 404, { error: 'Database not found.' });
+      const user = (db.users || [])[0];
+      if (!user) return send(res, 400, { error: 'This database has no user yet.' });
+      const password = strongPassword();
+      const r = await uapi(acct.user, 'Mysql', 'set_password', { user, password });
+      if (!r.status) return send(res, 400, { error: firstError(r) });
+      const { prefix } = await dbRestrictions(acct.user);
+      const short = database.startsWith(prefix) ? database.slice(prefix.length) : database;
+      const saved = await writeDbConfig(acct, short, database, user, password);
+      return send(res, 200, { ok: true, database, user, password, host: 'localhost', port: 3306, configSaved: saved, configFile: `nadinecloud-db-${short}.php`, envFile: `nadinecloud-db-${short}.env` });
+    }
+    if (req.method === 'POST' && urlPath === '/api/panel/databases/delete') {
+      const database = String(p.database || '');
+      const list = await uapi(acct.user, 'Mysql', 'list_databases');
+      const db = (list.data || []).find((d) => d.database === database);
+      if (!db) return send(res, 404, { error: 'Database not found.' });
+      const r = await uapi(acct.user, 'Mysql', 'delete_database', { name: database });
+      if (!r.status) return send(res, 400, { error: firstError(r) });
+      for (const u of db.users || []) await uapi(acct.user, 'Mysql', 'delete_user', { name: u });
+      return send(res, 200, { ok: true });
+    }
+    if (req.method === 'POST' && urlPath === '/api/panel/phpmyadmin') {
+      const s = await whm('/json-api/create_user_session?api.version=1&user=' + encodeURIComponent(acct.user) + '&service=cpaneld&app=Database_phpMyAdmin');
+      if (!(s.data && s.data.url)) return send(res, 502, { error: 'Could not open phpMyAdmin right now.' });
+      return send(res, 200, { url: s.data.url });
+    }
     if (req.method === 'GET' && urlPath === '/api/panel/deploy') {
       await ensureTables();
       const pr = await getPool().query('SELECT id, repo_url, branch, auto_deploy, last_commit, last_message, created_at FROM panel_projects WHERE domain = $1', [acct.domain.toLowerCase()]);
@@ -258,7 +337,13 @@ async function handlePanel(req, res, urlPath) {
       if (!c.status) return send(res, 400, { error: 'GitHub refused: ' + firstError(c) + ' (for a private repository, add an access token).' });
       const ins = await getPool().query('INSERT INTO panel_projects (domain, cpanel_user, repo_url, branch, repo_root) VALUES ($1, $2, $3, $4, $5) RETURNING *', [acct.domain.toLowerCase(), acct.user, url, branch, root]);
       setTimeout(() => runDeploy(ins.rows[0], acct, 'first').catch(() => {}), 15000);   // cloning finishes in the background
-      return send(res, 200, { ok: true, message: 'Connected. Your first deploy starts in a few seconds.' });
+      // "site + database": optionally create the site's database in the same step
+      let database = null;
+      if (p.database) {
+        const d = await createDatabase(acct, typeof p.database === 'string' ? p.database : 'site');
+        database = d.ok ? d : { error: d.error };
+      }
+      return send(res, 200, { ok: true, message: 'Connected. Your first deploy starts in a few seconds.', database });
     }
     if (req.method === 'POST' && urlPath === '/api/panel/deploy/now') {
       await ensureTables();
