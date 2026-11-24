@@ -192,6 +192,20 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  // Client hosting panel (modern controls for their own cPanel account) — owner-only until PANEL_PUBLIC=1.
+  if (urlPath.startsWith('/api/panel/')) {
+    let panel;
+    try { panel = require('./panel'); } catch (err) {
+      console.error('panel module failed to load:', err.message);
+      res.writeHead(503, { 'Content-Type': 'application/json' }); res.end('{"error":"Not available"}'); return;
+    }
+    panel.handlePanel(req, res, urlPath).catch((err) => {
+      console.error('panel failed:', err);
+      if (!res.headersSent) { res.writeHead(500, { 'Content-Type': 'application/json' }); res.end('{"error":"Something went wrong."}'); }
+    });
+    return;
+  }
+
   // "Pay now" bar shown on a hand-hosted client's own admin screen (script tag on their site).
   if (req.method === 'GET' && urlPath === '/api/billing-bar.js') {
     require('./payments').handleBillingBar(req, res).catch((err) => {
