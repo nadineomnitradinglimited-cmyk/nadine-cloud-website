@@ -84,6 +84,7 @@ async function ensureTables() {
     id SERIAL PRIMARY KEY, project_id INT NOT NULL REFERENCES panel_projects(id) ON DELETE CASCADE, commit_id TEXT, message TEXT, author TEXT,
     status TEXT NOT NULL, log TEXT, trigger TEXT, started_at TIMESTAMPTZ DEFAULT now(), finished_at TIMESTAMPTZ)`);
   await getPool().query('ALTER TABLE panel_projects ADD COLUMN IF NOT EXISTS repo_root TEXT');
+  await getPool().query('ALTER TABLE panel_projects ADD COLUMN IF NOT EXISTS deployed_items TEXT');
   tablesReady = true;
 }
 
@@ -121,12 +122,27 @@ async function copyToWebsite(acct, project) {
   const list = await uapi(acct.user, 'Fileman', 'list_files', { dir: repoRel(project), show_hidden: '1' });
   if (!list.status) return { ok: false, log: 'Could not read the repository: ' + firstError(list) };
   // never publish the .git folder or the deploy settings
-  const items = (list.data || []).map((f) => f.file).filter((f) => f !== '.git' && f !== '.github' && f !== '.cpanel.yml');
+  const entries = (list.data || []).filter((f) => f.file !== '.git' && f.file !== '.github' && f.file !== '.cpanel.yml')
+    .map((f) => ({ name: f.file, dir: f.type === 'dir' }));
+  const items = entries.map((e) => e.name);
   if (!items.length) return { ok: false, log: 'The repository is empty.' };
+  // Clear what the PREVIOUS deploy put on the website (only those items, never the client's other files), so files deleted
+  // in GitHub disappear and folders don't keep old files: removed items + previously deployed folders (re-copied fresh below).
+  let prev = []; try { prev = JSON.parse(project.deployed_items || '[]'); } catch { prev = []; }
+  const KEEP = new Set(['cgi-bin', '.well-known']);
+  const clear = prev.filter((p) => p && p.name && !KEEP.has(p.name) && !/[\/\\]|^\.\.?$/.test(p.name) && (p.dir || !items.includes(p.name))).map((p) => p.name);
+  let removed = 0;
+  if (clear.length) {
+    const u = await api2(acct.user, 'Fileman', 'fileop', { op: 'unlink', sourcefiles: clear.map((n) => `/home/${acct.user}/public_html/${n}`).join(','), doubledecode: '0' });
+    removed = (u.data || []).filter((x) => x.result).length;
+  }
   const r = await api2(acct.user, 'Fileman', 'fileop', { op: 'copy', sourcefiles: items.map((f) => repoRel(project) + '/' + f).join(','), destfiles: `/home/${acct.user}/public_html`, doubledecode: '0' });
   const res = r.data || [];
   const failed = res.filter((x) => !x.result);
-  return { ok: res.length > 0 && failed.length === 0, log: `Copied ${res.length - failed.length} of ${items.length} items to the website${failed.length ? ' — failed: ' + failed.map((x) => x.src.split('/').pop()).join(', ') : ''}.` };
+  const ok = res.length > 0 && failed.length === 0;
+  if (ok) await getPool().query('UPDATE panel_projects SET deployed_items = $2 WHERE id = $1', [project.id, JSON.stringify(entries)]);
+  const gone = prev.filter((p) => p && p.name && !items.includes(p.name)).length;
+  return { ok, log: `Copied ${res.length - failed.length} of ${items.length} items to the website${gone ? `; removed ${gone} item${gone === 1 ? '' : 's'} deleted from GitHub` : ''}${failed.length ? ' — failed: ' + failed.map((x) => x.src.split('/').pop()).join(', ') : ''}.` };
 }
 async function repoHead(acct, project) {
   const r = await uapi(acct.user, 'VersionControl', 'retrieve');

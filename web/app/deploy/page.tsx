@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 
-const TITLE = "Deploy your website — GitHub, Node.js, WordPress | Nadine Cloud";
+const TITLE = "Deploy your website — GitHub auto-deploy, WordPress, Sitejet | Nadine Cloud";
 const DESCRIPTION =
-  "Step-by-step guides to put your site live on Nadine Cloud hosting: deploy from GitHub, run Node.js apps, install WordPress in one click, or build with Sitejet.";
+  "Put your site live on Nadine Cloud hosting: automatic deploys from GitHub, WordPress in one click, or build with Sitejet. Node.js apps set up on request.";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -45,9 +45,9 @@ export default function Deploy() {
           <span className="eyebrow">Help center · Deploy</span>
           <h1>Put your website live in minutes.</h1>
           <p>
-            Every Nadine Cloud hosting plan comes with cPanel, Git, Node.js,
-            WordPress Manager and Sitejet Builder. Pick the guide that matches
-            your project.
+            Every Nadine Cloud hosting plan comes with automatic GitHub deploys,
+            cPanel, WordPress Manager and Sitejet Builder. Pick the guide that
+            matches your project.
           </p>
         </div>
       </section>
@@ -62,8 +62,8 @@ export default function Deploy() {
           <div className="guide-picker">
             <a href="#wordpress"><b>WordPress site</b><span>One click · easiest</span></a>
             <a href="#sitejet"><b>No website yet</b><span>Drag &amp; drop with Sitejet</span></a>
-            <a href="#github"><b>HTML / PHP from GitHub</b><span>Git Version Control</span></a>
-            <a href="#nodejs"><b>Node.js app</b><span>Express, Next.js, APIs</span></a>
+            <a href="#github"><b>HTML / PHP from GitHub</b><span>Automatic · push to update</span></a>
+            <a href="#nodejs"><b>Node.js app</b><span>Set up for you on request</span></a>
           </div>
         </div>
       </section>
@@ -105,6 +105,14 @@ export default function Deploy() {
             <h2>Deploy an HTML / PHP site from GitHub</h2>
             <p>Works for static sites and plain PHP projects (HTML, CSS, JavaScript, PHP).</p>
           </div>
+          <h3 className="guide-sub">The easy way: automatic deploys (recommended)</h3>
+          <ol className="guide-steps">
+            <li>Log in to <a href="/account#hosting"><b>My account</b></a> and open <b>Hosting &amp; websites</b>.</li>
+            <li>On your website, open the <b>Deploy from GitHub</b> tab and paste your repository link, for example <code>https://github.com/your-name/your-site</code>. Private repository? Add a read-only access token.</li>
+            <li>Click <b>Connect &amp; deploy</b>. Your site is live in under a minute.</li>
+            <li>From now on, every time you <b>push to GitHub</b>, your website updates by itself. Each update is listed with its status, and files you delete in GitHub are removed from the site too.</li>
+          </ol>
+          <h3 className="guide-sub">The manual way, in cPanel</h3>
           <ol className="guide-steps">
             <li>
               In your GitHub repository, add a file called <code>.cpanel.yml</code> at the top level,
@@ -140,7 +148,7 @@ export default function Deploy() {
           <div className="section-head">
             <span className="eyebrow">Guide 4 · Developers</span>
             <h2>Run a Node.js app</h2>
-            <p>For Express APIs, Next.js, Nest and other Node.js servers.</p>
+            <p>For Express APIs, Next.js, Nest and other Node.js servers. Node.js apps are <b>set up for you on request</b>: email <a href="mailto:support@nadinecloud.com?subject=Node.js%20app%20hosting">support@nadinecloud.com</a> with your repository and we switch it on and get it running. The steps below are what we follow, and what you can do yourself once it is switched on for your account.</p>
           </div>
           <ol className="guide-steps">
             <li>
