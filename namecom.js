@@ -160,4 +160,13 @@ async function handleDomainCheck(req, res, urlParams) {
   }
 }
 
-module.exports = { isConfigured, checkAvailability, handleDomainCheck, registerDomain };
+// Points a domain we registered at our hosting's nameservers (so the website and email work with no client action).
+// Never throws: returns { ok } or { ok: false, reason }.
+async function setNameservers(domainName, nameservers) {
+  try {
+    await namecomRequest('POST', `/v4/domains/${encodeURIComponent(domainName)}:setNameservers`, { nameservers });
+    return { ok: true };
+  } catch (err) { return { ok: false, reason: err.message || String(err) }; }
+}
+
+module.exports = { isConfigured, checkAvailability, handleDomainCheck, registerDomain, setNameservers };
