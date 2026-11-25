@@ -31,7 +31,8 @@
           }
           status.textContent = 'Success — redirecting…';
           status.classList.add('ok');
-          window.location.href = redirectTo;
+          const next = new URLSearchParams(window.location.search).get('next') || '';
+          window.location.href = /^\/[a-z0-9\-\/]*$/i.test(next) && next.indexOf('//') < 0 ? next : redirectTo;  // only our own pages
         })
         .catch(() => {
           status.textContent = 'Something went wrong — please try again.';

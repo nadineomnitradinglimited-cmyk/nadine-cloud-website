@@ -88,12 +88,27 @@ async function ensureTables() {
   tablesReady = true;
 }
 
+// ---------- can the panel show a live preview of the site? (it answers, and allows being shown in a frame) ----------
+async function canPreview(domain) {
+  try {
+    const r = await fetch('https://' + domain + '/', { redirect: 'follow', signal: AbortSignal.timeout(4000), headers: { 'User-Agent': 'NadineCloudPanel/1.0' } });
+    if (r.status >= 400) return false;
+    const xfo = String(r.headers.get('x-frame-options') || '').toLowerCase();
+    const csp = String(r.headers.get('content-security-policy') || '').toLowerCase();
+    if (xfo.includes('deny') || xfo.includes('sameorigin')) return false;
+    const fa = csp.match(/frame-ancestors([^;]*)/);
+    if (fa && !/\*|nadinecloud\.com/.test(fa[1])) return false;
+    return true;
+  } catch (e) { return false; }
+}
+
 // ---------- account overview ----------
 async function overview(acct) {
-  const [stats, ssl, pops] = await Promise.all([
+  const [stats, ssl, pops, preview] = await Promise.all([
     uapi(acct.user, 'StatsBar', 'get_stats', { display: 'diskusage|bandwidthusage|emailaccounts|mysqldatabases|subdomains' }),
     uapi(acct.user, 'SSL', 'installed_hosts'),
     uapi(acct.user, 'Email', 'list_pops'),
+    canPreview(acct.domain),
   ]);
   const s = {};
   (stats.data || []).forEach((x) => { s[x.name] = { used: x._count ?? x.count, max: x._max ?? x.max, units: x.units, percent: Number(x.percent) || 0 }; });
@@ -104,7 +119,7 @@ async function overview(acct) {
     domain: acct.domain, plan: acct.plan, suspended: acct.suspended, since: acct.startdate,
     // a brand-new account is not served by the web server for a few minutes
     justCreated: !!(acct.started && Date.now() / 1000 - acct.started < 15 * 60),
-    usage: s,
+    usage: s, preview,
     ssl: cert ? { ok: true, validUntil: cert.certificate && cert.certificate.not_after ? new Date(cert.certificate.not_after * 1000).toISOString() : null } : { ok: false },
     emailCount: (pops.data || []).filter((x) => x.login !== 'Main Account').length,
     deploy: p.rows[0] || null,
