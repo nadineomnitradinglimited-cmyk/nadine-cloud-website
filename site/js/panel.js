@@ -261,7 +261,17 @@ const NEWSITE = '<div style="display:flex;gap:10px;align-items:flex-start;backgr
     if (!r || !r.ok || !r.j.accounts || !r.j.accounts.length) return;           // hidden / nothing to show
     if (!document.getElementById('ncp-css')) { const s = document.createElement('style'); s.id = 'ncp-css'; s.textContent = CSS; document.head.appendChild(s); }
     host.innerHTML = ''; const wrap = document.createElement('div'); wrap.className = 'ncp';
-    r.j.accounts.filter((a) => !a.error).forEach((a) => wrap.appendChild(card(a)));
+    // v2: the full control panel lives at /panel — here we show one launcher row per website
+    r.j.accounts.filter((a) => !a.error).forEach((a) => {
+      const el = document.createElement('div'); el.className = 'ncp-card';
+      el.innerHTML = `<div class="ncp-top"><div class="ncp-site"><span class="ncp-dot ${a.suspended ? 'off' : ''}"></span><b>${esc(a.domain)}</b><span class="ncp-tag">${esc(a.plan || 'Hosting')}</span></div>
+        <div class="ncp-acts"><a class="ncp-b" href="https://${esc(a.domain)}" target="_blank" rel="noopener">${ic('globe', 16)} Visit site</a>
+        <a class="ncp-b pri" href="/panel?site=${encodeURIComponent(a.domain)}">${ic('rocket', 16)} Open control panel</a></div></div>
+        <div class="ncp-body" style="display:flex;flex-wrap:wrap;gap:18px;align-items:center;font-size:14px;color:#55607A">
+          <span class="ncp-ok">${ic('lock', 16)} ${a.ssl && a.ssl.ok ? 'Secure (https)' : 'SSL being set up'}</span>
+          <span>${ic('git', 15)} Deploy from GitHub · ${ic('db', 15)} Databases · ${ic('mail', 15)} Email — all in your control panel</span></div>`;
+      wrap.appendChild(el);
+    });
     host.appendChild(wrap);
   }
 
