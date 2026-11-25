@@ -23,6 +23,7 @@
     moon: '<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/>', out: '<path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/>',
     user: '<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>', chev: '<path d="m6 9 6 6 6-6"/>', panel: '<rect x="3" y="4" width="18" height="16" rx="3"/><path d="M3 9h18M8 4v5"/>',
     bolt: '<path d="M13 2 4 14h7l-1 8 9-12h-7l1-8Z"/>', menu: '<path d="M4 7h16M4 12h16M4 17h16"/>', refresh: '<path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7"/>',
+    folder: '<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z"/>', file: '<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8l-5-5Z"/><path d="M14 3v5h5"/>', upload: '<path d="M12 16V4M7 9l5-5 5 5M5 20h14"/>', download: '<path d="M12 4v12M7 11l5 5 5-5M5 20h14"/>', box: '<path d="M21 8 12 3 3 8v8l9 5 9-5V8Z"/><path d="M3 8l9 5 9-5M12 13v8"/>', cog: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"/>', up: '<path d="M15 18l-6-6 6-6"/>', edit: '<path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/>',
     help: '<circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6V14M12 17.5v.01"/>',
   };
   const ic = (n, s) => `<svg viewBox="0 0 24 24" width="${s || 18}" height="${s || 18}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${P[n]}</svg>`;
@@ -157,6 +158,22 @@
     .nx-side.open{transform:none}.nx-mob{display:inline-grid}.nx-main{padding:20px 16px 60px}.nx-who span,.nx-logo b,.nx-slash{display:none}
     .nx-3{grid-template-columns:1fr}.nx-head h1{font-size:23px}.nx-switch>button{max-width:200px}.nx-fact .k{width:104px}.nx-frame{height:220px}}
   @media (max-width:520px){.nx-gauges{grid-template-columns:minmax(0,1fr)}.nx-acts{grid-template-columns:minmax(0,1fr)}.nx-head .nx-btn{flex:1}.nx-chip{display:none}.nx-top{gap:8px;padding:0 10px}.nx-dep{flex-wrap:wrap}}
+  .nx-crumb{border:0;background:none;color:var(--acc);font-weight:700;font-size:14px;cursor:pointer;display:inline-flex;align-items:center;gap:5px;padding:2px 4px}
+  .nx-frow{display:flex;align-items:center;gap:12px;padding:10px 20px;border-bottom:1px solid var(--line2);font-size:14.5px}
+  .nx-frow:hover{background:var(--panel2)} .nx-fi{display:grid;place-items:center;width:30px;height:30px;border-radius:8px;background:var(--line2);color:var(--tx3);flex-shrink:0} .nx-fi.d{background:var(--accbg);color:var(--acc)}
+  .nx-fname{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;border:0;background:none;color:var(--tx);font:inherit;font-weight:600;text-align:left;padding:0} button.nx-fname{cursor:pointer;color:var(--acc)}
+  .nx-fmeta{font-size:12.5px;width:84px;text-align:right;flex-shrink:0} .nx-facts2{display:flex;gap:6px;flex-shrink:0}
+  .nx-drop{position:relative} .nx-dropmsg{display:none;position:absolute;inset:0;border:2px dashed var(--acc);border-radius:16px;background:var(--panel);opacity:.95;place-items:center;align-content:center;gap:8px;color:var(--acc);font-size:16px}
+  .nx-drop.over .nx-dropmsg{display:grid}
+  .nx-editor{display:block;width:100%;min-height:62vh;border:0;border-radius:0 0 16px 16px;padding:16px 18px;background:var(--term);color:#D7E1F2;font:13.5px/1.65 'IBM Plex Mono',monospace;resize:vertical;tab-size:2}
+  .nx-editor:focus{outline:none}
+  .nx-big{display:grid;place-items:center;width:54px;height:54px;border-radius:16px} .nx-big.ok{background:var(--okbg);color:var(--ok)} .nx-big.warn{background:var(--warnbg);color:var(--warn)}
+  .nx-kv{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line2);font-size:14px} .nx-kv:last-child{border-bottom:0} .nx-kv>span:first-child{flex:1;min-width:0;color:var(--tx2);font-weight:600;overflow:hidden;text-overflow:ellipsis}
+  .nx-cv2{font-family:'IBM Plex Mono',monospace;font-size:13px;padding:5px 9px;border-radius:7px;background:var(--line2)}
+  .nx-tablewrap{overflow-x:auto} .nx-table{width:100%;border-collapse:collapse;font-size:14px} .nx-table th{text-align:left;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--tx3);padding:10px 20px;border-bottom:1px solid var(--line2)}
+  .nx-table td{padding:9px 20px;border-bottom:1px solid var(--line2);vertical-align:middle} .nx-val{max-width:420px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .nx-dnsform{display:flex;flex-wrap:wrap;gap:8px} .nx-dnsform .nx-in{flex:1;min-width:110px} .nx-dnsform select.nx-in{flex:0 0 100px}
+  @media (max-width:820px){.nx-fmeta{display:none}.nx-frow{flex-wrap:wrap}.nx-facts2{width:100%;justify-content:flex-end}}
   .chat-widget{z-index:40!important}`;
 
   // ---------- state ----------
@@ -186,10 +203,13 @@
           <button class="nx-nav" data-v="overview">${ic('grid')} Overview</button>
           <button class="nx-nav" data-v="deploy">${ic('git')} Deployments</button>
           <button class="nx-nav" data-v="db">${ic('db')} Databases</button>
-          <button class="nx-nav" data-v="email">${ic('mail')} Email accounts</button>
+          <button class="nx-nav" data-v="files">${ic('folder')} Files</button>
+          <button class="nx-nav" data-v="email">${ic('mail')} Email</button>
+          <button class="nx-nav" data-v="domain">${ic('globe')} Domain &amp; SSL</button>
+          <button class="nx-nav" data-v="backups">${ic('box')} Backups</button>
+          <button class="nx-nav" data-v="settings">${ic('cog')} Settings</button>
           <small>More</small>
           <a class="nx-nav" href="/account">${ic('user')} Billing &amp; account</a>
-          <button class="nx-nav" data-cpanel>${ic('panel')} Advanced tools ${ic('ext', 14)}</button>
           <button class="nx-nav" data-logout>${ic('out')} Log out</button>
           <div class="nx-sidecard"><b>Need a hand?</b>Our team can set things up for you. Write to <a href="mailto:support@nadinecloud.com" style="color:var(--acc);font-weight:700">support@nadinecloud.com</a></div>
         </nav>
@@ -202,7 +222,6 @@
     document.addEventListener('click', () => { const m = root.querySelector('[data-swmenu]'); if (m) m.classList.remove('open'); });
     $('[data-mob]').onclick = () => $('[data-side]').classList.toggle('open');
     root.querySelectorAll('[data-v]').forEach((b) => b.onclick = () => { go(b.dataset.v); $('[data-side]').classList.remove('open'); });
-    $('[data-cpanel]').onclick = openCpanel;
     $('[data-logout]').onclick = () => fetch('/api/auth/logout', { method: 'POST', credentials: 'same-origin' }).finally(() => { window.location.href = '/'; });
   }
 
@@ -233,7 +252,7 @@
     root.querySelectorAll('[data-v]').forEach((b) => b.classList.toggle('on', b.dataset.v === view));
     if (location.hash.slice(1) !== view) history.replaceState(null, '', location.pathname + location.search + (view === 'overview' ? '' : '#' + view));
     const box = root.querySelector('[data-view]');
-    ({ overview, deploy: deployView, db: dbView, email: emailView }[view] || overview)(box);
+    ({ overview, deploy: deployView, db: dbView, email: emailView, files: filesView, domain: domainView, backups: backupsView, settings: settingsView }[view] || overview)(box);
   }
 
   // ---------- usage ring ----------
@@ -281,12 +300,11 @@
           <button class="nx-qa" data-goto="deploy"><span class="q">${ic('git')}</span>Deploy from GitHub<span>Push to update your site</span></button>
           <button class="nx-qa" data-goto="db"><span class="q">${ic('db')}</span>New database<span>Created &amp; connected for you</span></button>
           <button class="nx-qa" data-goto="email"><span class="q">${ic('mail')}</span>New email<span>you@${esc(a.domain)}</span></button>
-          <button class="nx-qa" data-qcp><span class="q">${ic('panel')}</span>Advanced<span>Open cPanel</span></button>
+          <button class="nx-qa" data-goto="files"><span class="q">${ic('upload')}</span>Upload files<span>Drag &amp; drop your site</span></button>
         </div></div>
       </div>`;
     animateRings(box);
     box.querySelectorAll('[data-goto]').forEach((b) => b.onclick = () => go(b.dataset.goto));
-    box.querySelector('[data-qcp]').onclick = openCpanel;
     // live preview: scale the 1440px-wide page down to the card; if the site refuses to be framed, the fallback stays visible
     const fr = box.querySelector('[data-frame]'); const ifr = fr.querySelector('iframe');
     if (ifr) { const fit = () => { ifr.style.transform = `scale(${fr.clientWidth / 1440})`; }; fit(); window.addEventListener('resize', fit); ifr.addEventListener('load', () => { ifr.style.opacity = '1'; }); }
@@ -436,8 +454,192 @@
       if (!x.ok) { out.className = 'nx-msg bad'; out.textContent = x.j.error || 'Could not create it.'; return; }
       toast(x.j.email + ' is ready'); setTimeout(() => emailView(box), 900); };
     box.querySelectorAll('[data-cp]').forEach((b) => b.onclick = () => copy(b.dataset.cp));
+    emailExtras(box, a);
     box.querySelectorAll('[data-del]').forEach((b) => b.onclick = async () => { if (!confirm('Delete ' + b.dataset.del + '? All its emails will be removed.')) return;
       await post('/api/panel/email/delete', { domain: a.domain, email: b.dataset.del }); toast('Deleted'); emailView(box); });
+  }
+
+  // ---------- small helpers for the new tools ----------
+  const sizeTxt = (n) => n >= 1073741824 ? (n / 1073741824).toFixed(1) + ' GB' : n >= 1048576 ? (n / 1048576).toFixed(1) + ' MB' : n >= 1024 ? Math.round(n / 1024) + ' KB' : n + ' B';
+  const loading = (box, title, extra) => { box.innerHTML = `${head(title, extra)}<div class="nx-card"><div class="nx-card-b"><div class="nx-skel" style="height:50px;margin-bottom:10px"></div><div class="nx-skel" style="height:50px"></div></div></div>`; };
+  const errCard = (m) => `<div class="nx-card nx-card-b nx-msg bad">${esc(m || 'Could not load.')}</div>`;
+  const still = (v, a) => S.view === v && S.cur === a;
+
+  // ---------- Files ----------
+  const TEXT_EXT = /\.(html?|css|js|mjs|json|txt|md|php|xml|svg|htaccess|env|ini|csv|yml|yaml|ts|tsx|jsx|py|sql)$|^\.htaccess$/i;
+  async function filesView(box, dir) {
+    const a = S.cur; dir = dir == null ? (S.fileDir && S.fileDir[a.domain]) || 'public_html' : dir;
+    (S.fileDir = S.fileDir || {})[a.domain] = dir;
+    loading(box, 'Files', `<button class="nx-btn" data-mk>${ic('folder', 16)} New folder</button><label class="nx-btn pri" style="cursor:pointer">${ic('upload', 16)} Upload<input type="file" multiple data-up hidden></label>`);
+    const r = await api('/api/panel/files?domain=' + encodeURIComponent(a.domain) + '&dir=' + encodeURIComponent(dir));
+    if (!still('files', a)) return;
+    const card = box.querySelector('.nx-card');
+    if (!r.ok) { card.outerHTML = errCard(r.j.error); return; }
+    const parts = dir ? dir.split('/') : [];
+    const crumbs = `<button class="nx-crumb" data-cd="">${ic('folder', 14)} home</button>` + parts.map((p, i) => `<span class="nx-muted">/</span><button class="nx-crumb" data-cd="${esc(parts.slice(0, i + 1).join('/'))}">${esc(p)}</button>`).join('');
+    const join = (n) => (dir ? dir + '/' : '') + n;
+    card.outerHTML = `<div class="nx-card nx-fade nx-drop" data-drop>
+      <div class="nx-card-h" style="flex-wrap:wrap">${crumbs}<span class="nx-sp"></span>${dir === 'public_html' ? '<span class="nx-muted" style="font-size:12.5px">This folder is your website</span>' : ''}</div>
+      ${dir ? `<div class="nx-frow" data-cd="${esc(parts.slice(0, -1).join('/'))}" style="cursor:pointer"><span class="nx-fi">${ic('up', 16)}</span><b>Back</b></div>` : ''}
+      ${r.j.items.length ? r.j.items.map((f) => `<div class="nx-frow">
+          <span class="nx-fi ${f.dir ? 'd' : ''}">${ic(f.dir ? 'folder' : 'file', 16)}</span>
+          ${f.dir ? `<button class="nx-fname" data-cd="${esc(join(f.name))}">${esc(f.name)}</button>` : `<span class="nx-fname">${esc(f.name)}</span>`}
+          <span class="nx-muted nx-fmeta">${f.dir ? '' : sizeTxt(f.size)}</span><span class="nx-muted nx-fmeta">${f.at ? esc(fmtDate(f.at)) : ''}</span>
+          <span class="nx-facts2">
+            ${!f.dir && TEXT_EXT.test(f.name) && f.size < 1500000 ? `<button class="nx-btn sm" data-edit="${esc(join(f.name))}" title="Edit">${ic('edit', 14)} Edit</button>` : ''}
+            ${!f.dir && /\.zip$/i.test(f.name) ? `<button class="nx-btn sm" data-unzip="${esc(join(f.name))}">Unzip</button>` : ''}
+            ${!f.dir ? `<a class="nx-btn sm" href="/api/panel/files/download?domain=${encodeURIComponent(a.domain)}&path=${encodeURIComponent(join(f.name))}" title="Download">${ic('download', 14)}</a>` : ''}
+            <button class="nx-btn sm" data-ren="${esc(join(f.name))}" data-n="${esc(f.name)}">Rename</button>
+            <button class="nx-btn sm danger" data-rm="${esc(join(f.name))}" title="Delete">${ic('trash', 14)}</button></span></div>`).join('')
+        : `<div class="nx-empty"><b>This folder is empty</b>Drag files here, or press Upload. Tip: upload a .zip of your whole site and press Unzip.</div>`}
+      <div class="nx-dropmsg">${ic('upload', 26)}<b>Drop files to upload to /${esc(dir)}</b></div></div>
+      <p class="nx-note" style="margin-top:12px">Deleted files go to the bin folder <span class="nx-code">.trash</span> in home, so mistakes can be undone. Files up to 40 MB each.</p>`;
+    box.querySelectorAll('[data-cd]').forEach((b) => b.onclick = () => filesView(box, b.dataset.cd));
+    const upload = async (files) => {
+      for (const f of files) {
+        toast('Uploading ' + f.name + '…');
+        const x = await fetch(`/api/panel/files/upload?domain=${encodeURIComponent(a.domain)}&dir=${encodeURIComponent(dir)}&name=${encodeURIComponent(f.name)}`, { method: 'POST', credentials: 'same-origin', body: f }).then((r2) => r2.json().catch(() => ({})).then((j) => ({ ok: r2.ok, j })));
+        if (!x.ok) { toast(x.j.error || 'Upload failed'); return filesView(box, dir); }
+      }
+      toast(files.length + ' file' + (files.length === 1 ? '' : 's') + ' uploaded'); filesView(box, dir);
+    };
+    box.querySelector('[data-up]').onchange = (e) => upload([...e.target.files]);
+    const drop = box.querySelector('[data-drop]');
+    drop.ondragover = (e) => { e.preventDefault(); drop.classList.add('over'); }; drop.ondragleave = () => drop.classList.remove('over');
+    drop.ondrop = (e) => { e.preventDefault(); drop.classList.remove('over'); if (e.dataTransfer.files.length) upload([...e.dataTransfer.files]); };
+    box.querySelector('[data-mk]').onclick = async () => { const n = prompt('Folder name'); if (!n) return; const x = await post('/api/panel/files/mkdir', { domain: a.domain, dir, name: n }); toast(x.ok ? 'Folder created' : x.j.error); filesView(box, dir); };
+    box.querySelectorAll('[data-rm]').forEach((b) => b.onclick = async () => { if (!confirm('Delete ' + b.dataset.rm + '? It goes to the .trash folder.')) return; const x = await post('/api/panel/files/delete', { domain: a.domain, path: b.dataset.rm }); toast(x.ok ? 'Deleted' : x.j.error); filesView(box, dir); });
+    box.querySelectorAll('[data-ren]').forEach((b) => b.onclick = async () => { const n = prompt('New name', b.dataset.n); if (!n || n === b.dataset.n) return; const x = await post('/api/panel/files/rename', { domain: a.domain, path: b.dataset.ren, newName: n }); toast(x.ok ? 'Renamed' : x.j.error); filesView(box, dir); });
+    box.querySelectorAll('[data-unzip]').forEach((b) => b.onclick = async () => { b.disabled = true; b.textContent = 'Unzipping…'; const x = await post('/api/panel/files/extract', { domain: a.domain, path: b.dataset.unzip }); toast(x.ok ? 'Unzipped' : x.j.error); filesView(box, dir); });
+    box.querySelectorAll('[data-edit]').forEach((b) => b.onclick = () => editFile(box, b.dataset.edit, dir));
+  }
+  async function editFile(box, path, backDir) {
+    const a = S.cur;
+    loading(box, 'Edit file', `<button class="nx-btn" data-back>${ic('up', 16)} Back to files</button><button class="nx-btn pri" data-save disabled>${ic('check', 16)} Save</button>`);
+    box.querySelector('[data-back]').onclick = () => filesView(box, backDir);
+    const r = await api('/api/panel/files/read?domain=' + encodeURIComponent(a.domain) + '&path=' + encodeURIComponent(path));
+    if (!still('files', a)) return;
+    if (!r.ok) { box.querySelector('.nx-card').outerHTML = errCard(r.j.error); return; }
+    box.querySelector('.nx-card').outerHTML = `<div class="nx-card nx-fade"><div class="nx-card-h"><span class="nx-code">${esc(path)}</span><span class="nx-sp"></span><span class="nx-muted" style="font-size:12.5px" data-state>No changes</span></div>
+      <textarea class="nx-editor" spellcheck="false" data-ta></textarea></div>`;
+    const ta = box.querySelector('[data-ta]'); ta.value = r.j.content; const save = box.querySelector('[data-save]'); const st = box.querySelector('[data-state]');
+    ta.oninput = () => { save.disabled = false; st.textContent = 'Not saved yet'; };
+    ta.onkeydown = (e) => { if (e.key === 'Tab') { e.preventDefault(); const p0 = ta.selectionStart; ta.setRangeText('  ', p0, ta.selectionEnd, 'end'); ta.oninput(); } if ((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); save.click(); } };
+    save.onclick = async () => { save.disabled = true; save.innerHTML = '<span class="nx-spin"></span> Saving…'; const x = await post('/api/panel/files/save', { domain: a.domain, path, content: ta.value });
+      save.innerHTML = `${ic('check', 16)} Save`; if (x.ok) { st.textContent = 'Saved ✓ — live on your website now'; toast('Saved'); } else { save.disabled = false; toast(x.j.error || 'Could not save'); } };
+  }
+
+  // ---------- Domain & SSL ----------
+  async function domainView(box) {
+    const a = S.cur;
+    loading(box, 'Domain & SSL');
+    const [d, ssl, subs] = await Promise.all([api('/api/panel/domain?domain=' + encodeURIComponent(a.domain)), api('/api/panel/ssl?domain=' + encodeURIComponent(a.domain)), api('/api/panel/subdomains?domain=' + encodeURIComponent(a.domain))]);
+    if (!still('domain', a)) return;
+    if (!d.ok) { box.querySelector('.nx-card').outerHTML = errCard(d.j.error); return; }
+    const D = d.j; const ns = D.nameservers || []; const usesOurs = ns.length && ns.every((n) => (D.liveNameservers || []).includes(n.toLowerCase()));
+    const cert = ((ssl.j && ssl.j.certs) || []).find((c) => c.host === a.domain || (c.aliases || []).includes(a.domain));
+    const days = cert && cert.expires ? Math.round((new Date(cert.expires) - Date.now()) / 86400000) : null;
+    const cp = (v) => `<span class="nx-cv2">${esc(v)}</span><button class="nx-btn sm" data-copy="${esc(v)}">${ic('copy', 13)} Copy</button>`;
+    box.querySelector('.nx-card').outerHTML = `
+      <div class="nx-card nx-fade" style="margin-bottom:20px"><div class="nx-card-b" style="display:flex;flex-wrap:wrap;gap:16px;align-items:center">
+        <span class="nx-big ${D.connected ? 'ok' : 'warn'}">${ic(D.connected ? 'check' : 'bolt', 26)}</span>
+        <div style="flex:1;min-width:230px"><h3 style="font-size:19px">${D.connected ? 'Your domain is connected' : 'Your domain is not connected yet'}</h3>
+          <div class="nx-muted">${D.connected ? `${esc(a.domain)} opens your website on Nadine Cloud.` : `When ${esc(a.domain)} points to us, your website and email start working. Follow one of the two ways below.`}</div></div>
+        <button class="nx-btn" data-recheck>${ic('refresh', 16)} Check again</button></div></div>
+      ${D.connected ? '' : `<div class="nx-two" style="margin-bottom:20px">
+        <div class="nx-card nx-fade"><div class="nx-card-h"><h3>Way 1 (easiest): change the nameservers</h3></div><div class="nx-card-b">
+          <p class="nx-note" style="margin-bottom:10px">Log in where you bought the domain, open its <b>Nameservers</b> setting, choose <b>Custom</b> and enter:</p>
+          ${ns.map((n, i) => `<div class="nx-kv"><span>Nameserver ${i + 1}</span>${cp(n)}</div>`).join('') || '<p class="nx-note">Nameservers not available — use Way 2.</p>'}
+          <p class="nx-note" style="margin-top:10px">Changes take from a few minutes up to 24 hours. Press <b>Check again</b> any time.</p></div></div>
+        <div class="nx-card nx-fade"><div class="nx-card-h"><h3>Way 2: add two records</h3></div><div class="nx-card-b">
+          <p class="nx-note" style="margin-bottom:10px">Keep your nameservers and add these in your domain's DNS settings:</p>
+          <div class="nx-kv"><span>Type A · Name @</span>${cp(D.serverIp || '')}</div>
+          <div class="nx-kv"><span>Type A · Name www</span>${cp(D.serverIp || '')}</div>
+          <p class="nx-note" style="margin-top:10px">Bought your domain from Nadine Cloud? We connect it for you automatically.</p></div></div></div>`}
+      <div class="nx-two" style="margin-bottom:20px">
+        <div class="nx-card nx-fade"><div class="nx-card-h"><h3>SSL (https)</h3><span class="nx-sp"></span><button class="nx-btn sm" data-ssl>${ic('refresh', 14)} Renew / fix now</button></div><div class="nx-card-b">
+          ${cert ? `<div class="nx-kv"><span>Status</span><b class="nx-ok">Secure ✓</b></div><div class="nx-kv"><span>Valid until</span><b>${esc(fmtDate(cert.expires))}${days != null ? ` <span class="nx-muted">(${days} days)</span>` : ''}</b></div><div class="nx-kv"><span>Renews</span><b>Automatically, free</b></div>`
+            : `<p class="nx-note">No certificate yet. It is issued automatically once your domain is connected — press <b>Renew / fix now</b> after connecting.</p>`}
+          ${(ssl.j && ssl.j.problems || []).length ? `<details style="margin-top:10px"><summary class="nx-muted" style="cursor:pointer">Why it may not be working (${ssl.j.problems.length})</summary>${ssl.j.problems.map((p) => `<p class="nx-note" style="margin-top:6px">${esc(p.domain)}: ${esc(p.problem)}</p>`).join('')}</details>` : ''}</div></div>
+        <div class="nx-card nx-fade"><div class="nx-card-h"><h3>Subdomains</h3></div><div class="nx-card-b">
+          ${((subs.j && subs.j.subdomains) || []).map((s) => `<div class="nx-kv"><span><a href="https://${esc(s)}" target="_blank" rel="noopener">${esc(s)}</a></span><button class="nx-btn sm danger" data-delsub="${esc(s)}">${ic('trash', 13)}</button></div>`).join('') || `<p class="nx-note" style="margin-bottom:10px">Like shop.${esc(a.domain)} or blog.${esc(a.domain)}.</p>`}
+          <form data-fsub style="display:flex;gap:8px;margin-top:10px;align-items:center"><input class="nx-in" name="name" placeholder="shop" style="flex:1;min-width:0" required><span class="nx-muted" style="white-space:nowrap">.${esc(a.domain)}</span><button class="nx-btn pri">${ic('plus', 15)} Add</button></form></div></div></div>
+      <div class="nx-card nx-fade"><div class="nx-card-h"><h3>DNS records</h3><span class="nx-muted" style="font-size:12.5px">${usesOurs ? 'Active — your domain uses our nameservers' : 'Used when your domain uses our nameservers'}</span></div>
+        <div class="nx-tablewrap"><table class="nx-table"><thead><tr><th>Type</th><th>Name</th><th>Value</th><th></th></tr></thead><tbody>
+        ${(D.records || []).map((x) => `<tr><td><span class="nx-chip">${esc(x.type)}</span></td><td class="nx-mono">${esc(x.name === a.domain ? '@' : x.name.replace('.' + a.domain, ''))}</td><td class="nx-mono nx-val" title="${esc(x.value)}">${x.priority != null ? esc(x.priority) + ' ' : ''}${esc(x.value)}</td><td style="text-align:right"><button class="nx-btn sm danger" data-deldns="${esc(x.line)}">${ic('trash', 13)}</button></td></tr>`).join('')}
+        </tbody></table></div>
+        <div class="nx-card-b" style="border-top:1px solid var(--line2)"><form class="nx-dnsform" data-fdns>
+          <select class="nx-in" name="type"><option>A</option><option>CNAME</option><option>MX</option><option>TXT</option><option>AAAA</option></select>
+          <input class="nx-in" name="name" placeholder="Name (@ or www)" required><input class="nx-in" name="value" placeholder="Value" required style="flex:2">
+          <input class="nx-in" name="priority" placeholder="Priority" style="max-width:100px;display:none"><button class="nx-btn pri">${ic('plus', 15)} Add record</button></form>
+          <p class="nx-note" style="margin-top:8px">Not sure? Leave DNS as it is — everything your website and email need is already set.</p></div></div>`;
+    box.querySelectorAll('[data-copy]').forEach((b) => b.onclick = () => copy(b.dataset.copy));
+    box.querySelector('[data-recheck]').onclick = () => domainView(box);
+    box.querySelector('[data-ssl]').onclick = async (e) => { e.currentTarget.disabled = true; const x = await post('/api/panel/ssl/renew', { domain: a.domain }); toast(x.ok ? 'SSL check started — give it a few minutes' : x.j.error); };
+    const fs2 = box.querySelector('[data-fsub]'); fs2.onsubmit = async (e) => { e.preventDefault(); const x = await post('/api/panel/subdomains', { domain: a.domain, name: fs2.name.value }); toast(x.ok ? x.j.subdomain + ' created — its files go in ' + x.j.folder : x.j.error); if (x.ok) domainView(box); };
+    box.querySelectorAll('[data-delsub]').forEach((b) => b.onclick = async () => { if (!confirm('Remove ' + b.dataset.delsub + '? Its files are kept.')) return; const x = await post('/api/panel/subdomains/delete', { domain: a.domain, subdomain: b.dataset.delsub }); toast(x.ok ? 'Removed' : x.j.error); domainView(box); });
+    const fd = box.querySelector('[data-fdns]'); fd.type.onchange = () => { fd.priority.style.display = fd.type.value === 'MX' ? '' : 'none'; };
+    fd.onsubmit = async (e) => { e.preventDefault(); const x = await post('/api/panel/dns/add', { domain: a.domain, type: fd.type.value, name: fd.name.value, value: fd.value.value, priority: fd.priority.value }); toast(x.ok ? 'Record added' : x.j.error); if (x.ok) domainView(box); };
+    box.querySelectorAll('[data-deldns]').forEach((b) => b.onclick = async () => { if (!confirm('Delete this DNS record? Your website or email may stop working if it is needed.')) return; const x = await post('/api/panel/dns/delete', { domain: a.domain, line: Number(b.dataset.deldns) }); toast(x.ok ? 'Record deleted' : x.j.error); domainView(box); });
+  }
+
+  // ---------- Backups ----------
+  async function backupsView(box) {
+    const a = S.cur;
+    loading(box, 'Backups', `<button class="nx-btn pri" data-bk>${ic('box', 16)} Create backup now</button>`);
+    const r = await api('/api/panel/backups?domain=' + encodeURIComponent(a.domain));
+    if (!still('backups', a)) return;
+    const list = (r.j && r.j.backups) || [];
+    box.querySelector('.nx-card').outerHTML = `<div class="nx-banner nx-fade">${ic('check', 20)}<div><b>Your website is also backed up every night by Nadine Cloud.</b> Use this page for an extra copy you can download — for example before a big change.</div></div>
+      <div class="nx-card nx-fade"><div class="nx-card-h"><h3>Your backups</h3><span class="nx-muted" style="font-size:13px">${list.length}</span></div>
+      ${!r.ok ? `<div class="nx-card-b nx-msg bad">${esc(r.j.error || 'Could not load.')}</div>` : list.length ? list.map((b) => `<div class="nx-row"><div class="m"><b>${ic('box', 16)} ${esc(fmtDate(b.at))} <span class="nx-muted" style="font-weight:500">${esc(new Date(b.at).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }))}</span></b><small>${esc(b.sizeMB)} MB · website files, databases and email</small></div>
+        <a class="nx-btn sm" href="/api/panel/files/download?domain=${encodeURIComponent(a.domain)}&path=${encodeURIComponent(b.file)}">${ic('download', 14)} Download</a><button class="nx-btn sm danger" data-rmb="${esc(b.file)}">${ic('trash', 14)}</button></div>`).join('')
+        : `<div class="nx-empty"><b>No downloadable backups yet</b>Press <b>Create backup now</b> — it is ready in a few minutes.</div>`}</div>`;
+    box.querySelector('[data-bk]').onclick = async (e) => { const b = e.currentTarget; b.disabled = true; b.innerHTML = '<span class="nx-spin"></span> Starting…'; const x = await post('/api/panel/backups', { domain: a.domain }); toast(x.ok ? 'Backup started — ready in a few minutes' : x.j.error); b.innerHTML = `${ic('box', 16)} Create backup now`; setTimeout(() => { if (still('backups', a)) backupsView(box); }, 60000); };
+    box.querySelectorAll('[data-rmb]').forEach((b) => b.onclick = async () => { if (!confirm('Delete this backup copy?')) return; const x = await post('/api/panel/files/delete', { domain: a.domain, path: b.dataset.rmb }); toast(x.ok ? 'Deleted' : x.j.error); backupsView(box); });
+  }
+
+  // ---------- Settings: PHP, redirects, error log ----------
+  async function settingsView(box) {
+    const a = S.cur;
+    loading(box, 'Settings');
+    const [php, red, logs] = await Promise.all([api('/api/panel/php?domain=' + encodeURIComponent(a.domain)), api('/api/panel/redirects?domain=' + encodeURIComponent(a.domain)), api('/api/panel/logs?domain=' + encodeURIComponent(a.domain))]);
+    if (!still('settings', a)) return;
+    const vers = (php.j && php.j.versions) || []; const nice = (v) => String(v).replace(/^ea-php(\d)(\d+)$/, 'PHP $1.$2');
+    const lines = (logs.j && logs.j.lines) || [];
+    box.querySelector('.nx-card').outerHTML = `<div class="nx-two" style="margin-bottom:20px">
+      <div class="nx-card nx-fade"><div class="nx-card-h"><h3>PHP version</h3></div><div class="nx-card-b">
+        ${vers.length ? `<div style="display:flex;gap:8px"><select class="nx-in" data-php style="flex:1">${vers.map((v) => `<option value="${esc(v)}" ${v === php.j.current ? 'selected' : ''}>${esc(nice(v))}${v === php.j.current ? ' (current)' : ''}</option>`).join('')}</select><button class="nx-btn pri" data-setphp>Save</button></div>
+          <p class="nx-note" style="margin-top:8px">Most websites work best on the newest version. Change it only if your site needs an older one.</p>` : `<p class="nx-note">${esc((php.j && php.j.error) || 'Not available on this plan.')}</p>`}</div></div>
+      <div class="nx-card nx-fade"><div class="nx-card-h"><h3>Redirects</h3></div><div class="nx-card-b">
+        ${((red.j && red.j.redirects) || []).map((x) => `<div class="nx-kv"><span class="nx-mono">${esc(x.from)} → ${esc(x.to)}</span><button class="nx-btn sm danger" data-delred="${esc(x.from)}" data-root="${esc(x.docroot || '')}">${ic('trash', 13)}</button></div>`).join('') || `<p class="nx-note" style="margin-bottom:8px">Send an old address to a new one, e.g. /old-menu → https://${esc(a.domain)}/menu</p>`}
+        <form data-fred style="display:grid;gap:8px;margin-top:8px"><input class="nx-in" name="from" placeholder="/old-page" required><input class="nx-in" name="to" placeholder="https://${esc(a.domain)}/new-page" required><button class="nx-btn pri" style="justify-self:start">${ic('plus', 15)} Add redirect</button></form></div></div></div>
+      <div class="nx-card nx-fade"><div class="nx-card-h"><h3>Error log</h3><span class="nx-muted" style="font-size:12.5px">Why a page shows an error — newest first</span><span class="nx-sp"></span><button class="nx-btn sm" data-relog>${ic('refresh', 14)} Refresh</button></div><div class="nx-card-b">
+        ${lines.length ? `<pre class="nx-term" style="max-height:360px;overflow:auto">${lines.map((l) => `<span class="d">${esc(l.date || '')}</span> ${esc(l.entry || '')}`).join('\n')}</pre>` : '<p class="nx-note">No errors recorded — your website is running cleanly.</p>'}</div></div>`;
+    const sp = box.querySelector('[data-setphp]'); if (sp) sp.onclick = async () => { const v = box.querySelector('[data-php]').value; const x = await post('/api/panel/php', { domain: a.domain, version: v }); toast(x.ok ? 'Now using ' + nice(v) : x.j.error); if (x.ok) settingsView(box); };
+    const fr = box.querySelector('[data-fred]'); fr.onsubmit = async (e) => { e.preventDefault(); const x = await post('/api/panel/redirects', { domain: a.domain, from: fr.from.value, to: fr.to.value }); toast(x.ok ? 'Redirect added' : x.j.error); if (x.ok) settingsView(box); };
+    box.querySelectorAll('[data-delred]').forEach((b) => b.onclick = async () => { const x = await post('/api/panel/redirects/delete', { domain: a.domain, from: b.dataset.delred, docroot: b.dataset.root }); toast(x.ok ? 'Removed' : x.j.error); settingsView(box); });
+    box.querySelector('[data-relog]').onclick = () => settingsView(box);
+  }
+
+  // ---------- Email extras: change password, forwarders ----------
+  async function emailExtras(box, a) {
+    box.querySelectorAll('[data-cp]').forEach((b) => {
+      const pw = document.createElement('button'); pw.className = 'nx-btn sm'; pw.innerHTML = `${ic('key', 14)} Password`; b.before(pw);
+      pw.onclick = async () => { const np = prompt('New password for ' + b.dataset.cp + ' (at least 10 characters). Leave empty for a strong suggested one.'); if (np === null) return;
+        const pass = np || genPassword(); const x = await post('/api/panel/email/password', { domain: a.domain, email: b.dataset.cp, password: pass });
+        if (x.ok) { if (!np) prompt('Password changed. Copy the new password now:', pass); else toast('Password changed'); } else toast(x.j.error || 'Could not change it'); };
+    });
+    const card = document.createElement('div'); card.className = 'nx-card nx-fade'; card.style.marginTop = '20px';
+    card.innerHTML = `<div class="nx-card-h"><h3>Forwarders</h3><span class="nx-muted" style="font-size:12.5px">Send copies of emails to another address, e.g. your Gmail</span></div><div class="nx-card-b" data-fw><div class="nx-skel" style="height:40px"></div></div>`;
+    box.appendChild(card);
+    const r = await api('/api/panel/forwarders?domain=' + encodeURIComponent(a.domain));
+    if (!still('email', a)) return;
+    const fw = card.querySelector('[data-fw]'); const list = (r.j && r.j.forwarders) || [];
+    fw.innerHTML = `${list.map((f) => `<div class="nx-kv"><span>${esc(f.from)} → ${esc(f.to)}</span><button class="nx-btn sm danger" data-dfw="${esc(f.from)}" data-to="${esc(f.to)}">${ic('trash', 13)}</button></div>`).join('')}
+      <form data-ffw style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;align-items:center"><input class="nx-in" name="name" placeholder="info" style="flex:1;min-width:120px" required><span class="nx-muted">@${esc(a.domain)} →</span><input class="nx-in" name="to" placeholder="you@gmail.com" style="flex:1;min-width:160px" required><button class="nx-btn pri">${ic('plus', 15)} Add</button></form>`;
+    const f = fw.querySelector('[data-ffw]'); f.onsubmit = async (e) => { e.preventDefault(); const x = await post('/api/panel/forwarders', { domain: a.domain, name: f.name.value, to: f.to.value }); toast(x.ok ? 'Forwarder added' : x.j.error); if (x.ok) emailView(box); };
+    fw.querySelectorAll('[data-dfw]').forEach((b) => b.onclick = async () => { const x = await post('/api/panel/forwarders/delete', { domain: a.domain, from: b.dataset.dfw, to: b.dataset.to }); toast(x.ok ? 'Removed' : x.j.error); emailView(box); });
   }
 
   // ---------- start ----------
@@ -458,7 +660,7 @@
     const want = new URLSearchParams(location.search).get('site');
     S.cur = list.find((x) => x.domain === want) || list[0];
     shell(); paintSwitcher();
-    go(['deploy', 'db', 'email'].includes(location.hash.slice(1)) ? location.hash.slice(1) : 'overview');
+    go(['deploy', 'db', 'email', 'files', 'domain', 'backups', 'settings'].includes(location.hash.slice(1)) ? location.hash.slice(1) : 'overview');
   }
   start();
 })();

@@ -280,6 +280,26 @@ async function attemptDomainRegistration(order) {
 // involved) but WHM's createacct still requires one to identify the
 // account — this generates a syntactically valid, internal-only one that's
 // never meant to resolve publicly.
+// A domain we just registered still uses the registrar's default DNS — point it at the new hosting account's
+// nameservers so the website and email work with nothing for the client to do.
+async function pointNewDomain(domain) {
+  try {
+    const { pointDomainToHosting } = require('./panel');
+    const r = await pointDomainToHosting(domain);
+    return r.ok ? `
+
+--- Domain pointed to the hosting automatically ---
+Nameservers: ${r.nameservers.join(', ')}`
+      : `
+
+--- ACTION NEEDED: point the domain to the hosting ---
+Could not set the nameservers automatically (${r.reason}). Set them by hand at the registrar.`;
+  } catch (e) { return `
+
+--- ACTION NEEDED: point the domain to the hosting ---
+${e.message}`; }
+}
+
 function syntheticDbDomain(reference) {
   const slug = reference.toLowerCase().replace(/[^a-z0-9]/g, '').slice(-12);
   return `db-${slug}.nadinecloud.com`;
@@ -469,6 +489,7 @@ The customer paid to keep ${order.plan} running. Their end date was extended by 
       message += `\n\n--- Domain registered automatically ---\nDomain: ${reg.domain}\nNamecheap order: ${reg.orderId}\n${freeDomain ? 'Included free with Zyra annual+ — do NOT bill the customer for this domain.' : 'Not included in this plan — confirm domain price with the customer and invoice separately if not already covered.'}\n\nProceeding to create the hosting account…`;
       const acct = await createAccount({ domain: order.domain, pkgSlug: order.pkg, contactemail: order.email });
       if (acct.ok) {
+        message += await pointNewDomain(order.domain);
         const emailResult = await emailAccountDetailsToCustomer(order, acct);
         message += `\n\n--- WHM account created automatically ---\nDomain: ${acct.domain}\nUsername: ${acct.username}\nPassword: ${acct.password}\ncPanel login: https://${acct.domain}:2083\n\nLogin details ${emailResult.ok ? 'were emailed directly to the customer' : `FAILED to send to the customer (${emailResult.reason}) — forward manually`} (${order.email}).`;
       } else {
@@ -527,6 +548,7 @@ The customer paid to keep ${order.plan} running. Their end date was extended by 
       message += `\n\n--- Domain registered automatically (included free with Launch) ---\nDomain: ${reg.domain}\nNamecheap order: ${reg.orderId}\n\nProceeding to create the Website Builder hosting account…`;
       const acct = await createAccount({ domain: order.domain, pkgSlug: order.pkg, contactemail: order.email });
       if (acct.ok) {
+        message += await pointNewDomain(order.domain);
         const emailResult = await emailBuilderDetailsToCustomer(order, acct);
         message += `\n\n--- WHM account created automatically (Website Builder) ---\nDomain: ${acct.domain}\nUsername: ${acct.username}\nPassword: ${acct.password}\ncPanel login: https://${acct.domain}:2083\n\nACTION NEEDED: enable the Website Builder feature for this account in WHM's Feature Manager.\n\nLogin details ${emailResult.ok ? 'were emailed directly to the customer' : `FAILED to send to the customer (${emailResult.reason}) — forward manually`}.`;
         message += await deployAiDraftIfAny(order, acct);
