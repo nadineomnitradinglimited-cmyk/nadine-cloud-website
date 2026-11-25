@@ -7,6 +7,8 @@ export const metadata: Metadata = {
   alternates: { canonical: "https://www.nadinecloud.com/panel" },
 };
 
+const BUILD = Date.now().toString(36);
+
 // Full-screen hosting control panel. Everything is drawn by /js/panel-app.js from /api/panel/* (logged-in owners only).
 export default function Panel() {
   return (
@@ -17,7 +19,8 @@ export default function Panel() {
           Loading your control panel…
         </div>
       </div>
-      <Script src="/js/panel-app.js" strategy="afterInteractive" />
+      {/* ?v= changes on every build, so browsers always load the newest panel */}
+      <Script src={`/js/panel-app.js?v=${BUILD}`} strategy="afterInteractive" />
     </>
   );
 }
