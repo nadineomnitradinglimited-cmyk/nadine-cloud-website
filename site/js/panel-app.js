@@ -442,7 +442,7 @@
 
   // ---------- start ----------
   function message(title, text, btn) {
-    root.innerHTML = `<div class="nx" data-theme="${theme}" style="display:grid;place-items:center;padding:20px"><div class="nx-card" style="max-width:460px;padding:34px;text-align:center">
+    root.innerHTML = `<div class="nx" data-theme="${theme}" style="display:grid;grid-template-rows:1fr;place-items:center;padding:20px;overflow-y:auto"><div class="nx-card" style="max-width:460px;padding:34px;text-align:center">
       <img src="/favicon.svg" alt="" width="44" height="44"><h2 style="margin:14px 0 6px;font-size:22px">${esc(title)}</h2><p class="nx-note" style="font-size:15px">${text}</p>
       <div style="margin-top:20px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap">${btn}</div></div></div>`;
   }
