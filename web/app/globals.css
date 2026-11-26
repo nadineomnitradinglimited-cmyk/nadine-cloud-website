@@ -918,3 +918,18 @@ footer a:hover{color:var(--copper-bright)}
 @media(max-width:720px){.v2-choose-row{grid-template-columns:1fr}.pricing-v2 .plan .for{min-height:0}}
 .pricing-v2 .v2-save,.pricing-v2 .v2-pop{height:24px;line-height:1;font-family:inherit;letter-spacing:0}
 .pricing-v2 .price .amt{font-family:'Plus Jakarta Sans',system-ui,sans-serif}
+/* compact plan cards */
+.pricing-v2 .plan{padding:22px 22px 18px}
+.pricing-v2 .plan .for{min-height:40px;margin-bottom:10px;font-size:14px}
+.pricing-v2 .cta{margin:14px 0 16px}
+.pricing-v2 .v2-specs{display:grid;grid-template-columns:1fr 1fr;gap:10px 12px;background:var(--sky);border-radius:12px;padding:12px 14px}
+.pricing-v2 .v2-specs div{display:grid;line-height:1.25}
+.pricing-v2 .v2-specs b{font-size:17px;font-weight:800;color:var(--cloud)}
+.pricing-v2 .v2-specs span{font-size:12.5px;color:var(--text-mute)}
+.pricing-v2 .v2-more{margin-top:12px}
+.pricing-v2 .v2-more summary{cursor:pointer;font-size:14px;font-weight:700;color:var(--copper);list-style:none;text-align:center;padding:4px 0}
+.pricing-v2 .v2-more summary::-webkit-details-marker{display:none}
+.pricing-v2 .v2-more summary::after{content:" ▾"}
+.pricing-v2 .v2-more[open] summary::after{content:" ▴"}
+.pricing-v2 .v2-more[open]{padding-top:6px}
+.pricing-v2 .plans{align-items:start}

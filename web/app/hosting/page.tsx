@@ -96,17 +96,20 @@ export default function Hosting() {
                 {p.intro ? <div className="intro-note" hidden>then <span className="amt-live" data-zmw={p.zmw}>ZMW {p.zmw}</span>/month</div> : null}
                 <div className="price-equiv" hidden></div>
                 <a className="cta" href={`/checkout?type=hosting&pkg=${p.pkg}&plan=Nadine+Cloud+%E2%80%94+${p.name}&amount=${p.zmw}&period=mo`}>Get {p.name}</a>
-                <ul className="v2-key">
-                  {p.key.map((k) => <li key={k}><strong>{k}</strong></li>)}
-                </ul>
-                <div className="v2-label">Build with</div>
-                <ul className="v2-list">
-                  {p.build.map((k) => <li key={k}>{k}</li>)}
-                </ul>
-                <div className="v2-label">Also included</div>
-                <ul className="v2-list">
-                  {p.also.map((k) => <li key={k}>{k}</li>)}
-                </ul>
+                <div className="v2-specs">
+                  {p.key.map((k) => { const w = k.replace("NVMe ", "").split(" "); const n = w[1] === "GB" ? 2 : 1; return <div key={k}><b>{w.slice(0, n).join(" ")}</b><span>{w.slice(n).join(" ")}</span></div>; })}
+                </div>
+                <details className="v2-more">
+                  <summary>See all features</summary>
+                  <div className="v2-label">Build with</div>
+                  <ul className="v2-list">
+                    {p.build.map((k) => <li key={k}>{k}</li>)}
+                  </ul>
+                  <div className="v2-label">Also included</div>
+                  <ul className="v2-list">
+                    {p.also.map((k) => <li key={k}>{k}</li>)}
+                  </ul>
+                </details>
                 <div className="other-billing"></div>
               </div>
             ))}
