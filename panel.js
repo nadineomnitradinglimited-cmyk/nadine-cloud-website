@@ -31,6 +31,7 @@ async function whm(pathAndQuery) {
 async function uapi(user, mod, fn, params = {}) {
   const q = new URLSearchParams({ 'api.version': '1', 'cpanel.user': user, 'cpanel.module': mod, 'cpanel.function': fn, ...params });
   const j = await whm('/json-api/uapi_cpanel?' + q);
+  if (!(j.data && j.data.uapi)) forgetUser(user);   // the account may have been removed/recreated: look it up fresh next time
   return (j.data && j.data.uapi) || { status: 0, errors: ['No answer from the server'] };
 }
 async function api2(user, mod, fn, params = {}) {
@@ -42,6 +43,8 @@ const firstError = (u) => (u && u.errors && u.errors.length ? String(u.errors[0]
 
 // domain -> cPanel user (only accounts owned by our reseller are returned by WHM)
 const acctCache = new Map();
+function forgetUser(user) { for (const [d, v] of acctCache) if (v.acct && v.acct.user === user) acctCache.delete(d); sessCacheForget(user); }
+function sessCacheForget(user) { try { sessCache.delete(user); } catch { /* not ready yet */ } }
 async function accountForDomain(domain) {
   const d = String(domain || '').toLowerCase().replace(/^www\./, '');
   const hit = acctCache.get(d);
