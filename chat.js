@@ -59,7 +59,7 @@ ACCOUNTS
 
 SERVICES OVERVIEW
 - Web design — modern, mobile-first websites for shops, clinics, ministries, schools, NGOs. Also web systems/portals (booking systems, patient portals, admin dashboards, KYC flows), and ongoing care & maintenance. Process: Discovery -> Design -> Build -> Launch & support. Pricing is a fixed quote per project, not a flat rate — direct people to /contact or info@nadinecloud.com for a quote.
-- Cloud hosting — cPanel hosting, priced in Zambian Kwacha (ZMW). Customer picks a billing period at checkout: Monthly, 6 Months (save 10%), 1 Year (save 15%), 2 Years (save 20%) or 3 Years (save 25%) — the longer the period, the bigger the discount.
+- Cloud hosting — managed with the easy Nadine Cloud control panel (no cPanel needed), priced in Zambian Kwacha (ZMW). Customer picks a billing period at checkout: Monthly, 6 Months (save 10%), 1 Year (save 15%), 2 Years (save 20%) or 3 Years (save 25%) — the longer the period, the bigger the discount.
 - Domain registration & transfers.
 - Business email hosting.
 - Standalone database hosting (PostgreSQL/MySQL) — for an app or website hosted anywhere, not tied to buying web hosting from us.
@@ -70,18 +70,18 @@ SERVICES OVERVIEW
 - Reseller hosting — not currently offered; still confirming with our infrastructure provider whether this is possible. If someone asks, say it's not available yet and point them to email/contact for updates.
 
 HOSTING PLANS (base price shown is per month, billed monthly by default)
-- Nadine Cloud — Avara — K99/mo: 1 website, 5 GB storage, 25 GB bandwidth, 5 email accounts, 2 databases, free SSL, cPanel, standard support.
-- Nadine Cloud — Elora — K179/mo (most popular): 1 website, 10 GB storage, 75 GB bandwidth, 15 email accounts, 5 databases, free SSL, cPanel, standard support.
+- Nadine Cloud — Avara — K99/mo: 1 website, 5 GB storage, 25 GB bandwidth, 5 email accounts, 2 databases, free SSL, easy control panel, standard support.
+- Nadine Cloud — Elora — K179/mo (most popular): 1 website, 10 GB storage, 75 GB bandwidth, 15 email accounts, 5 databases, free SSL, easy control panel, standard support.
 - Nadine Cloud — Veyra — K299/mo: 3 websites, 20 GB storage, 150 GB bandwidth, 30 email accounts, 10 databases, Website Builder included, free SSL, priority support.
 - Nadine Cloud — Zyra — K499/mo: 5 websites, 40 GB storage, 300 GB bandwidth, 50 email accounts, 20 databases, Website Builder included, free SSL, premium support.
 - Website Builder is only included on Veyra and Zyra, not Avara or Elora.
-- Included free on every hosting plan: free SSL certificate, automatic backups, free website migration, cPanel, worldwide support, and Python app support (Django/Flask and other WSGI apps via cPanel's Python Selector — fine for most small business apps, though background workers like Celery or apps needing a dedicated server should message us first to check fit).
+- Included free on every hosting plan: free SSL certificate, automatic backups, free website migration, worldwide support, and the Nadine Cloud control panel: deploy from GitHub automatically, file manager, one-click databases and email addresses, domain & DNS, free SSL. Hosting runs websites made of HTML, CSS, JavaScript and PHP (including WordPress and site-builder exports). Node.js and Python apps are not included on these plans — ask us and we'll advise the right setup.
 
 MANAGED WORDPRESS HOSTING (billed monthly, at /wordpress)
 - WP Starter — K149/mo: 1 WordPress site, 10 GB storage, 50 GB bandwidth, daily backups, free SSL, standard support.
 - WP Growth — K279/mo (most popular): 1 WP site, 20 GB storage, 100 GB bandwidth, staging site, weekly malware scan, priority support.
 - WP Pro — K449/mo: 3 WP sites, 40 GB storage, 200 GB bandwidth, staging, automatic core & plugin updates, premium support.
-- WordPress is installed for the customer — cPanel login comes immediately, WordPress admin login follows within a few hours by email.
+- WordPress is installed for the customer — the control panel link comes immediately, WordPress admin login follows within a few hours by email.
 
 WEBSITE BUILDER (billed monthly, at /builder)
 - Builder — K59/mo: 1 website, 2 GB storage, 10 GB bandwidth, drag-and-drop builder, 1 email account, free SSL, standard support. Customer needs their own domain (or can buy one from us).
@@ -98,13 +98,10 @@ WEBSITE CARE PLANS (billed monthly, at /care — works with any website, doesn't
 - Premium Care — K599/mo: daily monitoring, weekly backups & security scans, 2 hour content edits/month, same-day support, monthly performance report.
 
 DATABASE HOSTING (standalone, billed monthly, at /database)
-- Nadine Cloud — Orin — K79/mo: 1 database, 2 GB storage.
-- Nadine Cloud — Kaia — K149/mo (most popular): 3 databases, 5 GB storage.
-- Nadine Cloud — Velora — K249/mo: 5 databases, 15 GB storage, priority support.
-- Nadine Cloud — Zenix — K399/mo: 10 databases, 30 GB storage, premium support.
-- Nadine Cloud — Astra — K649/mo: 20 databases, 60 GB storage, premium support.
-- Nadine Cloud — Vantis — K999/mo: 40 databases, 120 GB storage, dedicated support.
-- Every plan includes PostgreSQL and MySQL support, daily backups and secure connections. No website or hosting plan needed — customer gets a cPanel login and creates their own database(s) via the Database Wizard, then connects their own app to it from wherever it's hosted.
+- Starter Package — K500/mo: 2 databases, 1 GB storage.
+- Professional Package — K1,000/mo: 5 databases, 5 GB storage.
+- Enterprise Package — K2,000/mo: 10 databases, 20 GB storage.
+- Every plan includes PostgreSQL and MySQL support, daily backups and secure connections. No website or hosting plan needed — the customer manages everything in the Nadine Cloud control panel (www.nadinecloud.com/panel): each database is created in one click with its own secure login, then they connect their own app to it from wherever it's hosted. Customers never need cPanel.
 
 BUSINESS EMAIL HOSTING (standalone, billed annually)
 - Basic Email — K300/yr: 5 accounts, 5 GB mailbox storage, webmail, IMAP/POP3/SMTP, spam protection.
@@ -119,7 +116,7 @@ DOMAIN REGISTRATION (annual, ZMW, "from" prices — exact price depends on the s
 Nadine Cloud can also transfer in domains registered elsewhere.
 
 PAYMENT
-Mobile money (MTN, Airtel, Zamtel) or card (Visa / Mastercard) at checkout, or bank transfer on request. Hosting billing period (Monthly/6 Months/1 Year/2 Years/3 Years) is chosen with a selector above the plans on the hosting page — longer periods get a bigger discount (10/15/20/25%), charged as one upfront total, not per month. Domains and standalone email are billed annually. For hosting plans, the customer's cPanel account is created automatically as soon as payment clears — no manual wait, though domain/email orders are still confirmed by the team.
+Mobile money (MTN, Airtel, Zamtel) or card (Visa / Mastercard) at checkout, or bank transfer on request. Hosting billing period (Monthly/6 Months/1 Year/2 Years/3 Years) is chosen with a selector above the plans on the hosting page — longer periods get a bigger discount (10/15/20/25%), charged as one upfront total, not per month. Domains and standalone email are billed annually. For hosting plans, the customer's hosting and control panel are set up automatically as soon as payment clears — no manual wait, though domain/email orders are still confirmed by the team.
 
 PORTFOLIO / PAST WORK (examples, not an exhaustive list)
 Royal South Luangwa Safari Lodge, Nadine Express Cargo (freight tracking), Nadify B2B marketplace, Optic Zone Opticians (patient management), MedMorph Pharmacy (pharmacy management). Nadine Cloud has also delivered corporate websites, e-commerce sites, progressive web apps, school management systems, POS systems, inventory/accounting systems, medical/patient databases, church websites, and custom web applications.
