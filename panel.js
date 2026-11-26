@@ -332,6 +332,9 @@ async function pointDomainToHosting(domain) {
   } catch (e) { return { ok: false, reason: e.message }; }
 }
 
+// only supported, secure PHP versions are offered (7.4 and newer); very old ones stay hidden
+const safePhp = (list) => list.filter((v) => { const m = String(v).match(/php(d)(d+)$/); return m && (Number(m[1]) > 7 || (Number(m[1]) === 7 && Number(m[2]) >= 4)); });
+
 async function handleTools(req, res, urlPath, acct, p, q) {
   const G = req.method === 'GET', P = req.method === 'POST';
   // ----- Domain & DNS -----
@@ -391,11 +394,11 @@ async function handleTools(req, res, urlPath, acct, p, q) {
   if (G && urlPath === '/api/panel/php') {
     const [inst, cur] = await Promise.all([uapi(acct.user, 'LangPHP', 'php_get_installed_versions'), uapi(acct.user, 'LangPHP', 'php_get_vhost_versions')]);
     const v = (cur.data || []).find((x) => x.vhost === acct.domain) || (cur.data || [])[0] || {};
-    return send(res, 200, { versions: (inst.data && inst.data.versions) || [], current: v.version || null, systemDefault: v.system_default });
+    return send(res, 200, { versions: safePhp((inst.data && inst.data.versions) || []), current: v.version || null, systemDefault: v.system_default });
   }
   if (P && urlPath === '/api/panel/php') {
     const inst = await uapi(acct.user, 'LangPHP', 'php_get_installed_versions');
-    const list = (inst.data && inst.data.versions) || [];
+    const list = safePhp((inst.data && inst.data.versions) || []);
     if (!list.includes(String(p.version))) return send(res, 400, { error: 'Pick one of the listed versions.' });
     const r = await uapi(acct.user, 'LangPHP', 'php_set_vhost_versions', { version: String(p.version), vhost: acct.domain });
     return r.status ? send(res, 200, { ok: true }) : send(res, 400, { error: firstError(r) });
