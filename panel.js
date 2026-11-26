@@ -102,8 +102,28 @@ async function canPreview(domain) {
   } catch (e) { return false; }
 }
 
+// ---------- is this hosting paid? The panel locks ON the due date (no grace for the panel — so nothing can be taken
+// out while unpaid). The website itself stays online for the 3-day grace period, then the billing job pauses it.
+const GRACE_DAYS = 3;
+async function billingState(acct) {
+  let exp = null, paused = false;
+  try {
+    const r = await getPool().query(
+      `SELECT max(expires_at) AS exp, bool_or(suspended_at IS NOT NULL) AS paused FROM orders
+        WHERE lower(regexp_replace(domain, '^www\\.', '')) = $1 AND status = 'paid' AND type = ANY($2)`,
+      [acct.domain.toLowerCase(), [...HOSTING_TYPES]]);
+    exp = r.rows[0] && r.rows[0].exp; paused = !!(r.rows[0] && r.rows[0].paused);
+  } catch (e) { /* billing unknown: fall back to the server's own suspension flag */ }
+  const due = exp ? new Date(exp).getTime() : null;
+  const sitePaused = !!acct.suspended || paused;
+  const overdue = !!(due && Date.now() >= due);
+  return { locked: sitePaused || overdue, sitePaused, dueAt: due ? new Date(due).toISOString() : null, graceEndsAt: due ? new Date(due + GRACE_DAYS * 86400000).toISOString() : null };
+}
+
 // ---------- account overview ----------
 async function overview(acct) {
+  const bill = await billingState(acct);
+  if (bill.locked) return { domain: acct.domain, plan: acct.plan, suspended: bill.sitePaused, locked: true, sitePaused: bill.sitePaused, dueAt: bill.dueAt, graceEndsAt: bill.graceEndsAt };
   const [stats, ssl, pops, preview] = await Promise.all([
     uapi(acct.user, 'StatsBar', 'get_stats', { display: 'diskusage|bandwidthusage|emailaccounts|mysqldatabases|subdomains' }),
     uapi(acct.user, 'SSL', 'installed_hosts'),
@@ -542,6 +562,10 @@ async function handlePanel(req, res, urlPath) {
     const acct = await pick();
     if (!acct) return send(res, 404, { error: 'Hosting account not found.' });
 
+    if (who.who !== 'owner') {
+      const bill = await billingState(acct);
+      if (bill.locked) return send(res, 403, { locked: true, dueAt: bill.dueAt, error: 'Your hosting is paused because the renewal has not been paid. Pay to unlock your website and control panel.' });
+    }
     if (await handleTools(req, res, urlPath, acct, p, q) !== false) return;
     if (req.method === 'POST' && urlPath === '/api/panel/open-cpanel') {
       if (who.who !== 'owner') return send(res, 403, { error: 'Everything is available right here in your control panel.' });   // clients never need cPanel
@@ -605,6 +629,7 @@ async function handlePanel(req, res, urlPath) {
       return send(res, 200, { ok: true });
     }
     if (req.method === 'POST' && urlPath === '/api/panel/phpmyadmin') {
+      if (who.who !== 'owner') return send(res, 403, { error: 'Our team can make changes inside your database for you — email support@nadinecloud.com.' });
       const s = await whm('/json-api/create_user_session?api.version=1&user=' + encodeURIComponent(acct.user) + '&service=cpaneld&app=Database_phpMyAdmin');
       if (!(s.data && s.data.url)) return send(res, 502, { error: 'Could not open phpMyAdmin right now.' });
       return send(res, 200, { url: s.data.url });
