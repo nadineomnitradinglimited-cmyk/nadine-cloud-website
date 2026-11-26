@@ -64,6 +64,7 @@
       });
     });
 
+    const v2 = section.classList.contains('pricing-v2');   // new layout: big per-month price + "billed …" note
     function setPeriod(period){
       const cfg = BILLING_PERIODS[period];
       if (!cfg) return;
@@ -87,14 +88,19 @@
         const total = isIntroMonthly ? plan._introMo : computed.total;
         const perMonth = computed.perMonth;
 
-        amtEl.setAttribute('data-zmw', total);
-        amtEl.textContent = 'ZMW ' + total.toLocaleString();
-        if (perEl) perEl.textContent = isIntroMonthly ? '/first month' : cfg.per;
+        const shown = v2 && !isIntroMonthly ? perMonth : total;
+        amtEl.setAttribute('data-zmw', shown);
+        amtEl.textContent = 'ZMW ' + shown.toLocaleString();
+        if (perEl) perEl.textContent = isIntroMonthly ? '/first month' : (v2 ? '/month' : cfg.per);
         if (introEl) introEl.hidden = !isIntroMonthly;
 
         if (equivEl) {
           if (period === 'mo') {
-            equivEl.hidden = true;
+            equivEl.hidden = !v2 || isIntroMonthly;
+            if (v2) equivEl.textContent = 'Billed monthly';
+          } else if (v2) {
+            equivEl.hidden = false;
+            equivEl.innerHTML = 'Billed <span data-zmw="' + total + '">ZMW ' + total.toLocaleString() + '</span> ' + ({ '6mo': 'every 6 months', yr: 'every year', '2yr': 'every 2 years', '3yr': 'every 3 years' }[period] || '');
           } else {
             equivEl.hidden = false;
             equivEl.innerHTML = 'Equivalent to <span data-zmw="' + perMonth + '">ZMW ' + perMonth.toLocaleString() + '</span>/month';
@@ -124,6 +130,8 @@
 
       if (window.ncRefreshPrices) window.ncRefreshPrices();
     }
+
+    if (section.dataset.defaultPeriod) setPeriod(section.dataset.defaultPeriod);
 
     toggle.addEventListener('click', function(e){
       const btn = e.target.closest('.billing-opt');
