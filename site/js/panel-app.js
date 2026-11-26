@@ -227,7 +227,7 @@
 
   function paintSwitcher() {
     const a = S.cur; root.querySelector('[data-swname]').textContent = a.domain;
-    root.querySelector('[data-swmenu]').innerHTML = S.accounts.map((x) => `<button data-pick="${esc(x.domain)}" class="${x === a ? 'on' : ''}"><span class="nx-pulse" style="color:${x.suspended ? 'var(--warn)' : 'var(--ok)'}"></span>${esc(x.domain)}<span class="nx-chip" style="margin-left:auto">${esc(planName(x.plan))}</span></button>`).join('');
+    root.querySelector('[data-swmenu]').innerHTML = S.accounts.map((x) => `<button data-pick="${esc(x.domain)}" class="${x === a ? 'on' : ''}"><span class="nx-pulse" style="color:${x.locked || x.suspended ? 'var(--warn)' : 'var(--ok)'}"></span>${esc(x.domain)}<span class="nx-chip" style="margin-left:auto">${esc(planName(x.plan))}</span></button>`).join('');
     root.querySelectorAll('[data-pick]').forEach((b) => b.onclick = () => { S.cur = S.accounts.find((x) => x.domain === b.dataset.pick); S.deploy = {}; history.replaceState(null, '', '/panel?site=' + encodeURIComponent(S.cur.domain) + (S.view !== 'overview' ? '#' + S.view : '')); paintSwitcher(); go(S.view); });
   }
 
@@ -252,6 +252,7 @@
     root.querySelectorAll('[data-v]').forEach((b) => b.classList.toggle('on', b.dataset.v === view));
     if (location.hash.slice(1) !== view) history.replaceState(null, '', location.pathname + location.search + (view === 'overview' ? '' : '#' + view));
     const box = root.querySelector('[data-view]');
+    if (S.cur && S.cur.locked) return lockedView(box);
     ({ overview, deploy: deployView, db: dbView, email: emailView, files: filesView, domain: domainView, backups: backupsView, settings: settingsView }[view] || overview)(box);
   }
 
@@ -403,7 +404,7 @@
   }
   async function dbView(box, fresh) {
     const a = S.cur;
-    box.innerHTML = `${head('Databases', `<button class="nx-btn" data-pma>${ic('ext', 16)} Open phpMyAdmin</button>`)}<div class="nx-card"><div class="nx-card-b"><div class="nx-skel" style="height:50px"></div></div></div>`;
+    box.innerHTML = `${head('Databases', ' ')}<div class="nx-card"><div class="nx-card-b"><div class="nx-skel" style="height:50px"></div></div></div>`;
     const r = await api('/api/panel/databases?domain=' + encodeURIComponent(a.domain));
     if (S.view !== 'db' || S.cur !== a) return;
     const list = (r.j && r.j.databases) || []; const max = r.j && r.j.max;
@@ -419,7 +420,7 @@
         <p class="nx-note">We create the database, a user with its own strong password, and connect it to your website — all in one step.</p>
         <div><button class="nx-btn pri" type="submit">${ic('plus', 16)} Create database</button></div><div class="nx-msg" data-out></div></form></div></div>`}`;
     bindCreds(box);
-    box.querySelector('[data-pma]').onclick = async () => { const w = window.open('about:blank', '_blank'); const x = await post('/api/panel/phpmyadmin', { domain: a.domain }); if (x.ok && x.j.url) { if (w) w.location = x.j.url; } else { if (w) w.close(); toast(x.j.error || 'Could not open phpMyAdmin'); } };
+    const pma = box.querySelector('[data-pma]'); if (pma) pma.onclick = async () => { const w = window.open('about:blank', '_blank'); const x = await post('/api/panel/phpmyadmin', { domain: a.domain }); if (x.ok && x.j.url) { if (w) w.location = x.j.url; } else { if (w) w.close(); toast(x.j.error || 'Could not open phpMyAdmin'); } };
     const f = box.querySelector('[data-f]');
     if (f) f.onsubmit = async (e) => { e.preventDefault(); const out = f.querySelector('[data-out]'); const b = f.querySelector('button'); b.disabled = true; b.innerHTML = '<span class="nx-spin"></span> Creating…';
       const x = await post('/api/panel/databases', { domain: a.domain, name: f.name.value });
@@ -457,6 +458,21 @@
     emailExtras(box, a);
     box.querySelectorAll('[data-del]').forEach((b) => b.onclick = async () => { if (!confirm('Delete ' + b.dataset.del + '? All its emails will be removed.')) return;
       await post('/api/panel/email/delete', { domain: a.domain, email: b.dataset.del }); toast('Deleted'); emailView(box); });
+  }
+
+  // ---------- unpaid: everything locked until the renewal is paid ----------
+  function lockedView(box) {
+    const a = S.cur;
+    box.innerHTML = `<div class="nx-head nx-fade"><div style="min-width:0"><div class="nx-muted" style="font-size:13.5px;font-weight:600;margin-bottom:2px">Control panel</div>
+        <div style="display:flex;flex-wrap:wrap;align-items:center;gap:12px"><h1>${esc(a.domain)}</h1><span class="nx-status off"><span class="nx-pulse"></span>${a.sitePaused ? 'Paused' : 'Renewal due'}</span></div></div></div>
+      <div class="nx-card nx-fade" style="max-width:720px"><div class="nx-card-b" style="padding:34px 30px;text-align:center">
+        <span class="nx-big warn" style="margin:0 auto 14px">${ic('lock', 28)}</span>
+        <h2 style="font-size:23px;margin-bottom:8px">${a.sitePaused ? 'Your hosting is paused' : 'Your hosting renewal is due'}</h2>
+        <p class="nx-note" style="font-size:15.5px;max-width:520px;margin:0 auto">The renewal for <b style="color:var(--tx)">${esc(a.domain)}</b> has not been paid${a.dueAt ? ' (it was due on <b style="color:var(--tx)">' + esc(fmtDate(a.dueAt)) + '</b>)' : ''}. ${a.sitePaused ? 'Your website and control panel are locked until payment is received.' : 'Your control panel is locked until the renewal is paid. Your website stays online for now' + (a.graceEndsAt ? ' — it will be paused on <b style="color:var(--tx)">' + esc(fmtDate(a.graceEndsAt)) + '</b> if still unpaid' : '') + '.'} <b style="color:var(--tx)">Nothing has been deleted.</b></p>
+        <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:22px">
+          <a class="nx-btn pri" href="/account" style="height:48px;padding:0 26px;font-size:16px;background:#16A34A;border-color:#16A34A">${ic('bolt', 18)} Pay now to unlock</a>
+          <a class="nx-btn" href="mailto:billing@nadinecloud.com?subject=${encodeURIComponent('Hosting renewal — ' + a.domain)}">${ic('mail', 16)} Talk to billing</a></div>
+        <p class="nx-note" style="margin-top:16px">Pay by Airtel Money, MTN MoMo, Zamtel Kwacha or card. Everything unlocks automatically within minutes.</p></div></div>`;
   }
 
   // ---------- small helpers for the new tools ----------
