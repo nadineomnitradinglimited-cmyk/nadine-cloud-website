@@ -488,7 +488,6 @@
           <span class="nx-facts2">
             ${!f.dir && TEXT_EXT.test(f.name) && f.size < 1500000 ? `<button class="nx-btn sm" data-edit="${esc(join(f.name))}" title="Edit">${ic('edit', 14)} Edit</button>` : ''}
             ${!f.dir && /\.zip$/i.test(f.name) ? `<button class="nx-btn sm" data-unzip="${esc(join(f.name))}">Unzip</button>` : ''}
-            ${!f.dir ? `<a class="nx-btn sm" href="/api/panel/files/download?domain=${encodeURIComponent(a.domain)}&path=${encodeURIComponent(join(f.name))}" title="Download">${ic('download', 14)}</a>` : ''}
             <button class="nx-btn sm" data-ren="${esc(join(f.name))}" data-n="${esc(f.name)}">Rename</button>
             <button class="nx-btn sm danger" data-rm="${esc(join(f.name))}" title="Delete">${ic('trash', 14)}</button></span></div>`).join('')
         : `<div class="nx-empty"><b>This folder is empty</b>Drag files here, or press Upload. Tip: upload a .zip of your whole site and press Unzip.</div>`}
@@ -586,17 +585,20 @@
   // ---------- Backups ----------
   async function backupsView(box) {
     const a = S.cur;
-    loading(box, 'Backups', `<button class="nx-btn pri" data-bk>${ic('box', 16)} Create backup now</button>`);
-    const r = await api('/api/panel/backups?domain=' + encodeURIComponent(a.domain));
-    if (!still('backups', a)) return;
-    const list = (r.j && r.j.backups) || [];
-    box.querySelector('.nx-card').outerHTML = `<div class="nx-banner nx-fade">${ic('check', 20)}<div><b>Your website is also backed up every night by Nadine Cloud.</b> Use this page for an extra copy you can download — for example before a big change.</div></div>
-      <div class="nx-card nx-fade"><div class="nx-card-h"><h3>Your backups</h3><span class="nx-muted" style="font-size:13px">${list.length}</span></div>
-      ${!r.ok ? `<div class="nx-card-b nx-msg bad">${esc(r.j.error || 'Could not load.')}</div>` : list.length ? list.map((b) => `<div class="nx-row"><div class="m"><b>${ic('box', 16)} ${esc(fmtDate(b.at))} <span class="nx-muted" style="font-weight:500">${esc(new Date(b.at).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }))}</span></b><small>${esc(b.sizeMB)} MB · website files, databases and email</small></div>
-        <a class="nx-btn sm" href="/api/panel/files/download?domain=${encodeURIComponent(a.domain)}&path=${encodeURIComponent(b.file)}">${ic('download', 14)} Download</a><button class="nx-btn sm danger" data-rmb="${esc(b.file)}">${ic('trash', 14)}</button></div>`).join('')
-        : `<div class="nx-empty"><b>No downloadable backups yet</b>Press <b>Create backup now</b> — it is ready in a few minutes.</div>`}</div>`;
-    box.querySelector('[data-bk]').onclick = async (e) => { const b = e.currentTarget; b.disabled = true; b.innerHTML = '<span class="nx-spin"></span> Starting…'; const x = await post('/api/panel/backups', { domain: a.domain }); toast(x.ok ? 'Backup started — ready in a few minutes' : x.j.error); b.innerHTML = `${ic('box', 16)} Create backup now`; setTimeout(() => { if (still('backups', a)) backupsView(box); }, 60000); };
-    box.querySelectorAll('[data-rmb]').forEach((b) => b.onclick = async () => { if (!confirm('Delete this backup copy?')) return; const x = await post('/api/panel/files/delete', { domain: a.domain, path: b.dataset.rmb }); toast(x.ok ? 'Deleted' : x.j.error); backupsView(box); });
+    box.innerHTML = `${head('Backups')}
+      <div class="nx-card nx-fade" style="margin-bottom:20px"><div class="nx-card-b" style="display:flex;flex-wrap:wrap;gap:16px;align-items:center">
+        <span class="nx-big ok">${ic('check', 26)}</span>
+        <div style="flex:1;min-width:230px"><h3 style="font-size:19px">Your website is backed up every night</h3>
+          <div class="nx-muted">Nadine Cloud automatically keeps a copy of your website files, databases and email every night, stored safely off the server.</div></div></div></div>
+      <div class="nx-two">
+        <div class="nx-card nx-fade"><div class="nx-card-h"><h3>Need something restored?</h3></div><div class="nx-card-b">
+          <p class="nx-note" style="margin-bottom:14px">Deleted a page by mistake, or an update went wrong? Our team restores it for you — usually the same working day.</p>
+          <a class="nx-btn pri" href="mailto:support@nadinecloud.com?subject=${encodeURIComponent('Restore request — ' + a.domain)}&body=${encodeURIComponent('Hello Nadine Cloud,\n\nPlease restore the following for ' + a.domain + ':\n\nWhat: \nFrom which date: \n\nThank you.')}">${ic('mail', 16)} Ask us to restore</a></div></div>
+        <div class="nx-card nx-fade"><div class="nx-card-h"><h3>Good to know</h3></div><div class="nx-card-b">
+          <div class="nx-kv"><span>How often</span><b>Every night, automatically</b></div>
+          <div class="nx-kv"><span>What is included</span><b>Files, databases, email</b></div>
+          <div class="nx-kv"><span>Deleted files</span><b>Kept in the bin (.trash) first</b></div>
+          <div class="nx-kv"><span>Using GitHub?</span><b>Your code is also safe on GitHub</b></div></div></div></div>`;
   }
 
   // ---------- Settings: PHP, redirects, error log ----------
