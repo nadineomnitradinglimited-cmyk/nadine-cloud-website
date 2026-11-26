@@ -309,48 +309,53 @@ function syntheticDbDomain(reference) {
 // to only go in the admin email with a note to forward it manually, from
 // back when Resend couldn't deliver to customers directly. Now that
 // nadinecloud.com is verified, send it to them immediately instead.
-async function emailAccountDetailsToCustomer(order, acct) {
-  const result = await sendEmail({
-    to: order.email,
-    subject: `Your Nadine Cloud hosting is ready — ${acct.domain}`,
-    text: `Hi ${order.name},\n\nYour hosting account is set up and ready to go.\n\ncPanel login: https://${acct.domain}:2083\nUsername: ${acct.username}\nPassword: ${acct.password}\n\nWe'd recommend logging in and changing your password once you're in.\n\nAny trouble, email us at info@nadinecloud.com.\n\n— Nadine Cloud`,
+// Welcome email for every hosting-type plan. Clients never get cPanel logins: everything is done in the
+// Nadine Cloud control panel (www.nadinecloud.com/panel), which they open by logging in with this email address.
+async function sendPanelWelcome(order, acct, { what, extraHtml = '', extraText = '' }) {
+  const { renderEmail } = require('./email');
+  const panelUrl = 'https://www.nadinecloud.com/panel?site=' + encodeURIComponent(acct.domain);
+  const name = order.name || 'there';
+  const html = renderEmail({
+    heading: `Your ${what} is ready`,
+    bodyHtml: `<p style="margin:0 0 14px">Hi ${name},</p>
+      <p style="margin:0 0 14px">Thank you for choosing Nadine Cloud. Your ${what} for <strong>${acct.domain}</strong> is set up and ready.</p>
+      <p style="margin:0 0 6px"><strong>Everything is in your control panel:</strong></p>
+      <ul style="margin:0 0 14px;padding-left:20px">
+        <li>Deploy your website from GitHub, or upload your files</li>
+        <li>Create databases and business email addresses</li>
+        <li>Connect your domain, free SSL, settings and more</li>
+      </ul>
+      ${extraHtml}
+      <p style="margin:0 0 6px">Log in with <strong>${order.email}</strong> — the email you paid with. New here? Sign up with that same email and confirm it; your hosting appears automatically.</p>`,
+    ctaText: 'Open your control panel',
+    ctaUrl: panelUrl,
   });
-  if (!result.ok) {
-    console.error(`Account details email not delivered to customer for ${acct.domain}:`, result.reason);
-  }
+  const text = `Hi ${name},\n\nYour ${what} for ${acct.domain} is set up and ready.\n\nOpen your control panel: ${panelUrl}\nLog in with ${order.email} (the email you paid with). New here? Sign up with that same email and confirm it.\n\nIn the control panel you can deploy from GitHub or upload files, create databases and email addresses, and connect your domain.\n${extraText}\nAny trouble, email us at support@nadinecloud.com.\n\n— Nadine Cloud`;
+  const result = await sendEmail({ to: order.email, subject: `Your Nadine Cloud ${what} is ready — ${acct.domain}`, text, html });
+  if (!result.ok) console.error(`Welcome email not delivered to customer for ${acct.domain}:`, result.reason);
   return result;
+}
+
+async function emailAccountDetailsToCustomer(order, acct) {
+  return sendPanelWelcome(order, acct, { what: 'hosting' });
 }
 
 async function emailDatabaseDetailsToCustomer(order, acct, maxsql) {
-  const result = await sendEmail({
-    to: order.email,
-    subject: `Your Nadine Cloud database hosting is ready — ${order.plan}`,
-    text: `Hi ${order.name},\n\nYour database hosting account is set up and ready to go.\n\ncPanel login: https://${acct.domain}:2083\nUsername: ${acct.username}\nPassword: ${acct.password}\n\nFrom there, go to MySQL Databases (or PostgreSQL Databases) and use the wizard to create your database(s) — your plan covers up to ${maxsql}. Each database gets its own username/password that your app connects with directly.\n\nWe'd recommend logging in and changing your cPanel password once you're in.\n\nAny trouble, email us at info@nadinecloud.com.\n\n— Nadine Cloud`,
-  });
-  if (!result.ok) {
-    console.error(`Database account email not delivered to customer for ${acct.domain}:`, result.reason);
-  }
-  return result;
+  return sendPanelWelcome(order, acct, { what: 'database hosting',
+    extraHtml: `<p style="margin:0 0 14px">Your plan includes up to <strong>${maxsql}</strong> databases — open <strong>Databases</strong> in the control panel and each one is created with its own secure login in one click.</p>`,
+    extraText: `Your plan includes up to ${maxsql} databases — open Databases in the control panel.\n` });
 }
 
 async function emailWordPressDetailsToCustomer(order, acct) {
-  const result = await sendEmail({
-    to: order.email,
-    subject: `Your Nadine Cloud WordPress hosting is ready — ${acct.domain}`,
-    text: `Hi ${order.name},\n\nYour hosting account is set up.\n\ncPanel login: https://${acct.domain}:2083\nUsername: ${acct.username}\nPassword: ${acct.password}\n\nWe're installing WordPress for you now — you'll get a separate email with your WordPress admin login within a few hours.\n\nWe'd recommend logging in to cPanel and changing your password once you're in.\n\nAny trouble, email us at info@nadinecloud.com.\n\n— Nadine Cloud`,
-  });
-  if (!result.ok) console.error(`WordPress account email not delivered to customer for ${acct.domain}:`, result.reason);
-  return result;
+  return sendPanelWelcome(order, acct, { what: 'WordPress hosting',
+    extraHtml: '<p style="margin:0 0 14px">We are installing WordPress for you now — you will get a separate email with your WordPress admin login within a few hours.</p>',
+    extraText: 'We are installing WordPress for you now — you will get your WordPress admin login by email within a few hours.\n' });
 }
 
 async function emailBuilderDetailsToCustomer(order, acct) {
-  const result = await sendEmail({
-    to: order.email,
-    subject: `Your Nadine Cloud Website Builder account is ready — ${acct.domain}`,
-    text: `Hi ${order.name},\n\nYour hosting account is set up.\n\ncPanel login: https://${acct.domain}:2083\nUsername: ${acct.username}\nPassword: ${acct.password}\n\nWe're enabling Website Builder for you now — it'll appear in cPanel within a few hours, and you can start building your site right from there.\n\nWe'd recommend logging in and changing your cPanel password once you're in.\n\nAny trouble, email us at info@nadinecloud.com.\n\n— Nadine Cloud`,
-  });
-  if (!result.ok) console.error(`Website Builder account email not delivered to customer for ${acct.domain}:`, result.reason);
-  return result;
+  return sendPanelWelcome(order, acct, { what: 'Website Builder hosting',
+    extraHtml: '<p style="margin:0 0 14px">We are switching on Website Builder for you now — we will email you as soon as it is ready (usually within a few hours).</p>',
+    extraText: 'We are switching on Website Builder for you now — we will email you when it is ready.\n' });
 }
 
 async function emailSslOrderConfirmation(order) {
@@ -476,7 +481,7 @@ The customer paid to keep ${order.plan} running. Their end date was extended by 
     const acct = await createAccount({ domain: order.domain, pkgSlug: order.pkg, contactemail: order.email });
     if (acct.ok) {
       const emailResult = await emailAccountDetailsToCustomer(order, acct);
-      message += `\n\n--- WHM account created automatically ---\nDomain: ${acct.domain}\nUsername: ${acct.username}\nPassword: ${acct.password}\ncPanel login: https://${acct.domain}:2083\n\nLogin details ${emailResult.ok ? 'were emailed directly to the customer' : `FAILED to send to the customer (${emailResult.reason}) — forward manually`} (${order.email}).`;
+      message += `\n\n--- WHM account created automatically ---\nDomain: ${acct.domain}\nUsername: ${acct.username}\nPassword: ${acct.password}\ncPanel login: https://${acct.domain}:2083\n\nWelcome email (control panel link — no cPanel login) ${emailResult.ok ? 'was sent to the customer' : `FAILED to send to the customer (${emailResult.reason}) — forward manually`} (${order.email}).`;
     } else {
       message += `\n\n--- WHM account creation FAILED ---\nReason: ${acct.reason}${acct.raw ? `\nDetails: ${JSON.stringify(acct.raw.metadata || acct.raw)}` : ''}\nYou'll need to create this account manually in WHM for ${order.domain} on package nadine14_${order.pkg}.`;
     }
@@ -491,7 +496,7 @@ The customer paid to keep ${order.plan} running. Their end date was extended by 
       if (acct.ok) {
         message += await pointNewDomain(order.domain);
         const emailResult = await emailAccountDetailsToCustomer(order, acct);
-        message += `\n\n--- WHM account created automatically ---\nDomain: ${acct.domain}\nUsername: ${acct.username}\nPassword: ${acct.password}\ncPanel login: https://${acct.domain}:2083\n\nLogin details ${emailResult.ok ? 'were emailed directly to the customer' : `FAILED to send to the customer (${emailResult.reason}) — forward manually`} (${order.email}).`;
+        message += `\n\n--- WHM account created automatically ---\nDomain: ${acct.domain}\nUsername: ${acct.username}\nPassword: ${acct.password}\ncPanel login: https://${acct.domain}:2083\n\nWelcome email (control panel link — no cPanel login) ${emailResult.ok ? 'was sent to the customer' : `FAILED to send to the customer (${emailResult.reason}) — forward manually`} (${order.email}).`;
       } else {
         message += `\n\n--- WHM account creation FAILED (domain is registered, hosting isn't) ---\nReason: ${acct.reason}\nCreate this account manually in WHM for ${order.domain} on package nadine14_${order.pkg}.`;
       }
@@ -502,9 +507,10 @@ The customer paid to keep ${order.plan} running. Their end date was extended by 
     const dbDomain = syntheticDbDomain(reference);
     const acct = await createAccount({ domain: dbDomain, pkgSlug: order.pkg, contactemail: order.email });
     if (acct.ok) {
+      try { await getPool().query("UPDATE orders SET domain = $1 WHERE reference = $2 AND (domain IS NULL OR domain = '')", [dbDomain, reference]); } catch (e) { console.error('db order domain', e.message); }
       const maxsql = (DATABASE_PACKAGES[order.pkg] || {}).MAXSQL || '?';
       const emailResult = await emailDatabaseDetailsToCustomer(order, acct, maxsql);
-      message += `\n\n--- WHM database account created automatically ---\nAccount domain (internal, not a real site): ${acct.domain}\nUsername: ${acct.username}\nPassword: ${acct.password}\ncPanel login: https://${acct.domain}:2083\nDatabase limit: ${maxsql}\n\nLogin details ${emailResult.ok ? 'were emailed directly to the customer' : `FAILED to send to the customer (${emailResult.reason}) — forward manually`} (${order.email}).`;
+      message += `\n\n--- WHM database account created automatically ---\nAccount domain (internal, not a real site): ${acct.domain}\nUsername: ${acct.username}\nPassword: ${acct.password}\ncPanel login: https://${acct.domain}:2083\nDatabase limit: ${maxsql}\n\nWelcome email (control panel link — no cPanel login) ${emailResult.ok ? 'was sent to the customer' : `FAILED to send to the customer (${emailResult.reason}) — forward manually`} (${order.email}).`;
     } else {
       message += `\n\n--- WHM database account creation FAILED ---\nReason: ${acct.reason}${acct.raw ? `\nDetails: ${JSON.stringify(acct.raw.metadata || acct.raw)}` : ''}\nYou'll need to create this account manually in WHM on package nadine14_${order.pkg} and send the customer (${order.email}) their login.`;
     }
@@ -512,7 +518,7 @@ The customer paid to keep ${order.plan} running. Their end date was extended by 
     const acct = await createAccount({ domain: order.domain, pkgSlug: order.pkg, contactemail: order.email });
     if (acct.ok) {
       const emailResult = await emailWordPressDetailsToCustomer(order, acct);
-      message += `\n\n--- WHM account created automatically (WordPress hosting) ---\nDomain: ${acct.domain}\nUsername: ${acct.username}\nPassword: ${acct.password}\ncPanel login: https://${acct.domain}:2083\n\nACTION NEEDED: install WordPress via Softaculous in cPanel for this account, then email the customer (${order.email}) their WordPress admin login.\n\nHosting login details ${emailResult.ok ? 'were emailed directly to the customer' : `FAILED to send to the customer (${emailResult.reason}) — forward manually`}.`;
+      message += `\n\n--- WHM account created automatically (WordPress hosting) ---\nDomain: ${acct.domain}\nUsername: ${acct.username}\nPassword: ${acct.password}\ncPanel login: https://${acct.domain}:2083\n\nACTION NEEDED: install WordPress via Softaculous in cPanel for this account, then email the customer (${order.email}) their WordPress admin login.\n\nWelcome email (control panel link — no cPanel login) ${emailResult.ok ? 'was sent to the customer' : `FAILED to send to the customer (${emailResult.reason}) — forward manually`}.`;
     } else {
       message += `\n\n--- WHM account creation FAILED (WordPress hosting) ---\nReason: ${acct.reason}${acct.raw ? `\nDetails: ${JSON.stringify(acct.raw.metadata || acct.raw)}` : ''}\nCreate this account manually in WHM for ${order.domain} on package nadine14_${order.pkg}, install WordPress, then send the customer (${order.email}) their logins.`;
     }
@@ -520,7 +526,7 @@ The customer paid to keep ${order.plan} running. Their end date was extended by 
     const acct = await createAccount({ domain: order.domain, pkgSlug: order.pkg, contactemail: order.email });
     if (acct.ok) {
       const emailResult = await emailBuilderDetailsToCustomer(order, acct);
-      message += `\n\n--- WHM account created automatically (Website Builder) ---\nDomain: ${acct.domain}\nUsername: ${acct.username}\nPassword: ${acct.password}\ncPanel login: https://${acct.domain}:2083\n\nACTION NEEDED: enable the Website Builder feature for this account in WHM's Feature Manager.\n\nLogin details ${emailResult.ok ? 'were emailed directly to the customer' : `FAILED to send to the customer (${emailResult.reason}) — forward manually`}.`;
+      message += `\n\n--- WHM account created automatically (Website Builder) ---\nDomain: ${acct.domain}\nUsername: ${acct.username}\nPassword: ${acct.password}\ncPanel login: https://${acct.domain}:2083\n\nACTION NEEDED: enable the Website Builder feature for this account in WHM's Feature Manager.\n\nWelcome email (control panel link — no cPanel login) ${emailResult.ok ? 'was sent to the customer' : `FAILED to send to the customer (${emailResult.reason}) — forward manually`}.`;
       message += await deployAiDraftIfAny(order, acct);
     } else {
       message += `\n\n--- WHM account creation FAILED (Website Builder) ---\nReason: ${acct.reason}${acct.raw ? `\nDetails: ${JSON.stringify(acct.raw.metadata || acct.raw)}` : ''}\nCreate this account manually in WHM for ${order.domain} on package nadine14_${order.pkg}.`;
@@ -550,7 +556,7 @@ The customer paid to keep ${order.plan} running. Their end date was extended by 
       if (acct.ok) {
         message += await pointNewDomain(order.domain);
         const emailResult = await emailBuilderDetailsToCustomer(order, acct);
-        message += `\n\n--- WHM account created automatically (Website Builder) ---\nDomain: ${acct.domain}\nUsername: ${acct.username}\nPassword: ${acct.password}\ncPanel login: https://${acct.domain}:2083\n\nACTION NEEDED: enable the Website Builder feature for this account in WHM's Feature Manager.\n\nLogin details ${emailResult.ok ? 'were emailed directly to the customer' : `FAILED to send to the customer (${emailResult.reason}) — forward manually`}.`;
+        message += `\n\n--- WHM account created automatically (Website Builder) ---\nDomain: ${acct.domain}\nUsername: ${acct.username}\nPassword: ${acct.password}\ncPanel login: https://${acct.domain}:2083\n\nACTION NEEDED: enable the Website Builder feature for this account in WHM's Feature Manager.\n\nWelcome email (control panel link — no cPanel login) ${emailResult.ok ? 'was sent to the customer' : `FAILED to send to the customer (${emailResult.reason}) — forward manually`}.`;
         message += await deployAiDraftIfAny(order, acct);
       } else {
         message += `\n\n--- WHM account creation FAILED (Website Builder) ---\nReason: ${acct.reason}${acct.raw ? `\nDetails: ${JSON.stringify(acct.raw.metadata || acct.raw)}` : ''}\nCreate this account manually in WHM for ${order.domain} on package nadine14_${order.pkg}.`;
@@ -1389,4 +1395,4 @@ async function handleBillingBar(req, res) {
 `);
 }
 
-module.exports = { handleBillingBar, handleAdminClients, handleAdminRecordPayment, lookupManagedClient, handleLipilaWebhook, handleCheckoutInitiate, handleCheckoutStatus, handleLencoWebhook, handleReceiptDownload, handleValidatePromo, handleAdminPromoCodes };
+module.exports = { handleBillingBar, handleAdminClients, handleAdminRecordPayment, lookupManagedClient, handleLipilaWebhook, handleCheckoutInitiate, handleCheckoutStatus, handleLencoWebhook, handleReceiptDownload, handleValidatePromo, handleAdminPromoCodes, emailAccountDetailsToCustomer };
