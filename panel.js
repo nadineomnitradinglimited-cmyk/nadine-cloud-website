@@ -423,7 +423,10 @@ async function handleTools(req, res, urlPath, acct, p, q) {
     const r = await uapi(acct.user, 'Stats', 'get_site_errors', { domain: acct.domain, log: 'error', maxlines: '80' });
     return send(res, 200, { lines: (r.data || []).map((x) => ({ date: x.date, entry: x.entry })).reverse(), error: r.status ? null : firstError(r) });
   }
-  // ----- Backups -----
+  // ----- Backups & downloads: Nadine Cloud staff only — clients cannot take copies of their whole account out -----
+  if ((urlPath === '/api/panel/backups' || urlPath === '/api/panel/files/download') && !adminOk(req)) {
+    return send(res, 403, { error: 'Downloads are not available in the control panel. Your website is backed up every night — email support@nadinecloud.com if you need anything restored.' });
+  }
   if (G && urlPath === '/api/panel/backups') {
     const r = await uapi(acct.user, 'Fileman', 'list_files', { dir: `/home/${acct.user}`, types: 'file' });
     const files = (r.data || []).filter((f) => /^backup-.*\.tar\.gz$/.test(f.file)).map((f) => ({ file: f.file, sizeMB: Math.round((Number(f.size) || 0) / 1048576 * 10) / 10, at: f.mtime ? new Date(f.mtime * 1000).toISOString() : null })).sort((a, b) => String(b.at).localeCompare(String(a.at)));
