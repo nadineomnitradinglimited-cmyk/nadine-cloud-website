@@ -449,6 +449,10 @@ async function handleTools(req, res, urlPath, acct, p, q) {
     const r = await uapi(acct.user, 'Stats', 'get_site_errors', { domain: acct.domain, log: 'error', maxlines: '80' });
     return send(res, 200, { lines: (r.data || []).map((x) => ({ date: x.date, entry: x.entry })).reverse(), error: r.status ? null : firstError(r) });
   }
+  if (G && urlPath === '/api/panel/backup-status') {
+    const list = await listBackups(acct.user);
+    return send(res, 200, { last: list[0] ? new Date(list[0].mtime * 1000).toISOString() : null, copies: list.length });
+  }
   // ----- Backups & downloads: Nadine Cloud staff only — clients cannot take copies of their whole account out -----
   if ((urlPath === '/api/panel/backups' || urlPath === '/api/panel/files/download') && !adminOk(req)) {
     return send(res, 403, { error: 'Downloads are not available in the control panel. Your website is backed up every night — email support@nadinecloud.com if you need anything restored.' });
@@ -467,12 +471,12 @@ async function handleTools(req, res, urlPath, acct, p, q) {
     const rel = safeRel(q.get('dir') || 'public_html'); if (rel === null) return send(res, 400, { error: 'Bad folder.' });
     const r = await uapi(acct.user, 'Fileman', 'list_files', { dir: absPath(acct, rel), show_hidden: '1', include_mime: '1' });
     if (!r.status) return send(res, 400, { error: firstError(r) });
-    const items = (r.data || []).map((f) => ({ name: f.file, dir: f.type === 'dir', size: Number(f.size) || 0, at: f.mtime ? new Date(f.mtime * 1000).toISOString() : null, mime: f.mimetype || '' }))
+    const items = (r.data || []).filter((f) => !(rel === '' && BACKUP_RE.test(f.file))).map((f) => ({ name: f.file, dir: f.type === 'dir', size: Number(f.size) || 0, at: f.mtime ? new Date(f.mtime * 1000).toISOString() : null, mime: f.mimetype || '' }))
       .sort((a, b) => (b.dir - a.dir) || a.name.localeCompare(b.name));
     return send(res, 200, { dir: rel, items });
   }
   if (G && urlPath === '/api/panel/files/read') {
-    const rel = safeRel(q.get('path')); if (!rel) return send(res, 400, { error: 'Bad file.' });
+    const rel = safeRel(q.get('path')); if (!rel || BACKUP_RE.test(rel)) return send(res, 400, { error: 'Bad file.' });
     const r = await uapi(acct.user, 'Fileman', 'get_file_content', { dir: absPath(acct, pathPosix.dirname(rel) === '.' ? '' : pathPosix.dirname(rel)), file: pathPosix.basename(rel), from_charset: '_DETECT_', to_charset: 'UTF-8' });
     if (!r.status) return send(res, 400, { error: firstError(r) });
     const content = (r.data && r.data.content) || '';
@@ -492,7 +496,7 @@ async function handleTools(req, res, urlPath, acct, p, q) {
     return r.data && r.data[0] && r.data[0].result === 0 ? send(res, 400, { error: r.data[0].reason || 'Could not create it.' }) : send(res, 200, { ok: true });
   }
   if (P && ['/api/panel/files/delete', '/api/panel/files/rename', '/api/panel/files/extract'].includes(urlPath)) {
-    const rel = safeRel(p.path); if (!rel || ['public_html', 'mail', 'etc', '.ssh', 'ssl', 'logs', 'tmp'].includes(rel)) return send(res, 400, { error: 'This item cannot be changed here.' });
+    const rel = safeRel(p.path); if (!rel || ['public_html', 'mail', 'etc', '.ssh', 'ssl', 'logs', 'tmp'].includes(rel) || BACKUP_RE.test(rel)) return send(res, 400, { error: 'This item cannot be changed here.' });
     let params;
     if (urlPath.endsWith('delete')) params = { op: 'trash', sourcefiles: absPath(acct, rel) };
     if (urlPath.endsWith('rename')) { const nn = String(p.newName || '').trim(); if (!/^[\w .()-]{1,120}$/.test(nn)) return send(res, 400, { error: 'Use letters, numbers, spaces, dots or dashes.' }); params = { op: 'rename', sourcefiles: absPath(acct, rel), destfiles: absPath(acct, (pathPosix.dirname(rel) === '.' ? '' : pathPosix.dirname(rel) + '/') + nn) }; }
@@ -510,6 +514,54 @@ async function handleTools(req, res, urlPath, acct, p, q) {
     const { Readable } = require('stream'); Readable.fromWeb(r.body).pipe(res); return;
   }
   return false;                                               // not one of ours
+}
+
+// =====================================================================================================
+// Nightly backups of every client hosting account (Nadine Cloud's own account has its own off-site backup).
+// cPanel writes backup-<date>_<user>.tar.gz into each account's home folder; we keep the 2 newest copies.
+// Clients never see these files (hidden from Files, cannot be touched); staff restore them on request.
+// =====================================================================================================
+const BACKUP_RE = /^backup-.*\.tar\.gz$/;
+const KEEP_BACKUPS = 2;
+async function listBackups(user) {
+  const r = await uapi(user, 'Fileman', 'list_files', { dir: '/home/' + user, types: 'file' });
+  return (r.data || []).filter((f) => BACKUP_RE.test(f.file)).map((f) => ({ file: f.file, mtime: Number(f.mtime) || 0, size: Number(f.size) || 0 })).sort((a, b) => b.mtime - a.mtime);
+}
+let backupRunning = false;
+async function backupSweep() {
+  if (backupRunning) return { ok: false, reason: 'already running' };
+  backupRunning = true;
+  const report = { started: new Date().toISOString(), done: [], failed: [] };
+  try {
+    const j = await whm('/json-api/listaccts?api.version=1');
+    const accts = ((j.data && j.data.acct) || []).filter((a) => a.user !== 'nadine14' && !Number(a.suspended));
+    for (const a of accts) {
+      try {
+        // make room: leave only the newest (KEEP_BACKUPS - 1) copies before tonight's backup is added
+        const old = await listBackups(a.user);
+        for (const f of old.slice(KEEP_BACKUPS - 1)) {
+          await api2(a.user, 'Fileman', 'fileop', { op: 'unlink', sourcefiles: '/home/' + a.user + '/' + f.file, doubledecode: '0' });
+        }
+        const r = await uapi(a.user, 'Backup', 'fullbackup_to_homedir', {});
+        if (r.status) report.done.push(a.domain); else report.failed.push(a.domain + ': ' + firstError(r));
+      } catch (e) { report.failed.push(a.domain + ': ' + e.message); }
+      await new Promise((x) => setTimeout(x, 20000));      // one account at a time, gently
+    }
+  } catch (e) { report.failed.push('account list: ' + e.message); }
+  backupRunning = false;
+  report.finished = new Date().toISOString();
+  try {
+    await ensureTables();
+    await getPool().query('CREATE TABLE IF NOT EXISTS panel_backup_runs (id SERIAL PRIMARY KEY, started TIMESTAMPTZ, finished TIMESTAMPTZ, done INT, failed INT, details TEXT)');
+    await getPool().query('INSERT INTO panel_backup_runs (started, finished, done, failed, details) VALUES ($1, $2, $3, $4, $5)', [report.started, report.finished, report.done.length, report.failed.length, JSON.stringify(report)]);
+  } catch (e) { console.error('backup log', e.message); }
+  if (report.failed.length) {
+    try {
+      const { sendEmail } = require('./email');
+      await sendEmail({ to: 'info@nadinecloud.com', subject: `Nightly backups: ${report.failed.length} failed`, text: `Backups started for ${report.done.length} hosting accounts.\n\nFAILED:\n${report.failed.join('\n')}\n\nPlease check these accounts.` });
+    } catch (e) { console.error('backup alert', e.message); }
+  }
+  return { ok: true, done: report.done.length, failed: report.failed.length };
 }
 
 // uploads arrive as the raw file body (no JSON), up to 40 MB
@@ -538,6 +590,11 @@ function body(req, max = 20000) { return new Promise((resolve) => { let b = ''; 
 async function handlePanel(req, res, urlPath) {
   if (!dbConfigured()) return send(res, 503, { error: 'Not available yet.' });
   // a server cron calls this every 2 minutes (the app may sleep between visits, so a timer alone is not enough)
+  if (req.method === 'POST' && urlPath === '/api/panel/backup-sweep') {
+    if (!adminOk(req)) return send(res, 401, { error: 'Unauthorized' });
+    backupSweep().catch((e) => console.error('backup sweep', e));
+    return send(res, 202, { ok: true, started: true });
+  }
   if (req.method === 'POST' && urlPath === '/api/panel/sweep') {
     if (!adminOk(req)) return send(res, 401, { error: 'Unauthorized' });
     await autoDeploySweep();

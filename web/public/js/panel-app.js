@@ -601,11 +601,16 @@
   // ---------- Backups ----------
   async function backupsView(box) {
     const a = S.cur;
-    box.innerHTML = `${head('Backups')}
+    loading(box, 'Backups');
+    const r = await api('/api/panel/backup-status?domain=' + encodeURIComponent(a.domain));
+    if (!still('backups', a)) return;
+    const last = r.ok && r.j.last ? new Date(r.j.last) : null;
+    const when = last ? fmtDate(last) + ' at ' + last.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) : null;
+    box.querySelector('.nx-card').outerHTML = `
       <div class="nx-card nx-fade" style="margin-bottom:20px"><div class="nx-card-b" style="display:flex;flex-wrap:wrap;gap:16px;align-items:center">
-        <span class="nx-big ok">${ic('check', 26)}</span>
-        <div style="flex:1;min-width:230px"><h3 style="font-size:19px">Your website is backed up every night</h3>
-          <div class="nx-muted">Nadine Cloud automatically keeps a copy of your website files, databases and email every night, stored safely off the server.</div></div></div></div>
+        <span class="nx-big ${last ? 'ok' : 'warn'}">${ic(last ? 'check' : 'box', 26)}</span>
+        <div style="flex:1;min-width:230px"><h3 style="font-size:19px">${last ? 'Your website is backed up' : 'Your first backup is coming tonight'}</h3>
+          <div class="nx-muted">${last ? 'Last backup: <b style="color:var(--tx)">' + esc(when) + '</b>. ' : ''}Nadine Cloud backs up your website files, databases and email automatically every night.</div></div></div></div>
       <div class="nx-two">
         <div class="nx-card nx-fade"><div class="nx-card-h"><h3>Need something restored?</h3></div><div class="nx-card-b">
           <p class="nx-note" style="margin-bottom:14px">Deleted a page by mistake, or an update went wrong? Our team restores it for you — usually the same working day.</p>
