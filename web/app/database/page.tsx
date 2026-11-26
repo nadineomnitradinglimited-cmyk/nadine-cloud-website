@@ -52,7 +52,7 @@ export default function Database() {
           <div className="section-head">
             <span className="eyebrow">Nadine Cloud Database Hosting</span>
             <h2>Affordable database rates</h2>
-            <p>Every plan includes PostgreSQL and MySQL support, daily backups and secure connections. Create and manage your databases yourself from cPanel — no website or hosting plan required.</p>
+            <p>Every plan includes PostgreSQL and MySQL support, daily backups and secure connections. Create and manage your databases in one click from your Nadine Cloud control panel — no website or hosting plan required.</p>
           </div>
           <div className="plans">
             <div className="plan">
