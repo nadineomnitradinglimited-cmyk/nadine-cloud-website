@@ -4,7 +4,7 @@ import Footer from "../components/Footer";
 
 const TITLE = "Hosting Plans — Nadine Cloud";
 const DESCRIPTION =
-  "Fast NVMe cPanel hosting with free SSL, daily backups and email support. Flexible monthly to 3-year billing, shown in your local currency — no surprises.";
+  "Fast NVMe hosting with free SSL, automatic backups, deploy from GitHub and an easy control panel. Flexible monthly to 3-year billing, shown in your local currency — no surprises.";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -26,6 +26,35 @@ export const metadata: Metadata = {
   },
 };
 
+
+// One place for the four hosting plans (prices in ZMW per month; checkout and billing use the same numbers).
+const PLANS = [
+  { pkg: "avara", name: "Avara", zmw: 99, intro: 50, popular: false,
+    forWho: "Everything you need for your first website.",
+    key: ["1 website", "5 GB NVMe storage", "25 GB bandwidth", "5 email accounts"],
+    build: ["Deploy from GitHub", "Upload your files", "WordPress ready"],
+    also: ["2 databases", "Free SSL", "Standard support"],
+    bestFor: ["First website", "Portfolios", "Landing pages"] },
+  { pkg: "elora", name: "Elora", zmw: 179, popular: true,
+    forWho: "More room for growing businesses and online shops.",
+    key: ["1 website", "10 GB NVMe storage", "75 GB bandwidth", "15 email accounts"],
+    build: ["Deploy from GitHub", "Upload your files", "WordPress ready"],
+    also: ["5 databases", "Free SSL", "Standard support"],
+    bestFor: ["Small businesses", "Online shops", "Busy blogs"] },
+  { pkg: "veyra", name: "Veyra", zmw: 299, popular: false,
+    forWho: "For businesses running more than one website.",
+    key: ["3 websites", "20 GB NVMe storage", "150 GB bandwidth", "30 email accounts"],
+    build: ["Deploy from GitHub", "Sitejet Website Builder", "WordPress ready"],
+    also: ["10 databases", "Free SSL", "Priority support"],
+    bestFor: ["Several websites", "Growing teams", "Lodges & hotels"] },
+  { pkg: "zyra", name: "Zyra", zmw: 499, popular: false,
+    forWho: "Our most powerful plan for busy sites and agencies.",
+    key: ["5 websites", "40 GB NVMe storage", "300 GB bandwidth", "50 email accounts"],
+    build: ["Deploy from GitHub", "Sitejet Website Builder", "WordPress ready"],
+    also: ["20 databases", "Free SSL", "Premium support"],
+    bestFor: ["Agencies", "High-traffic sites", "Many mailboxes"] },
+];
+
 export default function Hosting() {
   return (
     <>
@@ -40,121 +69,88 @@ export default function Hosting() {
         </div>
       </section>
 
-      <section className="section pricing" id="hosting">
+      <section className="section pricing pricing-v2" id="hosting" data-default-period="yr">
         <div className="wrap">
-          <div className="section-head">
+          <div className="section-head" style={{ textAlign: "center", marginLeft: "auto", marginRight: "auto" }}>
             <span className="eyebrow">Nadine Cloud Hosting</span>
-            <h2>Hosting plans built for your growth</h2>
-            <p>Choose the hosting plan that fits your website or business. Pay monthly, or save more with a longer billing period. Every plan includes free SSL, cPanel access, free website migration and worldwide support.</p>
+            <h2>Pick your plan. Go live today.</h2>
+            <p>Every plan comes with free SSL, free migration, automatic backups and the easy Nadine Cloud control panel. Pay by mobile money or card.</p>
           </div>
           <div className="billing-toggle" role="group" aria-label="Billing period">
-            <button type="button" className="billing-opt active" data-period="mo">Monthly</button>
+            <button type="button" className="billing-opt" data-period="mo">Monthly</button>
             <button type="button" className="billing-opt" data-period="6mo">6 Months<span className="save-tag">Save 10%</span></button>
-            <button type="button" className="billing-opt" data-period="yr">1 Year<span className="save-tag">Save 15%</span></button>
+            <button type="button" className="billing-opt active" data-period="yr">1 Year<span className="save-tag">Save 15%</span></button>
             <button type="button" className="billing-opt" data-period="2yr">2 Years<span className="save-tag">Save 20%</span></button>
             <button type="button" className="billing-opt" data-period="3yr">3 Years<span className="save-tag">Save 25%</span></button>
           </div>
-          <p style={{ fontFamily: "var(--mono)", fontSize: 12.5, color: "var(--ok)", marginBottom: 24 }}>✓ Choose 1 Year, 2 Years or 3 Years billing on any plan and get a free .com domain for the first year — excludes Avara&apos;s <span className="amt-live" data-zmw="50">ZMW 50</span> first-month rate.</p>
+          <p className="v2-domain-note">✓ Pay for 1 year or more and get a <strong>free .com domain</strong> for the first year.</p>
           <div className="plans">
-            <div className="plan">
-              <div className="plan-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><circle cx={12} cy={12} r={9} /><path d="M3 12h18M12 3c3 3.5 3 14 0 18-3-4-3-14.5 0-18Z" /></svg></div>
-              <h3>Nadine Cloud — Avara</h3>
-              <div className="for">Everything you need to get started</div>
-              <div className="price"><span className="amt amt-live" data-zmw="99" data-intro-zmw="50">ZMW 50</span> <span className="per">/first month</span><small className="price-note" hidden></small></div>
-              <div className="intro-note" style={{ fontFamily: "var(--mono)", fontSize: 12, color: "var(--text-mute)", marginBottom: 10 }}>then <span className="amt-live" data-zmw="99">ZMW 99</span>/month</div>
-              <div className="price-equiv" hidden></div>
-              <div className="price-savings" hidden></div>
-              <div className="plan-stats">
-                <div><span className="n">1</span><span className="l">Website</span></div>
-                <div><span className="n">5 GB</span><span className="l">Storage</span></div>
-                <div><span className="n">25 GB</span><span className="l">Bandwidth</span></div>
-                <div><span className="n">5</span><span className="l">Email accounts</span></div>
+            {PLANS.map((p) => (
+              <div className={"plan" + (p.popular ? " featured" : "")} key={p.pkg}>
+                <div className="v2-badges"><span className="price-savings v2-save" hidden></span>{p.popular ? <span className="v2-pop">Most popular</span> : null}</div>
+                <h3>{p.name}</h3>
+                <div className="for">{p.forWho}</div>
+                <div className="price">
+                  <span className="amt amt-live" data-zmw={p.zmw} {...(p.intro ? { "data-intro-zmw": p.intro } : {})}>ZMW {p.zmw}</span> <span className="per">/month</span><small className="price-note" hidden></small>
+                </div>
+                {p.intro ? <div className="intro-note" hidden>then <span className="amt-live" data-zmw={p.zmw}>ZMW {p.zmw}</span>/month</div> : null}
+                <div className="price-equiv" hidden></div>
+                <a className="cta" href={`/checkout?type=hosting&pkg=${p.pkg}&plan=Nadine+Cloud+%E2%80%94+${p.name}&amount=${p.zmw}&period=mo`}>Get {p.name}</a>
+                <ul className="v2-key">
+                  {p.key.map((k) => <li key={k}><strong>{k}</strong></li>)}
+                </ul>
+                <div className="v2-label">Build with</div>
+                <ul className="v2-list">
+                  {p.build.map((k) => <li key={k}>{k}</li>)}
+                </ul>
+                <div className="v2-label">Also included</div>
+                <ul className="v2-list">
+                  {p.also.map((k) => <li key={k}>{k}</li>)}
+                </ul>
+                <div className="other-billing"></div>
               </div>
-              <ul>
-                <li>2 Databases</li>
-                <li>Free SSL Certificate</li>
-                <li>Automatic Backups</li>
-                <li>cPanel Control Panel</li>
-                <li>Standard Support</li>
-              </ul>
-              <a className="cta" href="/checkout?type=hosting&pkg=avara&plan=Nadine+Cloud+%E2%80%94+Avara&amount=50&period=mo">Get Avara</a>
-              <div className="other-billing"></div>
-            </div>
-            <div className="plan featured">
-              <div className="plan-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><path d="m12 2 2.9 6.3 6.9.6-5.2 4.6 1.6 6.8L12 16.9l-6.2 3.4 1.6-6.8-5.2-4.6 6.9-.6Z" /></svg></div>
-              <h3>Nadine Cloud — Elora</h3>
-              <div className="for">Our most popular plan</div>
-              <div className="price"><span className="amt amt-live" data-zmw="179">ZMW 179</span> <span className="per">/month</span><small className="price-note" hidden></small></div>
-              <div className="price-equiv" hidden></div>
-              <div className="price-savings" hidden></div>
-              <div className="plan-stats">
-                <div><span className="n">1</span><span className="l">Website</span></div>
-                <div><span className="n">10 GB</span><span className="l">Storage</span></div>
-                <div><span className="n">75 GB</span><span className="l">Bandwidth</span></div>
-                <div><span className="n">15</span><span className="l">Email accounts</span></div>
-              </div>
-              <ul>
-                <li>5 Databases</li>
-                <li>Free SSL Certificate</li>
-                <li>Automatic Backups</li>
-                <li>cPanel Control Panel</li>
-                <li>Standard Support</li>
-              </ul>
-              <a className="cta" href="/checkout?type=hosting&pkg=elora&plan=Nadine+Cloud+%E2%80%94+Elora&amount=179&period=mo">Get Elora</a>
-              <div className="other-billing"></div>
-            </div>
-            <div className="plan">
-              <div className="plan-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><path d="m12 2 9 5-9 5-9-5 9-5Z" /><path d="m3 12 9 5 9-5" /><path d="m3 17 9 5 9-5" /></svg></div>
-              <h3>Nadine Cloud — Veyra</h3>
-              <div className="for">For businesses running more than one site</div>
-              <div className="price"><span className="amt amt-live" data-zmw="299">ZMW 299</span> <span className="per">/month</span><small className="price-note" hidden></small></div>
-              <div className="price-equiv" hidden></div>
-              <div className="price-savings" hidden></div>
-              <div className="plan-stats">
-                <div><span className="n">3</span><span className="l">Websites</span></div>
-                <div><span className="n">20 GB</span><span className="l">Storage</span></div>
-                <div><span className="n">150 GB</span><span className="l">Bandwidth</span></div>
-                <div><span className="n">30</span><span className="l">Email accounts</span></div>
-              </div>
-              <ul>
-                <li>10 Databases</li>
-                <li>Sitejet Website Builder</li>
-                <li>Free SSL Certificate</li>
-                <li>Automatic Backups</li>
-                <li>Priority Support</li>
-              </ul>
-              <a className="cta" href="/checkout?type=hosting&pkg=veyra&plan=Nadine+Cloud+%E2%80%94+Veyra&amount=299&period=mo">Get Veyra</a>
-              <div className="other-billing"></div>
-            </div>
-            <div className="plan">
-              <div className="plan-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><circle cx={12} cy={8} r={6} /><path d="M9 13.5 7 22l5-3 5 3-2-8.5" /></svg></div>
-              <h3>Nadine Cloud — Zyra</h3>
-              <div className="for">Our most powerful plan</div>
-              <div className="price"><span className="amt amt-live" data-zmw="499">ZMW 499</span> <span className="per">/month</span><small className="price-note" hidden></small></div>
-              <div className="price-equiv" hidden></div>
-              <div className="price-savings" hidden></div>
-              <div className="plan-stats">
-                <div><span className="n">5</span><span className="l">Websites</span></div>
-                <div><span className="n">40 GB</span><span className="l">Storage</span></div>
-                <div><span className="n">300 GB</span><span className="l">Bandwidth</span></div>
-                <div><span className="n">50</span><span className="l">Email accounts</span></div>
-              </div>
-              <ul>
-                <li>20 Databases</li>
-                <li>Sitejet Website Builder</li>
-                <li>Free SSL Certificate</li>
-                <li>Automatic Backups</li>
-                <li>Premium Support</li>
-              </ul>
-              <a className="cta" href="/checkout?type=hosting&pkg=zyra&plan=Nadine+Cloud+%E2%80%94+Zyra&amount=499&period=mo">Get Zyra</a>
-              <div className="other-billing"></div>
-            </div>
+            ))}
           </div>
-          <p className="pricing-note">* Prices shown are the total for the selected billing period, charged once at checkout. Pay by mobile money or card (Visa / Mastercard), or ask us for a bank transfer.</p>
+          <div className="v2-allplans">
+            <div><strong>Included in every plan</strong><span>The essentials, whichever plan you choose.</span></div>
+            <ul>
+              <li>Free SSL (https)</li>
+              <li>Free website migration</li>
+              <li>Automatic backups</li>
+              <li>Easy control panel</li>
+              <li>Deploy from GitHub</li>
+              <li>Business email</li>
+            </ul>
+          </div>
+          <div className="v2-trust">
+            <div><b>Pay the way you like</b><span>Airtel Money, MTN MoMo, Zamtel Kwacha or card — in Kwacha, with no hidden fees.</span></div>
+            <div><b>Fast, secure servers</b><span>NVMe SSD cloud servers, free SSL and automatic backups on every plan.</span></div>
+            <div><b>Local support, real people</b><span>A Zambian team that answers by email — and moves your site for free.</span></div>
+          </div>
+          <p className="pricing-note">* The price shown is per month; you pay the total for the billing period you choose, once, at checkout. Pay by mobile money (Airtel, MTN, Zamtel) or card (Visa / Mastercard), or ask us for a bank transfer.</p>
         </div>
       </section>
 
-      <section className="section" id="security" style={{ background: "var(--sky)" }}>
+      <section className="section" id="choose" style={{ background: "var(--sky)" }}>
+        <div className="wrap">
+          <div className="section-head">
+            <span className="eyebrow">Help me choose</span>
+            <h2>Which plan is right for you?</h2>
+            <p>Not sure? Start small — you can upgrade anytime and keep everything.</p>
+          </div>
+          <div className="v2-choose">
+            {PLANS.map((p) => (
+              <div className="v2-choose-row" key={p.pkg}>
+                <div><b>{p.name}</b><span>{p.forWho}</span></div>
+                <div className="v2-tags">{p.bestFor.map((t) => <span key={t}>{t}</span>)}</div>
+                <a href={`#hosting`}>See {p.name}</a>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="section" id="security">
         <div className="wrap">
           <div className="section-head">
             <span className="eyebrow">Included</span>
@@ -164,18 +160,16 @@ export default function Hosting() {
           <div className="included-grid">
             <div>Free SSL Certificate</div>
             <div>Free Website Migration</div>
-            <div>cPanel Control Panel</div>
-            <div>Softaculous One-Click Installer</div>
+            <div>Easy Nadine Cloud Control Panel</div>
+            <div><a href="/deploy" style={{ color: "inherit" }}>Deploy from GitHub, automatically</a></div>
+            <div>File Manager &amp; Code Editor</div>
+            <div>One-Click Databases (MySQL)</div>
+            <div>Business Email Accounts</div>
+            <div>Domain &amp; DNS Management</div>
+            <div>Automatic Backups</div>
             <div>WordPress Ready</div>
-            <div>Daily or Weekly Backups</div>
-            <div>Malware Protection</div>
-            <div>99.9% Uptime Guarantee</div>
-            <div>Worldwide Support</div>
+            <div>Mobile Money &amp; Card Payments</div>
             <div>Fast NVMe SSD Cloud Servers</div>
-            <div><a href="/deploy" style={{ color: "inherit" }}>Git Version Control — deploy from GitHub</a></div>
-            <div>Node.js App Hosting</div>
-            <div>Sitejet Website Builder</div>
-            <div>WordPress Manager</div>
           </div>
         </div>
       </section>
@@ -248,12 +242,12 @@ export default function Hosting() {
               <p>Yes — free website migration is included on every hosting plan, whichever host you&apos;re moving from.</p>
             </details>
             <details className="faq-item" id="python">
-              <summary>Can I run a Python or Django app on my hosting?</summary>
-              <p>Yes — every hosting plan includes cPanel&apos;s Python app tool, so you can deploy a Django, Flask or other Python web app on your domain, no extra setup fee. Great for most small business apps; if you need background workers (like Celery) or a dedicated server, message us first and we&apos;ll advise on the best fit.</p>
+              <summary>Can I run a Python, Django or Node.js app?</summary>
+              <p>Our hosting plans run websites built with HTML, CSS, JavaScript and PHP — including WordPress and sites exported from website builders. Python (Django, Flask) and Node.js apps aren&apos;t included on these plans yet. Email <a href="mailto:support@nadinecloud.com">support@nadinecloud.com</a> and we&apos;ll recommend the right setup for your app.</p>
             </details>
             <details className="faq-item" id="git">
               <summary>Can I deploy my site from GitHub or GitLab?</summary>
-              <p>Yes — every hosting plan includes cPanel&apos;s Git Version Control. Point it at your repo and pull your latest code straight into your hosting account, then deploy it with one click using a <code>.cpanel.yml</code> file. Great for developers and agencies who don&apos;t want to upload files by hand. Message us if you&apos;d like help setting up automatic deploys on every push.</p>
+              <p>Yes — and it&apos;s automatic. Open your control panel, choose <strong>Deployments</strong> and paste your GitHub repository link. Your site goes live in under a minute, and every time you push to GitHub it updates by itself. You can even create a database for your site in the same step. <a href="/deploy">See how it works</a>.</p>
             </details>
             <details className="faq-item">
               <summary>What payment methods do you accept?</summary>
