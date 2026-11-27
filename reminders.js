@@ -349,13 +349,14 @@ async function checkWelcomesOnly() {
 }
 
 function startReminderScheduler() {
+  const isPrimary = () => { try { return require('./role').isPrimary(); } catch { return true; } };   // asleep on the standby server until it takes over
   setTimeout(() => {
-    sendDueReminders().catch((err) => console.error('sendDueReminders failed:', err));
+    if (isPrimary()) sendDueReminders().catch((err) => console.error('sendDueReminders failed:', err));
     setInterval(() => {
-      sendDueReminders().catch((err) => console.error('sendDueReminders failed:', err));
+      if (isPrimary()) sendDueReminders().catch((err) => console.error('sendDueReminders failed:', err));
     }, CHECK_INTERVAL_MS);
     setInterval(() => {
-      checkWelcomesOnly().catch((err) => console.error('checkWelcomesOnly failed:', err));
+      if (isPrimary()) checkWelcomesOnly().catch((err) => console.error('checkWelcomesOnly failed:', err));
     }, WELCOME_CHECK_MS);
   }, FIRST_RUN_DELAY_MS);
 }

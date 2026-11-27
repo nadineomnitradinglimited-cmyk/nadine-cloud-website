@@ -1244,7 +1244,7 @@ async function sweepPendingPayments() {
     }
   }
 }
-setInterval(() => { sweepPendingPayments().catch(() => {}); }, SWEEP_EVERY_MS).unref();
+setInterval(() => { if ((() => { try { return require('./role').isPrimary(); } catch { return true; } })()) sweepPendingPayments().catch(() => {}); }, SWEEP_EVERY_MS).unref();
 
 // ---- "Pay now" bar on a hand-hosted client's own admin screen ----
 // The client's admin page loads  <script src="https://www.nadinecloud.com/api/billing-bar.js?client=MAN-…" defer>

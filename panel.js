@@ -256,7 +256,7 @@ async function autoDeploySweep() {
     }
   } catch (e) { console.error('panel auto-deploy sweep:', e.message); } finally { sweeping = false; }
 }
-setInterval(() => { autoDeploySweep(); }, DEPLOY_EVERY_MS).unref();
+setInterval(() => { if ((() => { try { return require('./role').isPrimary(); } catch { return true; } })()) autoDeploySweep(); }, DEPLOY_EVERY_MS).unref();
 
 // =====================================================================================================
 // "No cPanel" tools: everything a client would otherwise open cPanel for, done through the API.
